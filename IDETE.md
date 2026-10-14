@@ -1,77 +1,43 @@
-# Tri idetë për aplikacionin mobil
+# Idetë për aplikacione mobile
 
-## Ideja A – BarberBook (Ideja kryesore)
+## Ideja A – BarberBook
 
-**Emri:** BarberBook
+Aplikacion mobil për menaxhimin e termineve në një berberhane.
 
-**Përshkrimi:** Një aplikacion mobil për berberhane që u mundëson klientëve të shikojnë shërbimet, të zgjedhin berberin e preferuar dhe të rezervojnë termine online.
-
-**Problemi që zgjidh:** Klientët nuk kanë nevojë të telefonojnë ose të dërgojnë mesazhe për të rezervuar një termin. Berberhanet mund t'i organizojnë më lehtë rezervimet dhe orarin e punës.
-
-**Përdoruesit e synuar:** Klientët dhe pronarët e berberhaneve.
-
-**Funksionalitetet kryesore:**
-
-- Regjistrimi dhe kyçja e përdoruesve.
-- Shfaqja e shërbimeve dhe çmimeve.
-- Profilet e berberëve dhe galeria e modeleve të flokëve.
-- Rezervimi, ndryshimi dhe anulimi i termineve.
-- Kalendari i termineve dhe orari i punës.
-- Njoftimet për rezervimet e ardhshme.
-- Historia e rezervimeve të klientit.
-- Paneli i menaxhimit për pronarin e berberhanes.
-
-**Qëllimi afatgjatë:** Zhvillimi i një aplikacioni profesional që mund t'u ofrohet berberhaneve si shërbim me pagesë.
+- Regjistrimi dhe menaxhimi i termineve.
+- Informacionet për klientët dhe shërbimet.
+- Konfirmimi i termineve.
+- Mundësia për zgjerim me databazë dhe llogari përdoruesish.
 
 ## Ideja B – OutfitIQ
 
-**Përshkrimi:** Një aplikacion që u mundëson përdoruesve të fotografojnë rrobat e tyre dhe të krijojnë kombinime të ndryshme veshjesh.
+Aplikacion mobil për organizimin e veshjeve dhe krijimin e kombinimeve të ndryshme.
 
-**Problemi që zgjidh:** Ndihmon përdoruesit të organizojnë gardërobën dhe të zgjedhin kombinime pa blerë vazhdimisht rroba të reja.
+- Gardërobë digjitale me fotografi të rrobave.
+- Sugjerime për kombinime veshjesh.
+- Organizimi i rrobave sipas kategorive dhe ngjyrave.
 
-**Përdoruesit e synuar:** Personat që dëshirojnë të organizojnë gardërobën dhe të përmirësojnë stilin e tyre.
+**Çfarë pyeta AI-në:** Të propozojë ide për një aplikacion mobil që ndihmon në organizimin e veshjeve.
 
-**Funksionalitetet kryesore:**
-
-- Gardërobë digjitale me fotografi.
-- Krijimi i kombinimeve të veshjeve.
-- Kategorizimi i rrobave.
-- Sugjerime për kombinime sipas rastit dhe motit.
-
-**Çfarë pyeta AI:** Të propozojë ide për një aplikacion mobil që ndihmon në organizimin e veshjeve.
-
-**Çfarë mbajta nga përgjigjja e AI:** Konceptin e gardërobës digjitale dhe sugjerimet për kombinime.
+**Çfarë mbajta nga përgjigjja e AI-së:** Konceptin e gardërobës digjitale dhe sugjerimet për kombinime.
 
 ## Ideja C – StudyPlanner
 
-**Përshkrimi:** Një aplikacion për studentët që i ndihmon të organizojnë detyrat, provimet dhe orarin e studimit.
+Aplikacion mobil për organizimin e mësimit dhe detyrave universitare.
 
-**Problemi që zgjidh:** Ndihmon në menaxhimin e kohës dhe në shmangien e harrimit të afateve akademike.
-
-**Përdoruesit e synuar:** Studentët dhe nxënësit.
-
-**Funksionalitetet kryesore:**
-
-- Shtimi i detyrave dhe afateve.
-- Kalendari akademik.
-- Përkujtues për provime.
+- Planifikimi i orarit të mësimit.
+- Regjistrimi i detyrave dhe afateve.
+- Njoftime për provime dhe detyra.
 - Ndjekja e progresit të studimit.
 
-## Ideja D – ExpenseTracker
+## Përdorimi i AI-së gjatë zhvillimit
 
-**Përshkrimi:** Një aplikacion mobil për regjistrimin dhe analizimin e shpenzimeve personale.
+**Hapi B – Komponenti**
 
-**Problemi që zgjidh:** Ndihmon përdoruesit të kuptojnë se ku i shpenzojnë paratë dhe të menaxhojnë buxhetin.
+- **Çfarë pyeta AI-në:** Si të krijoja një komponent React Native me `type Props`, me fusha të tipizuara, dhe si ta përdorja tri herë me të dhëna të ndryshme.
+- **Çfarë mbajta nga përgjigjja e AI-së:** Strukturën e komponentit `KartaTerminit`, tipizimin e pronave dhe tri përdorimet me të dhëna provuese.
 
-**Përdoruesit e synuar:** Studentët dhe personat që dëshirojnë të kontrollojnë financat personale.
+**Hapi D – Ndërveprimi me `useState`**
 
-**Funksionalitetet kryesore:**
-
-- Regjistrimi i të ardhurave dhe shpenzimeve.
-- Kategorizimi i transaksioneve.
-- Vendosja e buxhetit mujor.
-- Statistikat dhe raportet e shpenzimeve.
-
-**Çfarë pyeta AI:** Të propozojë ide për një aplikacion mobil për menaxhimin e financave personale.
-
-**Çfarë mbajta nga përgjigjja e AI:** Kategorizimin e shpenzimeve, buxhetin mujor dhe raportet statistikore.
+- **Çfarë pyeta AI-në:** Si të përdorja `useState` për ta bërë kartën interaktive dhe për ta ndryshuar statusin e terminit pas shtypjes së butonit.
+- **Çfarë mbajta nga përgjigjja e AI-së:** Gjendjen `statusiAktual`, funksionin `setStatusiAktual` dhe shfaqjen e kushtëzuar të butonit “Konfirmo terminin”.
