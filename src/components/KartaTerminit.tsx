@@ -1,4 +1,11 @@
-import { StyleSheet, Text, View } from "react-native";
+
+import { useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
 type Props = {
   klienti: string;
@@ -13,12 +20,29 @@ export default function KartaTerminit({
   ora,
   statusi,
 }: Props) {
+  const [statusiAktual, setStatusiAktual] = useState(statusi);
+
   return (
     <View style={styles.card}>
       <Text style={styles.klienti}>{klienti}</Text>
+
       <Text style={styles.info}>Shërbimi: {sherbimi}</Text>
       <Text style={styles.info}>Ora: {ora}</Text>
-      <Text style={styles.status}>Statusi: {statusi}</Text>
+
+      <Text style={styles.status}>
+        Statusi: {statusiAktual}
+      </Text>
+
+      {statusiAktual === "Në pritje" && (
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => setStatusiAktual("Konfirmuar")}
+        >
+          <Text style={styles.buttonText}>
+            Konfirmo terminin
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -48,4 +72,17 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginTop: 4,
   },
+  button: {
+    backgroundColor: "#F0B35A",
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 12,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#111111",
+    fontWeight: "bold",
+    fontSize: 14,
+  },
 });
+
