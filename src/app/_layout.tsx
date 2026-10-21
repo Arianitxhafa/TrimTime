@@ -1,28 +1,25 @@
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { AuthProvider, useAuth } from "../context/AuthContext";
+import { PreferencatProvider, usePreferencat } from "../context/PreferencatContext";
 import { TemaProvider, useTema } from "../context/TemaContext";
 import { TerminetProvider } from "../context/TerminetContext";
-import { ngarkoGjuhenERuajtur } from "../i18n";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
-  const [gati, setGati] = useState(false);
-
-  useEffect(() => {
-    ngarkoGjuhenERuajtur().finally(() => setGati(true));
-  }, []);
-
-  if (!gati) return null;
-
   return (
     <TemaProvider>
-      <TerminetProvider>
-        <Navigimi />
-      </TerminetProvider>
+      <PreferencatProvider>
+        <AuthProvider>
+          <TerminetProvider>
+            <Navigimi />
+          </TerminetProvider>
+        </AuthProvider>
+      </PreferencatProvider>
     </TemaProvider>
   );
 }
@@ -30,11 +27,20 @@ export default function RootLayout() {
 function Navigimi() {
   const { t } = useTranslation();
   const { ngjyrat, eshteErret } = useTema();
+  const { sesioni, ngarkohet } = useAuth();
+  const { modi, onboardingIPare } = usePreferencat();
 
   useEffect(() => {
-    SplashScreen.hideAsync().catch(() => {});
-  }, []);
+    if (!ngarkohet) SplashScreen.hideAsync().catch(() => {});
+  }, [ngarkohet]);
 
+  // Splash screen-i mbetet derisa të dihet nëse përdoruesi ka hyrë.
+  if (ngarkohet) return null;
+
+  const kaHyre = sesioni !== null;
+
+  // Stack.Protected fsheh ekranet që nuk lejohen. Kur një kusht ndryshon (p.sh. pas
+  // hyrjes ose ndërrimit të modit), Expo Router kalon vetë te ekrani i parë i lejuar.
   return (
     <>
       <StatusBar style={eshteErret ? "light" : "dark"} />
@@ -48,10 +54,29 @@ function Navigimi() {
           contentStyle: { backgroundColor: ngjyrat.sfondi },
         }}
       >
-        <Stack.Screen name="index" options={{ headerShown: false, title: "Terminet" }} />
-        <Stack.Screen name="termini/[id]" options={{ title: "Detajet e terminit" }} />
-        <Stack.Screen name="shto" options={{ title: "Termin i ri", presentation: "modal" }} />
-        <Stack.Screen name="cilesimet" options={{ title: t("cilesimet.titulli") }} />
+        <Stack.Protected guard={!onboardingIPare}>
+          <Stack.Screen name="onboarding" options={{ headerShown: false, animation: "fade" }} />
+        </Stack.Protected>
+
+        <Stack.Protected guard={onboardingIPare && !kaHyre}>
+          <Stack.Screen name="(auth)" options={{ headerShown: false, animation: "fade" }} />
+        </Stack.Protected>
+
+        <Stack.Protected guard={onboardingIPare && kaHyre}>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+
+          <Stack.Protected guard={modi === "klient"}>
+            <Stack.Screen name="(klient)" options={{ headerShown: false, animation: "fade" }} />
+          </Stack.Protected>
+
+          <Stack.Protected guard={modi === "biznes"}>
+            <Stack.Screen name="(biznes)" options={{ headerShown: false, animation: "fade" }} />
+            <Stack.Screen name="termini/[id]" options={{ title: "Detajet e terminit" }} />
+            <Stack.Screen name="shto" options={{ title: "Termin i ri", presentation: "modal" }} />
+          </Stack.Protected>
+
+          <Stack.Screen name="cilesimet" options={{ title: t("cilesimet.titulli") }} />
+        </Stack.Protected>
       </Stack>
     </>
   );

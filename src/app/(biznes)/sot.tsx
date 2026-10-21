@@ -2,13 +2,13 @@ import { router } from "expo-router";
 import { useMemo, useState } from "react";
 import { FlatList, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Butoni from "../components/Butoni";
-import Ikona, { ikonat } from "../components/Ikona";
-import KartaTerminit from "../components/KartaTerminit";
-import { useTerminet } from "../context/TerminetContext";
-import { gjejSherbimin, statuset, type StatusiTerminit } from "../data/terminet";
-import { useStilet, useTema } from "../context/TemaContext";
-import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import Butoni from "../../components/Butoni";
+import Ikona, { ikonat } from "../../components/Ikona";
+import KartaTerminit from "../../components/KartaTerminit";
+import { useTerminet } from "../../context/TerminetContext";
+import { gjejSherbimin, statuset, type StatusiTerminit } from "../../data/terminet";
+import { useStilet, useTema } from "../../context/TemaContext";
+import { hapesira, rrezja, type Ngjyrat } from "../../theme";
 
 type Filtri = "Të gjitha" | StatusiTerminit;
 
@@ -27,7 +27,7 @@ function hapTerminin(id: string) {
   router.push({ pathname: "/termini/[id]", params: { id } });
 }
 
-export default function Index() {
+export default function Sot() {
   const insets = useSafeAreaInsets();
   const { ngjyrat, statusetMeta } = useTema();
   const styles = useStilet(krijoStilet);
@@ -185,7 +185,7 @@ export default function Index() {
       style={styles.container}
       contentContainerStyle={[
         styles.lista,
-        { paddingTop: insets.top + hapesira.lg, paddingBottom: insets.bottom + hapesira.xxl },
+        { paddingTop: insets.top + hapesira.lg, paddingBottom: hapesira.xxl },
       ]}
       data={teFiltruara}
       keyExtractor={(item) => item.id}
