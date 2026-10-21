@@ -41,4 +41,8 @@ export const ikonat = {
   kohezgjatja: { ios: "hourglass", android: "timer" },
   bosh: { ios: "tray", android: "inbox" },
   personi: { ios: "person.fill", android: "person" },
+  cilesimet: { ios: "gearshape.fill", android: "settings" },
+  dielli: { ios: "sun.max.fill", android: "light_mode" },
+  hena: { ios: "moon.fill", android: "dark_mode" },
+  pajisja: { ios: "iphone", android: "smartphone" },
 } satisfies Record<string, EmriIkones>;

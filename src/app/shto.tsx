@@ -15,7 +15,8 @@ import Butoni from "../components/Butoni";
 import { ikonat } from "../components/Ikona";
 import { useTerminet } from "../context/TerminetContext";
 import { oraretEPunes, sherbimet } from "../data/terminet";
-import { hapesira, ngjyrat, rrezja } from "../theme";
+import { useStilet, useTema } from "../context/TemaContext";
+import { hapesira, rrezja, type Ngjyrat } from "../theme";
 
 function kthehu() {
   if (router.canGoBack()) {
@@ -27,6 +28,8 @@ function kthehu() {
 
 export default function ShtoTermin() {
   const insets = useSafeAreaInsets();
+  const { ngjyrat } = useTema();
+  const styles = useStilet(krijoStilet);
   const { terminet, shtoTermin } = useTerminet();
 
   const [klienti, setKlienti] = useState("");
@@ -184,6 +187,7 @@ type FushaProps = {
 };
 
 function Fusha({ etiketa, gabimi, children }: FushaProps) {
+  const styles = useStilet(krijoStilet);
   return (
     <View style={styles.fusha}>
       <Text style={styles.etiketa}>{etiketa}</Text>
@@ -193,7 +197,8 @@ function Fusha({ etiketa, gabimi, children }: FushaProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const krijoStilet = (ngjyrat: Ngjyrat) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ngjyrat.sfondi,

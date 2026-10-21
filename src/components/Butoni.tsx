@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from "react-native";
-import { ngjyrat, rrezja } from "../theme";
+import { useTema } from "../context/TemaContext";
+import { rrezja, type Ngjyrat } from "../theme";
 import Ikona, { type EmriIkones } from "./Ikona";
 
 type Varianti = "kryesor" | "dytesor" | "rrezik";
@@ -13,11 +14,19 @@ type Props = {
   style?: StyleProp<ViewStyle>;
 };
 
-const stilet: Record<Varianti, { sfondi: string; teksti: string; kufiri: string }> = {
-  kryesor: { sfondi: ngjyrat.ari, teksti: ngjyrat.mbiAri, kufiri: ngjyrat.ari },
-  dytesor: { sfondi: ngjyrat.siperfaqja2, teksti: ngjyrat.teksti, kufiri: ngjyrat.kufiri },
-  rrezik: { sfondi: ngjyrat.rrezikSfond, teksti: ngjyrat.rrezik, kufiri: "#4A1E25" },
-};
+function ngjyratEVariantit(
+  ngjyrat: Ngjyrat,
+  varianti: Varianti,
+): { sfondi: string; teksti: string; kufiri: string } {
+  switch (varianti) {
+    case "kryesor":
+      return { sfondi: ngjyrat.ari, teksti: ngjyrat.mbiAri, kufiri: ngjyrat.ari };
+    case "dytesor":
+      return { sfondi: ngjyrat.siperfaqja2, teksti: ngjyrat.teksti, kufiri: ngjyrat.kufiri };
+    case "rrezik":
+      return { sfondi: ngjyrat.rrezikSfond, teksti: ngjyrat.rrezik, kufiri: ngjyrat.rrezikKufiri };
+  }
+}
 
 export default function Butoni({
   titulli,
@@ -27,7 +36,8 @@ export default function Butoni({
   joAktiv = false,
   style,
 }: Props) {
-  const s = stilet[varianti];
+  const { ngjyrat } = useTema();
+  const s = ngjyratEVariantit(ngjyrat, varianti);
 
   return (
     <Pressable

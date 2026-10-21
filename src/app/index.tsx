@@ -7,7 +7,8 @@ import Ikona, { ikonat } from "../components/Ikona";
 import KartaTerminit from "../components/KartaTerminit";
 import { useTerminet } from "../context/TerminetContext";
 import { gjejSherbimin, statuset, type StatusiTerminit } from "../data/terminet";
-import { hapesira, ngjyrat, rrezja, statusetMeta } from "../theme";
+import { useStilet, useTema } from "../context/TemaContext";
+import { hapesira, rrezja, type Ngjyrat } from "../theme";
 
 type Filtri = "Të gjitha" | StatusiTerminit;
 
@@ -28,6 +29,8 @@ function hapTerminin(id: string) {
 
 export default function Index() {
   const insets = useSafeAreaInsets();
+  const { ngjyrat, statusetMeta } = useTema();
+  const styles = useStilet(krijoStilet);
   const { terminet } = useTerminet();
   const [filtri, setFiltri] = useState<Filtri>("Të gjitha");
   const [kerkimi, setKerkimi] = useState("");
@@ -58,14 +61,24 @@ export default function Index() {
           <Text style={styles.data}>{dataESotme()}</Text>
           <Text style={styles.titulli}>TrimTime</Text>
         </View>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel="Shto termin të ri"
-          onPress={() => router.push("/shto")}
-          style={({ pressed }) => [styles.butoniShto, pressed && styles.shtypur]}
-        >
-          <Ikona emri={ikonat.shto} madhesia={22} ngjyra={ngjyrat.mbiAri} />
-        </Pressable>
+        <View style={styles.kokaButonat}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Cilësimet"
+            onPress={() => router.push("/cilesimet")}
+            style={({ pressed }) => [styles.butoniCilesimet, pressed && styles.shtypur]}
+          >
+            <Ikona emri={ikonat.cilesimet} madhesia={20} ngjyra={ngjyrat.teksti} />
+          </Pressable>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Shto termin të ri"
+            onPress={() => router.push("/shto")}
+            style={({ pressed }) => [styles.butoniShto, pressed && styles.shtypur]}
+          >
+            <Ikona emri={ikonat.shto} madhesia={22} ngjyra={ngjyrat.mbiAri} />
+          </Pressable>
+        </View>
       </View>
 
       {iRadhes ? (
@@ -220,6 +233,7 @@ type StatistikaProps = {
 };
 
 function Statistika({ etiketa, vlera, ngjyra, aktiv, onPress }: StatistikaProps) {
+  const styles = useStilet(krijoStilet);
   return (
     <Pressable
       accessibilityRole="button"
@@ -238,7 +252,8 @@ function Statistika({ etiketa, vlera, ngjyra, aktiv, onPress }: StatistikaProps)
   );
 }
 
-const styles = StyleSheet.create({
+const krijoStilet = (ngjyrat: Ngjyrat) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ngjyrat.sfondi,
@@ -269,6 +284,20 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "800",
     letterSpacing: -0.5,
+  },
+  kokaButonat: {
+    flexDirection: "row",
+    gap: hapesira.sm,
+  },
+  butoniCilesimet: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: ngjyrat.siperfaqja,
+    borderWidth: 1,
+    borderColor: ngjyrat.kufiri,
+    alignItems: "center",
+    justifyContent: "center",
   },
   butoniShto: {
     width: 48,

@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { gjejSherbimin, type Termini } from "../data/terminet";
-import { hapesira, ngjyrat, rrezja, statusetMeta } from "../theme";
+import { useStilet, useTema } from "../context/TemaContext";
+import { hapesira, rrezja, type Ngjyrat } from "../theme";
 import Avatar from "./Avatar";
 import BadgeStatusi from "./BadgeStatusi";
 import Ikona, { ikonat } from "./Ikona";
@@ -11,6 +12,8 @@ type Props = {
 };
 
 export default function KartaTerminit({ termini, onPress }: Props) {
+  const { ngjyrat, statusetMeta } = useTema();
+  const styles = useStilet(krijoStilet);
   const sherbimi = gjejSherbimin(termini.sherbimi);
   const meta = statusetMeta[termini.statusi];
   const eZbehur = termini.statusi === "Përfunduar" || termini.statusi === "Anuluar";
@@ -57,7 +60,8 @@ export default function KartaTerminit({ termini, onPress }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const krijoStilet = (ngjyrat: Ngjyrat) =>
+  StyleSheet.create({
   karta: {
     flexDirection: "row",
     backgroundColor: ngjyrat.siperfaqja,

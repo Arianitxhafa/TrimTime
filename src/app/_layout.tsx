@@ -1,12 +1,24 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { TemaProvider, useTema } from "../context/TemaContext";
 import { TerminetProvider } from "../context/TerminetContext";
-import { ngjyrat } from "../theme";
 
 export default function RootLayout() {
   return (
-    <TerminetProvider>
-      <StatusBar style="light" />
+    <TemaProvider>
+      <TerminetProvider>
+        <Navigimi />
+      </TerminetProvider>
+    </TemaProvider>
+  );
+}
+
+function Navigimi() {
+  const { ngjyrat, eshteErret } = useTema();
+
+  return (
+    <>
+      <StatusBar style={eshteErret ? "light" : "dark"} />
       <Stack
         screenOptions={{
           headerStyle: { backgroundColor: ngjyrat.sfondi },
@@ -20,7 +32,8 @@ export default function RootLayout() {
         <Stack.Screen name="index" options={{ headerShown: false, title: "Terminet" }} />
         <Stack.Screen name="termini/[id]" options={{ title: "Detajet e terminit" }} />
         <Stack.Screen name="shto" options={{ title: "Termin i ri", presentation: "modal" }} />
+        <Stack.Screen name="cilesimet" options={{ title: "Cilësimet" }} />
       </Stack>
-    </TerminetProvider>
+    </>
   );
 }

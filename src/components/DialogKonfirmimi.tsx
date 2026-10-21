@@ -1,5 +1,6 @@
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
-import { hapesira, ngjyrat, rrezja } from "../theme";
+import { useStilet } from "../context/TemaContext";
+import { hapesira, rrezja, type Ngjyrat } from "../theme";
 import Butoni from "./Butoni";
 
 type Props = {
@@ -22,6 +23,7 @@ export default function DialogKonfirmimi({
   onKonfirmo,
   onAnulo,
 }: Props) {
+  const styles = useStilet(krijoStilet);
   return (
     <Modal visible={iDukshem} transparent animationType="fade" onRequestClose={onAnulo}>
       <View style={styles.mbulesa}>
@@ -44,10 +46,11 @@ export default function DialogKonfirmimi({
   );
 }
 
-const styles = StyleSheet.create({
+const krijoStilet = (ngjyrat: Ngjyrat) =>
+  StyleSheet.create({
   mbulesa: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.7)",
+    backgroundColor: ngjyrat.mbulesa,
     justifyContent: "center",
     padding: hapesira.xl,
   },

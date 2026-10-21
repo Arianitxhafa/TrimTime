@@ -1,8 +1,11 @@
 import { StyleSheet, Text, View } from "react-native";
 import type { StatusiTerminit } from "../data/terminet";
-import { rrezja, statusetMeta } from "../theme";
+import { useStilet, useTema } from "../context/TemaContext";
+import { rrezja, type Ngjyrat } from "../theme";
 
 export default function BadgeStatusi({ statusi }: { statusi: StatusiTerminit }) {
+  const { statusetMeta } = useTema();
+  const styles = useStilet(krijoStilet);
   const meta = statusetMeta[statusi];
 
   return (
@@ -13,7 +16,8 @@ export default function BadgeStatusi({ statusi }: { statusi: StatusiTerminit }) 
   );
 }
 
-const styles = StyleSheet.create({
+const krijoStilet = (ngjyrat: Ngjyrat) =>
+  StyleSheet.create({
   badge: {
     flexDirection: "row",
     alignItems: "center",

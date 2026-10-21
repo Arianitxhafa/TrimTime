@@ -9,7 +9,8 @@ import DialogKonfirmimi from "../../components/DialogKonfirmimi";
 import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
 import { useTerminet } from "../../context/TerminetContext";
 import { gjejSherbimin } from "../../data/terminet";
-import { hapesira, ngjyrat, rrezja } from "../../theme";
+import { useStilet, useTema } from "../../context/TemaContext";
+import { hapesira, rrezja, type Ngjyrat } from "../../theme";
 
 type Dialogu = "anulo" | "fshi" | null;
 
@@ -24,6 +25,8 @@ function kthehu() {
 export default function DetajetTerminit() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const insets = useSafeAreaInsets();
+  const { ngjyrat } = useTema();
+  const styles = useStilet(krijoStilet);
   const { terminet, ndryshoStatusin, fshiTermin } = useTerminet();
   const [dialogu, setDialogu] = useState<Dialogu>(null);
 
@@ -186,6 +189,8 @@ type InfoProps = {
 };
 
 function Info({ ikona, etiketa, vlera, gjere = false }: InfoProps) {
+  const { ngjyrat } = useTema();
+  const styles = useStilet(krijoStilet);
   return (
     <View style={[styles.info, gjere && styles.infoGjere]}>
       <View style={styles.infoIkona}>
@@ -199,7 +204,8 @@ function Info({ ikona, etiketa, vlera, gjere = false }: InfoProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const krijoStilet = (ngjyrat: Ngjyrat) =>
+  StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: ngjyrat.sfondi,
