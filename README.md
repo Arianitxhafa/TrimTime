@@ -16,10 +16,16 @@ The project is being developed as part of a university Mobile Applications cours
 - **Protected navigation** — Screens are only reachable when allowed (onboarding → sign in → tabs), using Expo Router `Stack.Protected`.
 - **Dark & light mode** — Follows the phone, or can be set to light or dark in Settings. The choice is remembered.
 - **Albanian & English** — Albanian is the default; the language follows the phone or can be changed in Settings.
+- **Shop setup (business)** — A 4-step wizard: details, location picked on a map (address filled in automatically), weekly hours with lunch breaks, and first services.
+- **Shop management** — Edit details, cover photo and logo (Supabase Storage), hours, services (price, duration, hide/delete) and staff. Publish the shop when it has services and hours.
+- **Staff invites** — The owner creates an 8-character code; a barber enters it to join the shop.
+- **Discover (client)** — Nearby published shops ranked by distance or price, with search (shop, service or city) and “Open now” / price filters. Falls back to Prishtina without location permission.
+- **Map (client)** — Shops on a map with price markers and “Search this area” (phone only; react-native-maps doesn’t run on web).
+- **Shop profile** — Cover, open/closed status in the shop’s time zone, call, directions, services, barbers, weekly hours and description.
 - **Appointments (business “Today” tab)** — Appointment list, filters, search, details, confirm/complete/cancel and a new-appointment form (still local sample data).
 - **Database foundation** — Supabase/Postgres schema with Row Level Security and database-level protection against double bookings.
 
-> **Development status:** Phase 1 (foundation) of 7. Discover, Map, Bookings, Calendar, Clients and Shop tabs show a “Coming soon” screen until their phase is built.
+> **Development status:** Phase 2 of 7 done. Online booking (Phase 3) and the Bookings, Calendar and Clients tabs are still to come.
 
 ---
 
@@ -74,7 +80,7 @@ npm install
 ### 4. Configure Supabase
 
 1. Copy `.env.example` to `.env` and fill in the **Project URL** and the **publishable (anon) key** from Supabase → Project Settings → API Keys. Never put a secret / `service_role` key in the app.
-2. In Supabase → **SQL Editor**, paste the contents of `supabase/migrations/20261021120000_themeli.sql` and click **Run** (once per project).
+2. In Supabase → **SQL Editor**, run each file in `supabase/migrations/` **in order** (once per project): `20261021120000_themeli.sql`, then `20261022090000_lokalet_dhe_zbulimi.sql`.
 3. Optional during development: Authentication → Sign In / Providers → Email → turn off **Confirm email**, so new accounts can sign in immediately.
 
 ### 5. Start the Development Server
@@ -109,13 +115,19 @@ src/
 │   ├── (auth)/             # hyrja (sign in), regjistrimi (sign up)
 │   ├── (klient)/           # Client tabs: zbulo, harta, terminet-e-mia, profili
 │   ├── (biznes)/           # Business tabs: sot, kalendari, klientet, lokali, llogaria
+│   ├── lokali-i-ri.tsx     # New shop wizard
+│   ├── lokali/[id].tsx     # Public shop profile
+│   ├── menaxho/            # Shop management: info, orari, sherbimet, sherbimi, stafi
+│   ├── bashkohu.tsx        # Join a shop with an invite code
 │   ├── termini/[id].tsx    # Appointment details
 │   ├── shto.tsx            # New appointment
 │   └── cilesimet.tsx       # Settings (theme, language)
+├── api/                    # React Query hooks (shops, services, hours, staff)
 ├── components/             # Reusable UI (Butoni, FushaTekstit, KartaTerminit, …)
 ├── context/                # Tema, Preferencat, Auth, Terminet
 ├── i18n/                   # sq.ts (default), en.ts
-├── lib/                    # Supabase client and helpers
+├── hooks/                  # useVendndodhjaIme (location), useVonesa (debounce)
+├── lib/                    # Supabase client, types, formatting, location helpers
 └── theme/                  # Light/dark palettes, spacing, radii
 supabase/migrations/        # SQL migrations (run in order)
 ```
@@ -151,8 +163,8 @@ This approach demonstrates how TypeScript union types can restrict accepted valu
 | Phase | Scope | Status |
 | --- | --- | --- |
 | 1 · Foundation | Design system, dark/light mode, i18n, Supabase, auth, role-based navigation, onboarding | ✅ Done |
-| 2 · Shops & Discovery | Shop setup wizard, services, staff, map, search & filters, shop profile | ⏳ Next |
-| 3 · Booking Engine | Available slots, booking flow, cancel/reschedule, realtime, reminders | |
+| 2 · Shops & Discovery | Shop setup wizard, services, staff, map, search & filters, shop profile | ✅ Done |
+| 3 · Booking Engine | Available slots, booking flow, cancel/reschedule, realtime, reminders | ⏳ Next |
 | 4 · Business Tools | Calendar, bookings inbox, walk-ins, client CRM, analytics | |
 | 5 · Payments & Growth | Stripe, reviews, loyalty, promotions, subscriptions | |
 | 6 · AI Assistant | In-app assistant for barbers and clients | |
