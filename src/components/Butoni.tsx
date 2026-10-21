@@ -1,0 +1,74 @@
+import { Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from "react-native";
+import { ngjyrat, rrezja } from "../theme";
+import Ikona, { type EmriIkones } from "./Ikona";
+
+type Varianti = "kryesor" | "dytesor" | "rrezik";
+
+type Props = {
+  titulli: string;
+  onPress: () => void;
+  varianti?: Varianti;
+  ikona?: EmriIkones;
+  joAktiv?: boolean;
+  style?: StyleProp<ViewStyle>;
+};
+
+const stilet: Record<Varianti, { sfondi: string; teksti: string; kufiri: string }> = {
+  kryesor: { sfondi: ngjyrat.ari, teksti: ngjyrat.mbiAri, kufiri: ngjyrat.ari },
+  dytesor: { sfondi: ngjyrat.siperfaqja2, teksti: ngjyrat.teksti, kufiri: ngjyrat.kufiri },
+  rrezik: { sfondi: ngjyrat.rrezikSfond, teksti: ngjyrat.rrezik, kufiri: "#4A1E25" },
+};
+
+export default function Butoni({
+  titulli,
+  onPress,
+  varianti = "kryesor",
+  ikona,
+  joAktiv = false,
+  style,
+}: Props) {
+  const s = stilet[varianti];
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ disabled: joAktiv }}
+      disabled={joAktiv}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.butoni,
+        { backgroundColor: s.sfondi, borderColor: s.kufiri },
+        pressed && styles.shtypur,
+        joAktiv && styles.joAktiv,
+        style,
+      ]}
+    >
+      {ikona && <Ikona emri={ikona} madhesia={18} ngjyra={s.teksti} />}
+      <Text style={[styles.teksti, { color: s.teksti }]}>{titulli}</Text>
+    </Pressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  butoni: {
+    minHeight: 52,
+    paddingHorizontal: 18,
+    borderRadius: rrezja.md,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  shtypur: {
+    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
+  },
+  joAktiv: {
+    opacity: 0.4,
+  },
+  teksti: {
+    fontSize: 15,
+    fontWeight: "700",
+  },
+});

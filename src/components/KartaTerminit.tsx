@@ -1,78 +1,133 @@
-import { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { gjejSherbimin, type Termini } from "../data/terminet";
+import { hapesira, ngjyrat, rrezja, statusetMeta } from "../theme";
+import Avatar from "./Avatar";
+import BadgeStatusi from "./BadgeStatusi";
+import Ikona, { ikonat } from "./Ikona";
 
 type Props = {
-  klienti: string;
-  sherbimi: string;
-  ora: string;
-  statusi: "Në pritje" | "Konfirmuar" | "Përfunduar";
+  termini: Termini;
+  onPress: () => void;
 };
 
-export default function KartaTerminit({
-  klienti,
-  sherbimi,
-  ora,
-  statusi,
-}: Props) {
-  const [statusiAktual, setStatusiAktual] = useState(statusi);
+export default function KartaTerminit({ termini, onPress }: Props) {
+  const sherbimi = gjejSherbimin(termini.sherbimi);
+  const meta = statusetMeta[termini.statusi];
+  const eZbehur = termini.statusi === "Përfunduar" || termini.statusi === "Anuluar";
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.klienti}>{klienti}</Text>
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={`Termini i ${termini.klienti} në orën ${termini.ora}`}
+      onPress={onPress}
+      style={({ pressed }) => [styles.karta, pressed && styles.shtypur]}
+    >
+      <View style={styles.kolonaOres}>
+        <Text style={[styles.ora, eZbehur && styles.zbehur]}>{termini.ora}</Text>
+        <View style={[styles.vija, { backgroundColor: meta.ngjyra }]} />
+      </View>
 
-      <Text style={styles.info}>Shërbimi: {sherbimi}</Text>
+      <View style={styles.permbajtja}>
+        <View style={styles.rreshtiSiper}>
+          <Avatar emri={termini.klienti} madhesia={40} />
+          <View style={styles.emriKolona}>
+            <Text style={[styles.klienti, eZbehur && styles.zbehur]} numberOfLines={1}>
+              {termini.klienti}
+            </Text>
+            <View style={styles.rreshtiInfo}>
+              <Ikona emri={ikonat.gershere} madhesia={13} ngjyra={ngjyrat.tekstiDyte} />
+              <Text style={styles.info} numberOfLines={1}>
+                {termini.sherbimi}
+              </Text>
+            </View>
+          </View>
+          <Ikona emri={ikonat.djathtas} madhesia={18} ngjyra={ngjyrat.tekstiZbehte} />
+        </View>
 
-      <Text style={styles.info}>Ora: {ora}</Text>
-
-      <Text style={styles.status}>Statusi: {statusiAktual}</Text>
-
-      {statusiAktual === "Në pritje" && (
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => setStatusiAktual("Konfirmuar")}
-        >
-          <Text style={styles.buttonText}>Konfirmo terminin</Text>
-        </TouchableOpacity>
-      )}
-    </View>
+        <View style={styles.rreshtiPoshte}>
+          <BadgeStatusi statusi={termini.statusi} />
+          {sherbimi && (
+            <Text style={styles.detaje}>
+              {sherbimi.kohezgjatja} min · €{sherbimi.cmimi}
+            </Text>
+          )}
+        </View>
+      </View>
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: "#202020",
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    width: "100%",
+  karta: {
+    flexDirection: "row",
+    backgroundColor: ngjyrat.siperfaqja,
+    borderRadius: rrezja.lg,
+    borderWidth: 1,
+    borderColor: ngjyrat.kufiri,
+    padding: hapesira.lg,
+    marginBottom: hapesira.md,
+    gap: hapesira.md,
+  },
+  shtypur: {
+    backgroundColor: ngjyrat.siperfaqja2,
+    transform: [{ scale: 0.99 }],
+  },
+  kolonaOres: {
+    alignItems: "center",
+    width: 48,
+  },
+  ora: {
+    color: ngjyrat.teksti,
+    fontSize: 15,
+    fontWeight: "800",
+    fontVariant: ["tabular-nums"],
+  },
+  vija: {
+    flex: 1,
+    width: 3,
+    borderRadius: 2,
+    marginTop: hapesira.sm,
+    opacity: 0.8,
+  },
+  permbajtja: {
+    flex: 1,
+    gap: hapesira.md,
+  },
+  rreshtiSiper: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: hapesira.md,
+  },
+  emriKolona: {
+    flex: 1,
+    gap: 3,
   },
   klienti: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 8,
+    color: ngjyrat.teksti,
+    fontSize: 16,
+    fontWeight: "700",
+  },
+  rreshtiInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
   },
   info: {
-    color: "#D1D1D1",
-    fontSize: 14,
-    marginBottom: 5,
+    color: ngjyrat.tekstiDyte,
+    fontSize: 13,
+    flexShrink: 1,
   },
-  status: {
-    color: "#F0B35A",
-    fontSize: 14,
-    fontWeight: "600",
-    marginTop: 4,
+  zbehur: {
+    color: ngjyrat.tekstiDyte,
   },
-  button: {
-    backgroundColor: "#F0B35A",
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 12,
+  rreshtiPoshte: {
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "space-between",
   },
-  buttonText: {
-    color: "#111111",
-    fontWeight: "bold",
-    fontSize: 14,
+  detaje: {
+    color: ngjyrat.tekstiZbehte,
+    fontSize: 12,
+    fontWeight: "600",
   },
 });

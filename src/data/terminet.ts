@@ -1,4 +1,36 @@
-export type StatusiTerminit = "Në pritje" | "Konfirmuar" | "Përfunduar";
+export type StatusiTerminit = "Në pritje" | "Konfirmuar" | "Përfunduar" | "Anuluar";
+
+export const statuset: StatusiTerminit[] = [
+  "Në pritje",
+  "Konfirmuar",
+  "Përfunduar",
+  "Anuluar",
+];
+
+export type Sherbimi = {
+  emri: string;
+  cmimi: number;
+  kohezgjatja: number;
+};
+
+export const sherbimet: Sherbimi[] = [
+  { emri: "Prerje klasike", cmimi: 8, kohezgjatja: 30 },
+  { emri: "Prerje moderne", cmimi: 10, kohezgjatja: 40 },
+  { emri: "Prerje dhe mjekër", cmimi: 13, kohezgjatja: 50 },
+  { emri: "Rregullim i mjekrës", cmimi: 5, kohezgjatja: 20 },
+  { emri: "Prerje dhe larje", cmimi: 11, kohezgjatja: 45 },
+];
+
+export function gjejSherbimin(emri: string): Sherbimi | undefined {
+  return sherbimet.find((s) => s.emri === emri);
+}
+
+export const oraretEPunes: string[] = Array.from({ length: 19 }, (_, i) => {
+  const minutat = 9 * 60 + i * 30;
+  const ora = String(Math.floor(minutat / 60)).padStart(2, "0");
+  const min = String(minutat % 60).padStart(2, "0");
+  return `${ora}:${min}`;
+});
 
 export type Termini = {
   id: string;
@@ -6,6 +38,8 @@ export type Termini = {
   sherbimi: string;
   ora: string;
   statusi: StatusiTerminit;
+  telefoni?: string;
+  shenime?: string;
 };
 
 export const terminet: Termini[] = [
@@ -15,6 +49,7 @@ export const terminet: Termini[] = [
     sherbimi: "Prerje klasike",
     ora: "10:00",
     statusi: "Konfirmuar",
+    telefoni: "+383 44 123 456",
   },
   {
     id: "2",
@@ -36,6 +71,7 @@ export const terminet: Termini[] = [
     sherbimi: "Prerje moderne",
     ora: "14:00",
     statusi: "Në pritje",
+    shenime: "Preferon anët shumë të shkurtra.",
   },
   {
     id: "5",
