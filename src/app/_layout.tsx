@@ -2,7 +2,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { klientiIQuery } from "../api/klienti";
 import { AuthProvider, useAuth } from "../context/AuthContext";
@@ -38,10 +38,14 @@ function Navigimi() {
     if (!ngarkohet) SplashScreen.hideAsync().catch(() => {});
   }, [ngarkohet]);
 
-  // Të dhënat e një llogarie nuk duhet t'i shohë llogaria tjetër pas daljes.
+  // Të dhënat e një llogarie nuk duhet t'i shohë llogaria tjetër. Cache-i pastrohet vetëm kur
+  // largohet një përdorues që ishte brenda; pas hyrjes do të fshiheshin query-t që sapo kanë nisur.
   const perdoruesiId = sesioni?.user.id;
+  const perdoruesiIMeParshem = useRef(perdoruesiId);
   useEffect(() => {
-    klientiIQuery.clear();
+    const iMeParshmi = perdoruesiIMeParshem.current;
+    perdoruesiIMeParshem.current = perdoruesiId;
+    if (iMeParshmi !== undefined && iMeParshmi !== perdoruesiId) klientiIQuery.clear();
   }, [perdoruesiId]);
 
   // Splash screen-i mbetet derisa të dihet nëse përdoruesi ka hyrë.
@@ -83,7 +87,16 @@ function Navigimi() {
             <Stack.Screen name="(biznes)" options={{ headerShown: false, animation: "fade" }} />
             <Stack.Screen name="termini/[id]" options={{ title: "Detajet e terminit" }} />
             <Stack.Screen name="shto" options={{ title: "Termin i ri", presentation: "modal" }} />
+            <Stack.Screen name="lokali-i-ri" options={{ title: t("wizard.titulli"), presentation: "modal" }} />
+            <Stack.Screen name="bashkohu" options={{ title: "", presentation: "modal" }} />
+            <Stack.Screen name="menaxho/info" options={{ title: t("info.titulli") }} />
+            <Stack.Screen name="menaxho/orari" options={{ title: t("orari.titulli") }} />
+            <Stack.Screen name="menaxho/sherbimet" options={{ title: t("sherbimet.titulli") }} />
+            <Stack.Screen name="menaxho/sherbimi" options={{ title: "", presentation: "modal" }} />
+            <Stack.Screen name="menaxho/stafi" options={{ title: t("stafi.titulli") }} />
           </Stack.Protected>
+
+          <Stack.Screen name="lokali/[id]" options={{ title: "" }} />
 
           <Stack.Screen name="cilesimet" options={{ title: t("cilesimet.titulli") }} />
         </Stack.Protected>

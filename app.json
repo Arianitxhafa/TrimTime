@@ -38,7 +38,21 @@
           }
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "TrimTime përdor vendndodhjen për të të treguar berberët pranë teje."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "TrimTime përdor fotot për logon dhe kopertinën e lokalit tënd.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
