@@ -1,60 +1,87 @@
+import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Ikona, { ikonat, type EmriIkones } from "../components/Ikona";
 import { useStilet, useTema, type ZgjedhjaTemes } from "../context/TemaContext";
+import { gjuhaAktuale, gjuhet, ndryshoGjuhen } from "../i18n";
 import { hapesira, rrezja, type Ngjyrat } from "../theme";
 
-const opsionetETemes: { vlera: ZgjedhjaTemes; titulli: string; pershkrimi: string; ikona: EmriIkones }[] = [
-  {
-    vlera: "sistemi",
-    titulli: "Sipas sistemit",
-    pershkrimi: "Ndjek cilësimet e telefonit",
-    ikona: ikonat.pajisja,
-  },
-  { vlera: "celet", titulli: "I çelët", pershkrimi: "Sfond i bardhë i ngrohtë", ikona: ikonat.dielli },
-  { vlera: "erret", titulli: "I errët", pershkrimi: "Më i qetë për sytë natën", ikona: ikonat.hena },
-];
+const opsionetETemes = [
+  { vlera: "sistemi", titulli: "cilesimet.temaSistemi", pershkrimi: "cilesimet.temaSistemiPershkrimi", ikona: ikonat.pajisja },
+  { vlera: "celet", titulli: "cilesimet.temaCelet", pershkrimi: "cilesimet.temaCeletPershkrimi", ikona: ikonat.dielli },
+  { vlera: "erret", titulli: "cilesimet.temaErret", pershkrimi: "cilesimet.temaErretPershkrimi", ikona: ikonat.hena },
+] as const satisfies readonly { vlera: ZgjedhjaTemes; titulli: string; pershkrimi: string; ikona: EmriIkones }[];
 
 export default function Cilesimet() {
-  const { zgjedhja, ndryshoZgjedhjen, ngjyrat } = useTema();
+  const { t } = useTranslation();
+  const { zgjedhja, ndryshoZgjedhjen } = useTema();
   const styles = useStilet(krijoStilet);
+  const gjuha = gjuhaAktuale();
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.permbajtja}>
-      <Text style={styles.seksioni}>Pamja</Text>
+      <Text style={styles.seksioni}>{t("cilesimet.pamja")}</Text>
       <View accessibilityRole="radiogroup" style={styles.grupi}>
-        {opsionetETemes.map((opsioni, i) => {
-          const aktiv = zgjedhja === opsioni.vlera;
-          return (
-            <Pressable
-              key={opsioni.vlera}
-              accessibilityRole="radio"
-              accessibilityState={{ selected: aktiv }}
-              onPress={() => ndryshoZgjedhjen(opsioni.vlera)}
-              style={({ pressed }) => [
-                styles.rreshti,
-                i > 0 && styles.rreshtiMeKufi,
-                pressed && styles.shtypur,
-              ]}
-            >
-              <View style={[styles.ikona, aktiv && styles.ikonaAktive]}>
-                <Ikona
-                  emri={opsioni.ikona}
-                  madhesia={18}
-                  ngjyra={aktiv ? ngjyrat.mbiAri : ngjyrat.tekstiDyte}
-                />
-              </View>
-              <View style={styles.teksti}>
-                <Text style={styles.titulli}>{opsioni.titulli}</Text>
-                <Text style={styles.pershkrimi}>{opsioni.pershkrimi}</Text>
-              </View>
-              <View style={[styles.radio, aktiv && styles.radioAktiv]}>
-                {aktiv && <View style={styles.radioPika} />}
-              </View>
-            </Pressable>
-          );
-        })}
+        {opsionetETemes.map((opsioni, i) => (
+          <RreshtiZgjedhjes
+            key={opsioni.vlera}
+            ikona={opsioni.ikona}
+            titulli={t(opsioni.titulli)}
+            pershkrimi={t(opsioni.pershkrimi)}
+            aktiv={zgjedhja === opsioni.vlera}
+            meKufi={i > 0}
+            onPress={() => ndryshoZgjedhjen(opsioni.vlera)}
+          />
+        ))}
+      </View>
+
+      <Text style={[styles.seksioni, styles.seksioniTjeter]}>{t("cilesimet.gjuha")}</Text>
+      <View accessibilityRole="radiogroup" style={styles.grupi}>
+        {gjuhet.map((g, i) => (
+          <RreshtiZgjedhjes
+            key={g.kodi}
+            ikona={ikonat.gjuha}
+            titulli={g.emri}
+            aktiv={gjuha === g.kodi}
+            meKufi={i > 0}
+            onPress={() => ndryshoGjuhen(g.kodi)}
+          />
+        ))}
       </View>
     </ScrollView>
+  );
+}
+
+type RreshtiProps = {
+  ikona: EmriIkones;
+  titulli: string;
+  pershkrimi?: string;
+  aktiv: boolean;
+  meKufi: boolean;
+  onPress: () => void;
+};
+
+function RreshtiZgjedhjes({ ikona, titulli, pershkrimi, aktiv, meKufi, onPress }: RreshtiProps) {
+  const { ngjyrat } = useTema();
+  const styles = useStilet(krijoStilet);
+
+  return (
+    <Pressable
+      accessibilityRole="radio"
+      accessibilityState={{ selected: aktiv }}
+      onPress={onPress}
+      style={({ pressed }) => [styles.rreshti, meKufi && styles.rreshtiMeKufi, pressed && styles.shtypur]}
+    >
+      <View style={[styles.ikona, aktiv && styles.ikonaAktive]}>
+        <Ikona emri={ikona} madhesia={18} ngjyra={aktiv ? ngjyrat.mbiAri : ngjyrat.tekstiDyte} />
+      </View>
+      <View style={styles.teksti}>
+        <Text style={styles.titulli}>{titulli}</Text>
+        {pershkrimi ? <Text style={styles.pershkrimi}>{pershkrimi}</Text> : null}
+      </View>
+      <View style={[styles.radio, aktiv && styles.radioAktiv]}>
+        {aktiv && <View style={styles.radioPika} />}
+      </View>
+    </Pressable>
   );
 }
 
@@ -74,6 +101,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginBottom: hapesira.md,
+    },
+    seksioniTjeter: {
+      marginTop: hapesira.xxl,
     },
     grupi: {
       backgroundColor: ngjyrat.siperfaqja,

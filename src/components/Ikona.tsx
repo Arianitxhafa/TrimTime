@@ -45,4 +45,5 @@ export const ikonat = {
   dielli: { ios: "sun.max.fill", android: "light_mode" },
   hena: { ios: "moon.fill", android: "dark_mode" },
   pajisja: { ios: "iphone", android: "smartphone" },
+  gjuha: { ios: "globe", android: "language" },
 } satisfies Record<string, EmriIkones>;

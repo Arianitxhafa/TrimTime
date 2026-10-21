@@ -1,9 +1,23 @@
 import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { TemaProvider, useTema } from "../context/TemaContext";
 import { TerminetProvider } from "../context/TerminetContext";
+import { ngarkoGjuhenERuajtur } from "../i18n";
+
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
+  const [gati, setGati] = useState(false);
+
+  useEffect(() => {
+    ngarkoGjuhenERuajtur().finally(() => setGati(true));
+  }, []);
+
+  if (!gati) return null;
+
   return (
     <TemaProvider>
       <TerminetProvider>
@@ -14,7 +28,12 @@ export default function RootLayout() {
 }
 
 function Navigimi() {
+  const { t } = useTranslation();
   const { ngjyrat, eshteErret } = useTema();
+
+  useEffect(() => {
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
 
   return (
     <>
@@ -32,7 +51,7 @@ function Navigimi() {
         <Stack.Screen name="index" options={{ headerShown: false, title: "Terminet" }} />
         <Stack.Screen name="termini/[id]" options={{ title: "Detajet e terminit" }} />
         <Stack.Screen name="shto" options={{ title: "Termin i ri", presentation: "modal" }} />
-        <Stack.Screen name="cilesimet" options={{ title: "Cilësimet" }} />
+        <Stack.Screen name="cilesimet" options={{ title: t("cilesimet.titulli") }} />
       </Stack>
     </>
   );
