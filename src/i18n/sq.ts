@@ -43,6 +43,7 @@ export const sq = {
     uDergua: "Nëse ekziston një llogari me këtë email, lidhja u dërgua.",
     gabimEmail: "Shkruaj një email të vlefshëm.",
     gabimFjalekalimi: "Fjalëkalimi duhet të ketë të paktën 8 karaktere.",
+    gabimFjalekalimiBosh: "Shkruaj fjalëkalimin.",
     gabimEmri: "Shkruaj emrin tënd.",
     gabimKredencialet: "Email-i ose fjalëkalimi nuk është i saktë.",
     gabimJoKonfirmuar: "Konfirmo email-in para se të hysh.",

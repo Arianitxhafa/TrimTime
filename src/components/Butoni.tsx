@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from "react-native";
 import { useTema } from "../context/TemaContext";
 import { rrezja, type Ngjyrat } from "../theme";
 import Ikona, { type EmriIkones } from "./Ikona";
@@ -11,6 +11,7 @@ type Props = {
   varianti?: Varianti;
   ikona?: EmriIkones;
   joAktiv?: boolean;
+  ngarkohet?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -34,6 +35,7 @@ export default function Butoni({
   varianti = "kryesor",
   ikona,
   joAktiv = false,
+  ngarkohet = false,
   style,
 }: Props) {
   const { ngjyrat } = useTema();
@@ -42,8 +44,8 @@ export default function Butoni({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityState={{ disabled: joAktiv }}
-      disabled={joAktiv}
+      accessibilityState={{ disabled: joAktiv || ngarkohet, busy: ngarkohet }}
+      disabled={joAktiv || ngarkohet}
       onPress={onPress}
       style={({ pressed }) => [
         styles.butoni,
@@ -53,7 +55,11 @@ export default function Butoni({
         style,
       ]}
     >
-      {ikona && <Ikona emri={ikona} madhesia={18} ngjyra={s.teksti} />}
+      {ngarkohet ? (
+        <ActivityIndicator color={s.teksti} />
+      ) : (
+        ikona && <Ikona emri={ikona} madhesia={18} ngjyra={s.teksti} />
+      )}
       <Text style={[styles.teksti, { color: s.teksti }]}>{titulli}</Text>
     </Pressable>
   );

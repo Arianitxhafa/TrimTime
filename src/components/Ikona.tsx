@@ -1,12 +1,12 @@
 import { SymbolView, type AndroidSymbol, type SFSymbol } from "expo-symbols";
-import type { StyleProp, ViewStyle } from "react-native";
+import type { ColorValue, StyleProp, ViewStyle } from "react-native";
 
 export type EmriIkones = { ios: SFSymbol; android: AndroidSymbol };
 
 type Props = {
   emri: EmriIkones;
   madhesia?: number;
-  ngjyra: string;
+  ngjyra: ColorValue;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -46,4 +46,15 @@ export const ikonat = {
   hena: { ios: "moon.fill", android: "dark_mode" },
   pajisja: { ios: "iphone", android: "smartphone" },
   gjuha: { ios: "globe", android: "language" },
+  zbulo: { ios: "sparkles", android: "explore" },
+  harta: { ios: "map.fill", android: "map" },
+  sot: { ios: "list.bullet.rectangle.fill", android: "today" },
+  klientet: { ios: "person.2.fill", android: "group" },
+  lokali: { ios: "storefront.fill", android: "storefront" },
+  email: { ios: "envelope.fill", android: "mail" },
+  dryni: { ios: "lock.fill", android: "lock" },
+  syri: { ios: "eye", android: "visibility" },
+  syriMbyllur: { ios: "eye.slash", android: "visibility_off" },
+  dil: { ios: "rectangle.portrait.and.arrow.right", android: "logout" },
+  gabim: { ios: "exclamationmark.triangle.fill", android: "warning" },
 } satisfies Record<string, EmriIkones>;

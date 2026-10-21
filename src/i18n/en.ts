@@ -44,6 +44,7 @@ export const en: Perkthimet = {
     uDergua: "If an account exists for this email, the link has been sent.",
     gabimEmail: "Enter a valid email.",
     gabimFjalekalimi: "Password must be at least 8 characters.",
+    gabimFjalekalimiBosh: "Enter your password.",
     gabimEmri: "Enter your name.",
     gabimKredencialet: "Incorrect email or password.",
     gabimJoKonfirmuar: "Confirm your email before signing in.",
