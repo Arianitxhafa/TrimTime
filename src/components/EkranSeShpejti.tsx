@@ -9,11 +9,11 @@ type Props = {
   ikona: EmriIkones;
   titulli: string;
   teksti: string;
-  // Faza e planit kur ndërtohet ky ekran.
-  faza: number;
+  // Faza e planit kur ndërtohet ky ekran; pa të, badge-i nuk shfaqet.
+  faza?: number;
 };
 
-// Ekran i përkohshëm për tab-et që ndërtohen në fazat e ardhshme.
+// Ekran informues, p.sh. për tab-et që ndërtohen në fazat e ardhshme.
 export default function EkranSeShpejti({ ikona, titulli, teksti, faza }: Props) {
   const { t } = useTranslation();
   const { ngjyrat } = useTema();
@@ -27,11 +27,13 @@ export default function EkranSeShpejti({ ikona, titulli, teksti, faza }: Props) 
           <Ikona emri={ikona} madhesia={34} ngjyra={ngjyrat.mbiAri} />
         </View>
       </View>
-      <View style={styles.badge}>
-        <Text style={styles.badgeTeksti}>
-          {t("pergjithshme.seShpejti")} · {t("seShpejti.faza", { numri: faza })}
-        </Text>
-      </View>
+      {faza !== undefined && (
+        <View style={styles.badge}>
+          <Text style={styles.badgeTeksti}>
+            {t("pergjithshme.seShpejti")} · {t("seShpejti.faza", { numri: faza })}
+          </Text>
+        </View>
+      )}
       <Text style={styles.titulli}>{titulli}</Text>
       <Text style={styles.teksti}>{teksti}</Text>
     </View>
