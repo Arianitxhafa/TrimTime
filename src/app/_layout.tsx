@@ -1,8 +1,10 @@
+import { QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { klientiIQuery } from "../api/klienti";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { PreferencatProvider, usePreferencat } from "../context/PreferencatContext";
 import { TemaProvider, useTema } from "../context/TemaContext";
@@ -14,11 +16,13 @@ export default function RootLayout() {
   return (
     <TemaProvider>
       <PreferencatProvider>
-        <AuthProvider>
-          <TerminetProvider>
-            <Navigimi />
-          </TerminetProvider>
-        </AuthProvider>
+        <QueryClientProvider client={klientiIQuery}>
+          <AuthProvider>
+            <TerminetProvider>
+              <Navigimi />
+            </TerminetProvider>
+          </AuthProvider>
+        </QueryClientProvider>
       </PreferencatProvider>
     </TemaProvider>
   );
@@ -33,6 +37,12 @@ function Navigimi() {
   useEffect(() => {
     if (!ngarkohet) SplashScreen.hideAsync().catch(() => {});
   }, [ngarkohet]);
+
+  // Të dhënat e një llogarie nuk duhet t'i shohë llogaria tjetër pas daljes.
+  const perdoruesiId = sesioni?.user.id;
+  useEffect(() => {
+    klientiIQuery.clear();
+  }, [perdoruesiId]);
 
   // Splash screen-i mbetet derisa të dihet nëse përdoruesi ka hyrë.
   if (ngarkohet) return null;
