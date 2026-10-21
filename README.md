@@ -10,14 +10,16 @@ The project is being developed as part of a university Mobile Applications cours
 
 ## ✨ Current Features
 
-- **Appointment Cards** — Display client names, requested services, appointment times, and statuses.
-- **Appointment Statuses** — Support for `Pending`, `Confirmed`, and `Completed` appointment states.
-- **Interactive Confirmation** — Confirm pending appointments directly from the interface.
-- **Reusable Components** — Appointment information is rendered using a reusable, typed React Native component.
-- **Type Safety** — TypeScript helps identify invalid values and prevent common development errors.
-- **Expo Go Support** — Run and test the application on a physical mobile device during development.
+- **Onboarding** — Three animated intro screens shown on first launch.
+- **Accounts** — Sign up and sign in with email and password (Supabase Auth), with validation and translated error messages.
+- **Client & Business modes** — One account can switch between finding barbers (client) and managing a shop (business). Each mode has its own tab bar.
+- **Protected navigation** — Screens are only reachable when allowed (onboarding → sign in → tabs), using Expo Router `Stack.Protected`.
+- **Dark & light mode** — Follows the phone, or can be set to light or dark in Settings. The choice is remembered.
+- **Albanian & English** — Albanian is the default; the language follows the phone or can be changed in Settings.
+- **Appointments (business “Today” tab)** — Appointment list, filters, search, details, confirm/complete/cancel and a new-appointment form (still local sample data).
+- **Database foundation** — Supabase/Postgres schema with Row Level Security and database-level protection against double bookings.
 
-> **Development status:** TrimTime is currently an early-stage prototype. Appointment information uses sample data, and status changes are managed locally in the component state. Database persistence, authentication, and backend integration are not yet implemented.
+> **Development status:** Phase 1 (foundation) of 7. Discover, Map, Bookings, Calendar, Clients and Shop tabs show a “Coming soon” screen until their phase is built.
 
 ---
 
@@ -31,6 +33,9 @@ The project is being developed as part of a university Mobile Applications cours
 | [Expo Router](https://docs.expo.dev/router/introduction/) | Application navigation                     |
 | [Git](https://git-scm.com/)                               | Version control                            |
 | [GitHub](https://github.com/)                             | Source code hosting and team collaboration |
+| [Supabase](https://supabase.com/)                         | Auth, Postgres database, Row Level Security |
+| [i18next](https://www.i18next.com/)                       | Albanian and English translations          |
+| [Reanimated](https://docs.swmansion.com/react-native-reanimated/) | Animations                           |
 | [Expo Go](https://expo.dev/go)                            | Testing on a physical device               |
 
 ---
@@ -66,13 +71,19 @@ cd projekti-im
 npm install
 ```
 
-### 4. Start the Development Server
+### 4. Configure Supabase
+
+1. Copy `.env.example` to `.env` and fill in the **Project URL** and the **publishable (anon) key** from Supabase → Project Settings → API Keys. Never put a secret / `service_role` key in the app.
+2. In Supabase → **SQL Editor**, paste the contents of `supabase/migrations/20261021120000_themeli.sql` and click **Run** (once per project).
+3. Optional during development: Authentication → Sign In / Providers → Email → turn off **Confirm email**, so new accounts can sign in immediately.
+
+### 5. Start the Development Server
 
 ```
 npx expo start
 ```
 
-### 5. Open the App on Your Phone
+### 6. Open the App on Your Phone
 
 1. Open Expo Go on your phone.
 2. Scan the QR code displayed by the Expo development server.
@@ -91,24 +102,23 @@ npx expo start --tunnel
 ## 📂 Project Structure
 
 ```
-projekti-im/
-├── src/
-│   ├── app/
-│   │   ├── _layout.tsx
-│   │   └── index.tsx
-│   └── components/
-│       └── KartaTerminit.tsx
-├── IDETE.md
-├── package.json
-└── README.md
+src/
+├── app/                    # Screens (Expo Router: every file is a route)
+│   ├── _layout.tsx         # Providers + protected navigation
+│   ├── onboarding.tsx
+│   ├── (auth)/             # hyrja (sign in), regjistrimi (sign up)
+│   ├── (klient)/           # Client tabs: zbulo, harta, terminet-e-mia, profili
+│   ├── (biznes)/           # Business tabs: sot, kalendari, klientet, lokali, llogaria
+│   ├── termini/[id].tsx    # Appointment details
+│   ├── shto.tsx            # New appointment
+│   └── cilesimet.tsx       # Settings (theme, language)
+├── components/             # Reusable UI (Butoni, FushaTekstit, KartaTerminit, …)
+├── context/                # Tema, Preferencat, Auth, Terminet
+├── i18n/                   # sq.ts (default), en.ts
+├── lib/                    # Supabase client and helpers
+└── theme/                  # Light/dark palettes, spacing, radii
+supabase/migrations/        # SQL migrations (run in order)
 ```
-
-**Key files**
-
-- `src/app/index.tsx` — Main screen displaying the TrimTime interface and sample appointments.
-- `src/app/_layout.tsx` — Root navigation layout.
-- `src/components/KartaTerminit.tsx` — Reusable appointment card component, including appointment details and confirmation interaction.
-- `IDETE.md` — Project ideas and documentation of selected development decisions.
 
 ---
 
@@ -138,18 +148,15 @@ This approach demonstrates how TypeScript union types can restrict accepted valu
 
 ## 🗺️ Development Roadmap
 
-The following features are potential future improvements and are not yet implemented.
-
-- Professional UI and improved user experience
-- Barber profiles and service catalog
-- Appointment booking flow
-- Date and time selection
-- Persistent appointment storage
-- Backend and database integration
-- User authentication and role-based access
-- Appointment editing and cancellation
-- Push notifications and appointment reminders
-- Business dashboard for barbershop owners
+| Phase | Scope | Status |
+| --- | --- | --- |
+| 1 · Foundation | Design system, dark/light mode, i18n, Supabase, auth, role-based navigation, onboarding | ✅ Done |
+| 2 · Shops & Discovery | Shop setup wizard, services, staff, map, search & filters, shop profile | ⏳ Next |
+| 3 · Booking Engine | Available slots, booking flow, cancel/reschedule, realtime, reminders | |
+| 4 · Business Tools | Calendar, bookings inbox, walk-ins, client CRM, analytics | |
+| 5 · Payments & Growth | Stripe, reviews, loyalty, promotions, subscriptions | |
+| 6 · AI Assistant | In-app assistant for barbers and clients | |
+| 7 · Polish & Launch | Accessibility, performance, tests, store builds | |
 
 ---
 
