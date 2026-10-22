@@ -10,6 +10,7 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   View,
 } from "react-native";
@@ -197,12 +198,63 @@ function Forma({ lokali }: { lokali: Lokali }) {
           maxLength={80}
           gabimi={provuar ? gabimet.qyteti : null}
         />
+
+        <RregullatERezervimit lokali={lokali} />
       </ScrollView>
 
       <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>
         <Butoni titulli={t("info.ruaj")} ngarkohet={perditeso.isPending && !ngarkohetFoto} onPress={ruaj} />
       </View>
     </KeyboardAvoidingView>
+  );
+}
+
+const AFATET_E_ANULIMIT = [0, 1, 2, 6, 12, 24];
+
+// Ruhen menjëherë, pa butonin "Ruaj", sepse janë zgjedhje të vetme.
+function RregullatERezervimit({ lokali }: { lokali: Lokali }) {
+  const { t } = useTranslation();
+  const { ngjyrat } = useTema();
+  const styles = useStilet(krijoStilet);
+  const perditeso = usePerditesoLokalin(lokali.id);
+
+  return (
+    <View style={styles.rregullat}>
+      <Text style={styles.etiketa}>{t("rregullat.seksioni")}</Text>
+      <View style={styles.rregulli}>
+        <View style={styles.rregulliTeksti}>
+          <Text style={styles.rregulliTitulli}>{t("rregullat.pranimiAutomatik")}</Text>
+          <Text style={styles.rregulliPershkrimi}>{t("rregullat.pranimiAutomatikTeksti")}</Text>
+        </View>
+        <Switch
+          value={lokali.pranimi_automatik}
+          onValueChange={(v) => perditeso.mutate({ pranimi_automatik: v })}
+          trackColor={{ true: ngjyrat.ari, false: ngjyrat.kufiri }}
+          thumbColor="#FFFFFF"
+          accessibilityLabel={t("rregullat.pranimiAutomatik")}
+        />
+      </View>
+
+      <Text style={styles.rregulliTitulli}>{t("rregullat.anulimi")}</Text>
+      <View style={styles.afatet}>
+        {AFATET_E_ANULIMIT.map((ore) => {
+          const aktiv = lokali.anulimi_deri_ore === ore;
+          return (
+            <Pressable
+              key={ore}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: aktiv }}
+              onPress={() => perditeso.mutate({ anulimi_deri_ore: ore })}
+              style={[styles.afati, aktiv && styles.afatiAktiv]}
+            >
+              <Text style={[styles.afatiTeksti, aktiv && styles.afatiTekstiAktiv]}>
+                {ore === 0 ? t("rregullat.kurdo") : t("rregullat.oreParaj", { ore })}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    </View>
   );
 }
 
@@ -288,6 +340,59 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       color: ngjyrat.ari,
       fontSize: 14,
       fontWeight: "700",
+    },
+    rregullat: {
+      marginTop: hapesira.lg,
+      gap: hapesira.md,
+    },
+    rregulli: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: hapesira.md,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderRadius: rrezja.md,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
+      padding: hapesira.lg,
+    },
+    rregulliTeksti: {
+      flex: 1,
+      gap: 2,
+    },
+    rregulliTitulli: {
+      color: ngjyrat.teksti,
+      fontSize: 15,
+      fontWeight: "700",
+    },
+    rregulliPershkrimi: {
+      color: ngjyrat.tekstiZbehte,
+      fontSize: 13,
+    },
+    afatet: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: hapesira.sm,
+    },
+    afati: {
+      paddingHorizontal: 14,
+      height: 38,
+      borderRadius: rrezja.plote,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
+      backgroundColor: ngjyrat.siperfaqja,
+      justifyContent: "center",
+    },
+    afatiAktiv: {
+      backgroundColor: ngjyrat.ari,
+      borderColor: ngjyrat.ari,
+    },
+    afatiTeksti: {
+      color: ngjyrat.teksti,
+      fontSize: 14,
+      fontWeight: "700",
+    },
+    afatiTekstiAktiv: {
+      color: ngjyrat.mbiAri,
     },
     fundi: {
       paddingHorizontal: hapesira.xl,

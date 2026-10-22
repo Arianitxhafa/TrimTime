@@ -13,7 +13,7 @@ import type {
 import { celesat } from "./klienti";
 
 const KOLONAT_E_LOKALIT =
-  "id, pronari_id, emri, pershkrimi, adresa, qyteti, telefoni, logo_url, kopertina_url, zona_kohore, i_publikuar, krijuar_me, lat, lng, i_hapur_tani, cmimi_min, burimi";
+  "id, pronari_id, emri, pershkrimi, adresa, qyteti, telefoni, logo_url, kopertina_url, zona_kohore, i_publikuar, krijuar_me, lat, lng, i_hapur_tani, cmimi_min, burimi, pranimi_automatik, anulimi_deri_ore";
 
 // PostGIS e pranon pikën si tekst EWKT; gjatësia (lng) shkon e para.
 export function pikaEWKT({ lat, lng }: Koordinata): string {
@@ -155,6 +155,8 @@ export function useKrijoLokalin() {
 
 type NdryshimiILokalit = Partial<TeDhenatELokalit> & {
   i_publikuar?: boolean;
+  pranimi_automatik?: boolean;
+  anulimi_deri_ore?: number;
   logo_url?: string | null;
   kopertina_url?: string | null;
 };
