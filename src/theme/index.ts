@@ -1,5 +1,5 @@
 import type { EmriIkones } from "../components/Ikona";
-import type { StatusiTerminit } from "../data/terminet";
+import type { StatusiTerminit } from "../lib/tipet";
 
 export type Ngjyrat = {
   sfondi: string;
@@ -78,22 +78,25 @@ export type MetaStatusi = {
 export type StatusetMeta = Record<StatusiTerminit, MetaStatusi>;
 
 const ikonatEStatuseve: Record<StatusiTerminit, EmriIkones> = {
-  "Në pritje": { ios: "hourglass", android: "hourglass_top" },
-  Konfirmuar: { ios: "checkmark.circle.fill", android: "check_circle" },
-  Përfunduar: { ios: "checkmark.seal.fill", android: "task_alt" },
-  Anuluar: { ios: "xmark.circle.fill", android: "cancel" },
+  ne_pritje: { ios: "hourglass", android: "hourglass_top" },
+  konfirmuar: { ios: "checkmark.circle.fill", android: "check_circle" },
+  perfunduar: { ios: "checkmark.seal.fill", android: "task_alt" },
+  anuluar: { ios: "xmark.circle.fill", android: "cancel" },
+  nuk_erdhi: { ios: "person.fill.xmark", android: "person_off" },
 };
 
 export const statusetMetaErrta: StatusetMeta = {
-  "Në pritje": { ngjyra: "#F5A524", sfondi: "#2B2112", ikona: ikonatEStatuseve["Në pritje"] },
-  Konfirmuar: { ngjyra: "#3DD68C", sfondi: "#11271D", ikona: ikonatEStatuseve.Konfirmuar },
-  Përfunduar: { ngjyra: "#7C9CFF", sfondi: "#161C33", ikona: ikonatEStatuseve.Përfunduar },
-  Anuluar: { ngjyra: "#F04452", sfondi: "#2B1418", ikona: ikonatEStatuseve.Anuluar },
+  ne_pritje: { ngjyra: "#F5A524", sfondi: "#2B2112", ikona: ikonatEStatuseve.ne_pritje },
+  konfirmuar: { ngjyra: "#3DD68C", sfondi: "#11271D", ikona: ikonatEStatuseve.konfirmuar },
+  perfunduar: { ngjyra: "#7C9CFF", sfondi: "#161C33", ikona: ikonatEStatuseve.perfunduar },
+  anuluar: { ngjyra: "#F04452", sfondi: "#2B1418", ikona: ikonatEStatuseve.anuluar },
+  nuk_erdhi: { ngjyra: "#A1A1AE", sfondi: "#1D1D27", ikona: ikonatEStatuseve.nuk_erdhi },
 };
 
 export const statusetMetaCelta: StatusetMeta = {
-  "Në pritje": { ngjyra: "#B26A00", sfondi: "#FDF1DC", ikona: ikonatEStatuseve["Në pritje"] },
-  Konfirmuar: { ngjyra: "#1A8754", sfondi: "#E2F5EA", ikona: ikonatEStatuseve.Konfirmuar },
-  Përfunduar: { ngjyra: "#3B5BD9", sfondi: "#E8EDFD", ikona: ikonatEStatuseve.Përfunduar },
-  Anuluar: { ngjyra: "#D92D3A", sfondi: "#FDE8EA", ikona: ikonatEStatuseve.Anuluar },
+  ne_pritje: { ngjyra: "#B26A00", sfondi: "#FDF1DC", ikona: ikonatEStatuseve.ne_pritje },
+  konfirmuar: { ngjyra: "#1A8754", sfondi: "#E2F5EA", ikona: ikonatEStatuseve.konfirmuar },
+  perfunduar: { ngjyra: "#3B5BD9", sfondi: "#E8EDFD", ikona: ikonatEStatuseve.perfunduar },
+  anuluar: { ngjyra: "#D92D3A", sfondi: "#FDE8EA", ikona: ikonatEStatuseve.anuluar },
+  nuk_erdhi: { ngjyra: "#5C5C68", sfondi: "#F0EDE6", ikona: ikonatEStatuseve.nuk_erdhi },
 };

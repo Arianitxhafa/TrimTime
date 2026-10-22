@@ -1,9 +1,11 @@
+import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
-import type { StatusiTerminit } from "../data/terminet";
 import { useStilet, useTema } from "../context/TemaContext";
+import type { StatusiTerminit } from "../lib/tipet";
 import { rrezja, type Ngjyrat } from "../theme";
 
 export default function BadgeStatusi({ statusi }: { statusi: StatusiTerminit }) {
+  const { t } = useTranslation();
   const { statusetMeta } = useTema();
   const styles = useStilet(krijoStilet);
   const meta = statusetMeta[statusi];
@@ -11,7 +13,7 @@ export default function BadgeStatusi({ statusi }: { statusi: StatusiTerminit }) 
   return (
     <View style={[styles.badge, { backgroundColor: meta.sfondi }]}>
       <View style={[styles.pika, { backgroundColor: meta.ngjyra }]} />
-      <Text style={[styles.teksti, { color: meta.ngjyra }]}>{statusi}</Text>
+      <Text style={[styles.teksti, { color: meta.ngjyra }]}>{t(`statuset.${statusi}`)}</Text>
     </View>
   );
 }

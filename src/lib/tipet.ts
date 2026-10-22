@@ -20,6 +20,8 @@ export type Lokali = {
   i_hapur_tani: boolean;
   cmimi_min: number | null;
   burimi: BurimiILokalit;
+  pranimi_automatik: boolean;
+  anulimi_deri_ore: number;
 };
 
 // "osm": lokal i importuar nga OpenStreetMap, pa pronar në TrimTime.
@@ -80,4 +82,60 @@ export type TeDhenatELokalit = {
   qyteti: string;
   telefoni: string | null;
   vendndodhja: Koordinata;
+};
+
+export type StatusiTerminit = "ne_pritje" | "konfirmuar" | "perfunduar" | "anuluar" | "nuk_erdhi";
+
+export const STATUSET: StatusiTerminit[] = ["ne_pritje", "konfirmuar", "perfunduar", "anuluar", "nuk_erdhi"];
+
+// Statuset që ende zënë kohën e berberit.
+export const STATUSET_AKTIVE: StatusiTerminit[] = ["ne_pritje", "konfirmuar"];
+
+export type OraELire = {
+  fillon_me: string;
+  // "HH:MM" sipas orës së lokalit.
+  ora: string;
+  berberi_id: string;
+};
+
+export type TerminiIKlientit = {
+  id: string;
+  lokali_id: string;
+  lokali_emri: string;
+  lokali_adresa: string;
+  lokali_qyteti: string;
+  lokali_logo_url: string | null;
+  lokali_telefoni: string | null;
+  lat: number;
+  lng: number;
+  sherbimi_id: string;
+  sherbimi_emri: string;
+  kohezgjatja_min: number;
+  berberi_id: string;
+  berberi_emri: string;
+  fillon_me: string;
+  // "YYYY-MM-DD" dhe "HH:MM" sipas orës së lokalit.
+  data_lokale: string;
+  ora_lokale: string;
+  statusi: StatusiTerminit;
+  cmimi_centa: number;
+  shenime: string | null;
+  mund_te_ndryshohet: boolean;
+};
+
+export type TerminiILokalit = {
+  id: string;
+  klienti_id: string | null;
+  klienti_emri: string;
+  klienti_telefoni: string | null;
+  sherbimi_id: string;
+  sherbimi_emri: string;
+  kohezgjatja_min: number;
+  berberi_id: string;
+  berberi_emri: string;
+  fillon_me: string;
+  ora_lokale: string;
+  statusi: StatusiTerminit;
+  cmimi_centa: number;
+  shenime: string | null;
 };
