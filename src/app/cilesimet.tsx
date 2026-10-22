@@ -1,8 +1,9 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import Ikona, { ikonat, type EmriIkones } from "../components/Ikona";
 import { useStilet, useTema, type ZgjedhjaTemes } from "../context/TemaContext";
-import { gjuhaAktuale, gjuhet, ndryshoGjuhen } from "../i18n";
+import { gjuhaAktuale, gjuhet, ndryshoGjuhen, type Gjuha } from "../i18n";
 import { hapesira, rrezja, type Ngjyrat } from "../theme";
 
 const opsionetETemes = [
@@ -15,7 +16,15 @@ export default function Cilesimet() {
   const { t } = useTranslation();
   const { zgjedhja, ndryshoZgjedhjen } = useTema();
   const styles = useStilet(krijoStilet);
-  const gjuha = gjuhaAktuale();
+  // Zgjedhja shfaqet menjëherë; përkthimi i gjithë aplikacionit nis pasi të vizatohet ajo,
+  // që prekja të mos presë rivizatimin e të gjitha ekraneve.
+  const [gjuha, setGjuha] = useState<Gjuha>(gjuhaAktuale);
+
+  function zgjidhGjuhen(kodi: Gjuha) {
+    if (kodi === gjuha) return;
+    setGjuha(kodi);
+    setTimeout(() => ndryshoGjuhen(kodi), 0);
+  }
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.permbajtja}>
@@ -43,7 +52,7 @@ export default function Cilesimet() {
             titulli={g.emri}
             aktiv={gjuha === g.kodi}
             meKufi={i > 0}
-            onPress={() => ndryshoGjuhen(g.kodi)}
+            onPress={() => zgjidhGjuhen(g.kodi)}
           />
         ))}
       </View>
