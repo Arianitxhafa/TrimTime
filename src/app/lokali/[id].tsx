@@ -12,6 +12,7 @@ import Butoni from "../../components/Butoni";
 import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
 import { celesiIDites, RENDI_I_DITEVE } from "../../components/RedaktoriIOrarit";
 import { useStilet, useTema } from "../../context/TemaContext";
+import { useModiAktiv } from "../../hooks/useModiAktiv";
 import { formatoCmimin, formatoKohezgjatjen } from "../../lib/formatimi";
 import { lidhjaEUdhezimeve } from "../../lib/vendndodhja";
 import { hapesira, rrezja, type Ngjyrat } from "../../theme";
@@ -26,6 +27,7 @@ export default function ProfiliILokalit() {
   const sherbimet = useSherbimet(id);
   const orari = useOrari(id);
   const stafi = useStafi(id);
+  const modi = useModiAktiv();
 
   if (lokali.isPending) {
     return (
@@ -53,11 +55,17 @@ export default function ProfiliILokalit() {
   const berberet = (stafi.data ?? []).filter((a) => a.aktiv);
   const sot = new Date().getDay();
   const ngaOsm = l.burimi === "osm";
+  // Vetëm klientët rezervojnë; pronari e sheh profilin si parapamje.
+  const mundTeRezervoje = !ngaOsm && modi === "klient" && sherbimetAktive.length > 0;
+
+  function hapRezervimin(sherbimiId?: string) {
+    router.push({ pathname: "/rezervo/[lokaliId]", params: { lokaliId: l.id, ...(sherbimiId ? { sherbimiId } : {}) } });
+  }
 
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ title: l.emri }} />
-      <ScrollView contentContainerStyle={{ paddingBottom: (ngaOsm ? hapesira.xxl : 120) + insets.bottom }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: (mundTeRezervoje ? 120 : hapesira.xxl) + insets.bottom }}>
         <View style={styles.kopertina}>
           {l.kopertina_url ? (
             <Image source={{ uri: l.kopertina_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
@@ -127,14 +135,21 @@ export default function ProfiliILokalit() {
           ) : (
             <View style={styles.grupi}>
               {sherbimetAktive.map((s, i) => (
-                <View key={s.id} style={[styles.sherbimi, i > 0 && styles.meKufi]}>
+                <Pressable
+                  key={s.id}
+                  accessibilityRole={mundTeRezervoje ? "button" : undefined}
+                  disabled={!mundTeRezervoje}
+                  onPress={() => hapRezervimin(s.id)}
+                  style={({ pressed }) => [styles.sherbimi, i > 0 && styles.meKufi, pressed && styles.shtypur]}
+                >
                   <View style={styles.sherbimiTeksti}>
                     <Text style={styles.sherbimiEmri}>{s.emri}</Text>
                     {s.pershkrimi ? <Text style={styles.sherbimiPershkrimi}>{s.pershkrimi}</Text> : null}
                     <Text style={styles.sherbimiKoha}>{formatoKohezgjatjen(s.kohezgjatja_min)}</Text>
                   </View>
                   <Text style={styles.sherbimiCmimi}>{formatoCmimin(s.cmimi_centa)}</Text>
-                </View>
+                  {mundTeRezervoje && <Ikona emri={ikonat.djathtas} madhesia={16} ngjyra={ngjyrat.tekstiZbehte} />}
+                </Pressable>
               ))}
             </View>
           )}
@@ -190,15 +205,19 @@ export default function ProfiliILokalit() {
         </View>
       </ScrollView>
 
-      {!ngaOsm && (
+      {mundTeRezervoje && (
         <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>
           <View style={styles.fundiTeksti}>
             {l.cmimi_min !== null && (
               <Text style={styles.fundiCmimi}>{t("lokali.ngaCmimi", { cmimi: formatoCmimin(l.cmimi_min) })}</Text>
             )}
-            <Text style={styles.fundiShenim}>{t("profiliLokalit.rezervimiSeShpejti")}</Text>
+            <Text style={styles.fundiShenim}>
+              {l.anulimi_deri_ore > 0
+                ? t("rezervimi.anulimiInfo", { ore: l.anulimi_deri_ore })
+                : t("rezervimi.anulimiKurdo")}
+            </Text>
           </View>
-          <Butoni titulli={t("profiliLokalit.rezervo")} joAktiv onPress={() => {}} style={styles.rezervo} />
+          <Butoni titulli={t("profiliLokalit.rezervo")} ikona={ikonat.kalendar} onPress={() => hapRezervimin()} style={styles.rezervo} />
         </View>
       )}
     </View>
