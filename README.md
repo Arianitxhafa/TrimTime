@@ -23,10 +23,14 @@ The project is being developed as part of a university Mobile Applications cours
 - **All barbershops in Kosovo** — 379 shops imported from OpenStreetMap appear on the map and in search, marked as not yet on TrimTime (© OpenStreetMap contributors, ODbL).
 - **Map (client)** — Shops on a map with price markers and “Search this area” (phone only; react-native-maps doesn’t run on web).
 - **Shop profile** — Cover, open/closed status in the shop’s time zone, call, directions, services, barbers, weekly hours and description.
-- **Appointments (business “Today” tab)** — Appointment list, filters, search, details, confirm/complete/cancel and a new-appointment form (still local sample data).
+- **Online booking (client)** — Pick a service, a barber or “Anyone”, a day and a free time; prices and end times are calculated on the server and double bookings are impossible.
+- **My bookings (client)** — Upcoming and past bookings, cancel or change the time within the shop’s free-cancellation window, directions and “Book again”.
+- **Reminders** — Local notifications 24 h and 2 h before each appointment.
+- **Today (business)** — Real bookings per day with live updates, confirm / complete / no-show / cancel, and walk-in or phone bookings added by staff.
+- **Booking rules** — Each shop chooses automatic confirmation and the free-cancellation window.
 - **Database foundation** — Supabase/Postgres schema with Row Level Security and database-level protection against double bookings.
 
-> **Development status:** Phase 2 of 7 done. Online booking (Phase 3) and the Bookings, Calendar and Clients tabs are still to come.
+> **Development status:** Phase 3 of 7 done. The Calendar and Clients tabs (Phase 4) are still to come.
 
 ---
 
@@ -81,7 +85,7 @@ npm install
 ### 4. Configure Supabase
 
 1. Copy `.env.example` to `.env` and fill in the **Project URL** and the **publishable (anon) key** from Supabase → Project Settings → API Keys. Never put a secret / `service_role` key in the app.
-2. In Supabase → **SQL Editor**, run each file in `supabase/migrations/` **in order** (once per project): `20261021120000_themeli.sql`, `20261022090000_lokalet_dhe_zbulimi.sql`, then `20261022150000_lokalet_osm.sql`.
+2. In Supabase → **SQL Editor**, run each file in `supabase/migrations/` **in order** (once per project): `20261021120000_themeli.sql`, `20261022090000_lokalet_dhe_zbulimi.sql`, `20261022150000_lokalet_osm.sql`, then `20261023090000_rezervimet.sql`.
    Then run `supabase/seed/lokalet_osm_kosove.sql` to load the barbershops of Kosovo. To refresh them later: `npm run importo:osm` and run the regenerated file again.
 3. Optional during development: Authentication → Sign In / Providers → Email → turn off **Confirm email**, so new accounts can sign in immediately.
 
@@ -121,12 +125,14 @@ src/
 │   ├── lokali/[id].tsx     # Public shop profile
 │   ├── menaxho/            # Shop management: info, orari, sherbimet, sherbimi, stafi
 │   ├── bashkohu.tsx        # Join a shop with an invite code
-│   ├── termini/[id].tsx    # Appointment details
-│   ├── shto.tsx            # New appointment
+│   ├── rezervo/[lokaliId].tsx  # Booking flow (client)
+│   ├── riplanifiko/[id].tsx    # Change booking time (client)
+│   ├── termini/[id].tsx    # Appointment details (staff)
+│   ├── shto.tsx            # Walk-in / phone booking (staff)
 │   └── cilesimet.tsx       # Settings (theme, language)
 ├── api/                    # React Query hooks (shops, services, hours, staff)
 ├── components/             # Reusable UI (Butoni, FushaTekstit, KartaTerminit, …)
-├── context/                # Tema, Preferencat, Auth, Terminet
+├── context/                # Tema, Preferencat, Auth
 ├── i18n/                   # sq.ts (default), en.ts
 ├── hooks/                  # useVendndodhjaIme (location), useVonesa (debounce)
 ├── lib/                    # Supabase client, types, formatting, location helpers
@@ -166,8 +172,8 @@ This approach demonstrates how TypeScript union types can restrict accepted valu
 | --- | --- | --- |
 | 1 · Foundation | Design system, dark/light mode, i18n, Supabase, auth, role-based navigation, onboarding | ✅ Done |
 | 2 · Shops & Discovery | Shop setup wizard, services, staff, map, search & filters, shop profile | ✅ Done |
-| 3 · Booking Engine | Available slots, booking flow, cancel/reschedule, realtime, reminders | ⏳ Next |
-| 4 · Business Tools | Calendar, bookings inbox, walk-ins, client CRM, analytics | |
+| 3 · Booking Engine | Available slots, booking flow, cancel/reschedule, realtime, reminders | ✅ Done |
+| 4 · Business Tools | Calendar, bookings inbox, walk-ins, client CRM, analytics | ⏳ Next |
 | 5 · Payments & Growth | Stripe, reviews, loyalty, promotions, subscriptions | |
 | 6 · AI Assistant | In-app assistant for barbers and clients | |
 | 7 · Polish & Launch | Accessibility, performance, tests, store builds | |
