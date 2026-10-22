@@ -130,6 +130,11 @@ export default function Zbulo() {
       keyboardShouldPersistTaps="handled"
       ListHeaderComponent={koka}
       ItemSeparatorComponent={() => <View style={{ height: hapesira.lg }} />}
+      ListFooterComponent={
+        (lokalet.data ?? []).some((l) => l.burimi === "osm") ? (
+          <Text style={styles.atribuimi}>{t("pergjithshme.atribuimiOsm")}</Text>
+        ) : null
+      }
       renderItem={({ item }) => <KartaELokalit lokali={item} />}
       refreshControl={
         <RefreshControl refreshing={lokalet.isRefetching} onRefresh={lokalet.refetch} tintColor={ngjyrat.ari} />
@@ -272,6 +277,12 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     ngarkimi: {
       marginTop: hapesira.xxl,
+    },
+    atribuimi: {
+      color: ngjyrat.tekstiZbehte,
+      fontSize: 12,
+      textAlign: "center",
+      marginTop: hapesira.xl,
     },
     bosh: {
       alignItems: "center",

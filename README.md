@@ -20,6 +20,7 @@ The project is being developed as part of a university Mobile Applications cours
 - **Shop management** — Edit details, cover photo and logo (Supabase Storage), hours, services (price, duration, hide/delete) and staff. Publish the shop when it has services and hours.
 - **Staff invites** — The owner creates an 8-character code; a barber enters it to join the shop.
 - **Discover (client)** — Nearby published shops ranked by distance or price, with search (shop, service or city) and “Open now” / price filters. Falls back to Prishtina without location permission.
+- **All barbershops in Kosovo** — 379 shops imported from OpenStreetMap appear on the map and in search, marked as not yet on TrimTime (© OpenStreetMap contributors, ODbL).
 - **Map (client)** — Shops on a map with price markers and “Search this area” (phone only; react-native-maps doesn’t run on web).
 - **Shop profile** — Cover, open/closed status in the shop’s time zone, call, directions, services, barbers, weekly hours and description.
 - **Appointments (business “Today” tab)** — Appointment list, filters, search, details, confirm/complete/cancel and a new-appointment form (still local sample data).
@@ -80,7 +81,8 @@ npm install
 ### 4. Configure Supabase
 
 1. Copy `.env.example` to `.env` and fill in the **Project URL** and the **publishable (anon) key** from Supabase → Project Settings → API Keys. Never put a secret / `service_role` key in the app.
-2. In Supabase → **SQL Editor**, run each file in `supabase/migrations/` **in order** (once per project): `20261021120000_themeli.sql`, then `20261022090000_lokalet_dhe_zbulimi.sql`.
+2. In Supabase → **SQL Editor**, run each file in `supabase/migrations/` **in order** (once per project): `20261021120000_themeli.sql`, `20261022090000_lokalet_dhe_zbulimi.sql`, then `20261022150000_lokalet_osm.sql`.
+   Then run `supabase/seed/lokalet_osm_kosove.sql` to load the barbershops of Kosovo. To refresh them later: `npm run importo:osm` and run the regenerated file again.
 3. Optional during development: Authentication → Sign In / Providers → Email → turn off **Confirm email**, so new accounts can sign in immediately.
 
 ### 5. Start the Development Server

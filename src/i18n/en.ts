@@ -6,6 +6,7 @@ export const en: Perkthimet = {
     anulo: "Cancel",
     gabimPapritur: "Something went wrong. Please try again.",
     seShpejti: "Coming soon",
+    atribuimiOsm: "Shop data: © OpenStreetMap contributors",
   },
   onboarding: {
     kalo: "Skip",
@@ -76,12 +77,20 @@ export const en: Perkthimet = {
     lokaliTeksti: "Services, prices, hours, staff and the shop's location.",
     faza: "Phase {{numri}}",
   },
+  roli: {
+    titulli: "How will you use TrimTime?",
+    nentitulli: "Choose once. Your account stays linked to this role.",
+    klient: "I'm a client",
+    klientTeksti: "Find shops near you, compare prices and book appointments.",
+    biznes: "I'm a barber or shop owner",
+    biznesTeksti: "Manage your shop, services, hours, staff and bookings.",
+    siKlient: "Continuing as a client",
+    siBiznes: "Continuing as a barber",
+    ndrysho: "Change",
+    etiketaKlient: "Client",
+    etiketaBiznes: "Barber · Shop",
+  },
   profili: {
-    modiKlient: "Client mode",
-    modiKlientPershkrimi: "Find and book barbers",
-    modiBiznes: "Business mode",
-    modiBiznesPershkrimi: "Manage your shop and bookings",
-    modi: "How are you using TrimTime?",
     llogaria: "Account",
     cilesimet: "Settings",
     dil: "Sign out",
@@ -273,5 +282,8 @@ export const en: Perkthimet = {
     kthehu: "Go back",
     paSherbime: "This shop hasn't added services yet.",
     larg: "{{distanca}} away",
+    osmTitulli: "This shop isn't on TrimTime yet",
+    osmTeksti:
+      "The details come from OpenStreetMap and may be incomplete. Online booking opens once the owner claims the shop on TrimTime.",
   },
 };

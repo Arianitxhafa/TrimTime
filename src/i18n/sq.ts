@@ -4,6 +4,7 @@ export const sq = {
     anulo: "Anulo",
     gabimPapritur: "Ndodhi një gabim. Provo përsëri.",
     seShpejti: "Së shpejti",
+    atribuimiOsm: "Të dhënat e lokaleve: © OpenStreetMap contributors",
   },
   onboarding: {
     kalo: "Kalo",
@@ -75,12 +76,20 @@ export const sq = {
     lokaliTeksti: "Shërbimet, çmimet, orari, stafi dhe vendndodhja e lokalit.",
     faza: "Faza {{numri}}",
   },
+  roli: {
+    titulli: "Si do ta përdorësh TrimTime?",
+    nentitulli: "Zgjidh një herë. Llogaria jote mbetet e lidhur me këtë rol.",
+    klient: "Jam klient",
+    klientTeksti: "Gjej lokale pranë teje, shiko çmimet dhe rezervo termine.",
+    biznes: "Jam berber ose pronar lokali",
+    biznesTeksti: "Menaxho lokalin, shërbimet, orarin, stafin dhe terminet.",
+    siKlient: "Po vazhdon si klient",
+    siBiznes: "Po vazhdon si berber",
+    ndrysho: "Ndrysho",
+    etiketaKlient: "Klient",
+    etiketaBiznes: "Berber · Lokal",
+  },
   profili: {
-    modiKlient: "Modi i klientit",
-    modiKlientPershkrimi: "Gjej dhe rezervo berberë",
-    modiBiznes: "Modi i biznesit",
-    modiBiznesPershkrimi: "Menaxho lokalin dhe terminet",
-    modi: "Si po e përdor TrimTime?",
     llogaria: "Llogaria",
     cilesimet: "Cilësimet",
     dil: "Dil nga llogaria",
@@ -273,5 +282,8 @@ export const sq = {
     kthehu: "Kthehu",
     paSherbime: "Ky lokal nuk ka shtuar ende shërbime.",
     larg: "{{distanca}} larg",
+    osmTitulli: "Ky lokal nuk është ende në TrimTime",
+    osmTeksti:
+      "Informacioni vjen nga OpenStreetMap dhe mund të mos jetë i plotë. Rezervimi online hapet kur pronari ta marrë lokalin në TrimTime.",
   },
 };

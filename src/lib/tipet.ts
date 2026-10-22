@@ -4,7 +4,7 @@ export type RoliNeLokal = "pronar" | "berber";
 
 export type Lokali = {
   id: string;
-  pronari_id: string;
+  pronari_id: string | null;
   emri: string;
   pershkrimi: string | null;
   adresa: string;
@@ -19,7 +19,11 @@ export type Lokali = {
   lng: number;
   i_hapur_tani: boolean;
   cmimi_min: number | null;
+  burimi: BurimiILokalit;
 };
+
+// "osm": lokal i importuar nga OpenStreetMap, pa pronar në TrimTime.
+export type BurimiILokalit = "trimtime" | "osm";
 
 export type LokaliPrane = {
   id: string;
@@ -34,6 +38,7 @@ export type LokaliPrane = {
   i_hapur_tani: boolean;
   cmimi_min: number | null;
   nr_sherbimeve: number;
+  burimi: BurimiILokalit;
 };
 
 export type Sherbimi = {

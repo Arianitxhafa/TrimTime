@@ -13,7 +13,7 @@ import type {
 import { celesat } from "./klienti";
 
 const KOLONAT_E_LOKALIT =
-  "id, pronari_id, emri, pershkrimi, adresa, qyteti, telefoni, logo_url, kopertina_url, zona_kohore, i_publikuar, krijuar_me, lat, lng, i_hapur_tani, cmimi_min";
+  "id, pronari_id, emri, pershkrimi, adresa, qyteti, telefoni, logo_url, kopertina_url, zona_kohore, i_publikuar, krijuar_me, lat, lng, i_hapur_tani, cmimi_min, burimi";
 
 // PostGIS e pranon pikën si tekst EWKT; gjatësia (lng) shkon e para.
 export function pikaEWKT({ lat, lng }: Koordinata): string {
@@ -76,6 +76,8 @@ export type ParametratEKerkimit = {
   vetemHapur: boolean;
   cmimiMax: number | null;
   renditja: "distanca" | "cmimi";
+  // Harta kërkon më shumë rezultate se lista (serveri lejon deri në 300).
+  limit?: number;
 };
 
 export function useLokaletPrane(p: ParametratEKerkimit, aktiv = true) {
@@ -93,6 +95,7 @@ export function useLokaletPrane(p: ParametratEKerkimit, aktiv = true) {
         p_vetem_hapur: p.vetemHapur,
         p_cmimi_max: p.cmimiMax,
         p_renditja: p.renditja,
+        p_limit: p.limit ?? 50,
       });
       if (error) throw error;
       return (data ?? []) as LokaliPrane[];

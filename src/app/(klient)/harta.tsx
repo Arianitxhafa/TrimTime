@@ -47,6 +47,7 @@ export default function Harta() {
       vetemHapur: false,
       cmimiMax: null,
       renditja: "distanca",
+      limit: 300,
     },
     kaLeje !== null,
   );
@@ -126,6 +127,12 @@ export default function Harta() {
         </Pressable>
       )}
 
+      {!lokaliIZgjedhur && (lokalet.data ?? []).some((l) => l.burimi === "osm") && (
+        <View style={styles.atribuimi} pointerEvents="none">
+          <Text style={styles.atribuimiTeksti}>© OpenStreetMap contributors</Text>
+        </View>
+      )}
+
       {lokaliIZgjedhur && (
         <View style={styles.karta}>
           <KartaELokalit lokali={lokaliIZgjedhur} kompakte />
@@ -203,6 +210,21 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       alignItems: "center",
       justifyContent: "center",
       elevation: 3,
+    },
+    atribuimi: {
+      position: "absolute",
+      left: hapesira.md,
+      bottom: hapesira.md,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderRadius: rrezja.sm,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      opacity: 0.9,
+    },
+    atribuimiTeksti: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 11,
+      fontWeight: "600",
     },
     karta: {
       position: "absolute",

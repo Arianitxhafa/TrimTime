@@ -52,11 +52,12 @@ export default function ProfiliILokalit() {
   const sherbimetAktive = (sherbimet.data ?? []).filter((s) => s.aktiv);
   const berberet = (stafi.data ?? []).filter((a) => a.aktiv);
   const sot = new Date().getDay();
+  const ngaOsm = l.burimi === "osm";
 
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ title: l.emri }} />
-      <ScrollView contentContainerStyle={{ paddingBottom: 120 + insets.bottom }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: (ngaOsm ? hapesira.xxl : 120) + insets.bottom }}>
         <View style={styles.kopertina}>
           {l.kopertina_url ? (
             <Image source={{ uri: l.kopertina_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
@@ -109,8 +110,19 @@ export default function ProfiliILokalit() {
             />
           </View>
 
-          <Text style={styles.seksioni}>{t("profiliLokalit.sherbimet")}</Text>
-          {sherbimetAktive.length === 0 ? (
+          {ngaOsm && (
+            <View style={styles.osm}>
+              <Ikona emri={ikonat.zbulo} madhesia={18} ngjyra={ngjyrat.ari} />
+              <View style={styles.osmTeksti}>
+                <Text style={styles.osmTitulli}>{t("profiliLokalit.osmTitulli")}</Text>
+                <Text style={styles.osmPershkrimi}>{t("profiliLokalit.osmTeksti")}</Text>
+                <Text style={styles.osmAtribuimi}>{t("pergjithshme.atribuimiOsm")}</Text>
+              </View>
+            </View>
+          )}
+
+          {!ngaOsm && <Text style={styles.seksioni}>{t("profiliLokalit.sherbimet")}</Text>}
+          {ngaOsm ? null : sherbimetAktive.length === 0 ? (
             <Text style={styles.paTeDhena}>{t("profiliLokalit.paSherbime")}</Text>
           ) : (
             <View style={styles.grupi}>
@@ -178,15 +190,17 @@ export default function ProfiliILokalit() {
         </View>
       </ScrollView>
 
-      <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>
-        <View style={styles.fundiTeksti}>
-          {l.cmimi_min !== null && (
-            <Text style={styles.fundiCmimi}>{t("lokali.ngaCmimi", { cmimi: formatoCmimin(l.cmimi_min) })}</Text>
-          )}
-          <Text style={styles.fundiShenim}>{t("profiliLokalit.rezervimiSeShpejti")}</Text>
+      {!ngaOsm && (
+        <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>
+          <View style={styles.fundiTeksti}>
+            {l.cmimi_min !== null && (
+              <Text style={styles.fundiCmimi}>{t("lokali.ngaCmimi", { cmimi: formatoCmimin(l.cmimi_min) })}</Text>
+            )}
+            <Text style={styles.fundiShenim}>{t("profiliLokalit.rezervimiSeShpejti")}</Text>
+          </View>
+          <Butoni titulli={t("profiliLokalit.rezervo")} joAktiv onPress={() => {}} style={styles.rezervo} />
         </View>
-        <Butoni titulli={t("profiliLokalit.rezervo")} joAktiv onPress={() => {}} style={styles.rezervo} />
-      </View>
+      )}
     </View>
   );
 }
@@ -421,6 +435,33 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       color: ngjyrat.tekstiDyte,
       fontSize: 15,
       lineHeight: 22,
+    },
+    osm: {
+      flexDirection: "row",
+      gap: hapesira.md,
+      backgroundColor: ngjyrat.ariIErret,
+      borderRadius: rrezja.lg,
+      padding: hapesira.lg,
+      marginBottom: hapesira.sm,
+    },
+    osmTeksti: {
+      flex: 1,
+      gap: 4,
+    },
+    osmTitulli: {
+      color: ngjyrat.teksti,
+      fontSize: 15,
+      fontWeight: "800",
+    },
+    osmPershkrimi: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 13,
+      lineHeight: 19,
+    },
+    osmAtribuimi: {
+      color: ngjyrat.tekstiZbehte,
+      fontSize: 11,
+      marginTop: 4,
     },
     fundi: {
       position: "absolute",
