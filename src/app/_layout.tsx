@@ -9,6 +9,7 @@ import { AuthProvider, useAuth } from "../context/AuthContext";
 import { PreferencatProvider, usePreferencat } from "../context/PreferencatContext";
 import { TemaProvider, useTema } from "../context/TemaContext";
 import { TerminetProvider } from "../context/TerminetContext";
+import { useModiAktiv } from "../hooks/useModiAktiv";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -32,7 +33,8 @@ function Navigimi() {
   const { t } = useTranslation();
   const { ngjyrat, eshteErret } = useTema();
   const { sesioni, ngarkohet } = useAuth();
-  const { modi, onboardingIPare } = usePreferencat();
+  const { onboardingIPare } = usePreferencat();
+  const modi = useModiAktiv();
 
   useEffect(() => {
     if (!ngarkohet) SplashScreen.hideAsync().catch(() => {});

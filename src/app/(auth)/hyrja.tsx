@@ -6,6 +6,8 @@ import Butoni from "../../components/Butoni";
 import FushaTekstit from "../../components/FushaTekstit";
 import { ikonat } from "../../components/Ikona";
 import KornizaAuth, { GabimiIFormes } from "../../components/KornizaAuth";
+import RoliIZgjedhur from "../../components/RoliIZgjedhur";
+import { usePreferencat } from "../../context/PreferencatContext";
 import { useStilet } from "../../context/TemaContext";
 import { emailIVlefshem, mesazhiIGabimit } from "../../lib/gabimetEAuth";
 import { supabase } from "../../lib/supabase";
@@ -14,6 +16,7 @@ import { type Ngjyrat } from "../../theme";
 export default function Hyrja() {
   const { t } = useTranslation();
   const styles = useStilet(krijoStilet);
+  const { modi } = usePreferencat();
   const [email, setEmail] = useState("");
   const [fjalekalimi, setFjalekalimi] = useState("");
   const [provuar, setProvuar] = useState(false);
@@ -31,13 +34,21 @@ export default function Hyrja() {
     if (gabimet.email || gabimet.fjalekalimi) return;
 
     setNgarkohet(true);
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: email.trim(),
       password: fjalekalimi,
     });
     setNgarkohet(false);
-    // Pas hyrjes së suksesshme, navigimi kalon vetë te tab-et (shih _layout.tsx).
-    if (error) setGabimi(mesazhiIGabimit(error, t));
+    if (error) {
+      setGabimi(mesazhiIGabimit(error, t));
+      return;
+    }
+    // Llogaritë e krijuara para zgjedhjes së rolit e marrin rolin këtu. Kur llogaria ka rol,
+    // ai ka përparësi ndaj zgjedhjes në këtë pajisje.
+    if (!data.user.user_metadata?.roli) {
+      await supabase.auth.updateUser({ data: { roli: modi } });
+    }
+    // Pas hyrjes, navigimi kalon vetë te tab-et (shih _layout.tsx).
   }
 
   return (
@@ -53,6 +64,7 @@ export default function Hyrja() {
         </>
       }
     >
+      <RoliIZgjedhur />
       <GabimiIFormes mesazhi={gabimi} />
       <FushaTekstit
         etiketa={t("auth.email")}

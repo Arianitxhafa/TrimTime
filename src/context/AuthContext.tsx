@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import { supabase } from "../lib/supabase";
+import type { Modi } from "./PreferencatContext";
 
 export type Profili = {
   id: string;
@@ -21,6 +22,8 @@ type VleraKontekstit = {
   profili: Profili | null;
   // Emri për t'u shfaqur: nga profili, nga regjistrimi ose nga email-i.
   emriIShfaqur: string;
+  // Roli i ruajtur në llogari gjatë regjistrimit; null për llogaritë e vjetra pa rol.
+  roli: Modi | null;
   ngarkohet: boolean;
   dil: () => Promise<void>;
 };
@@ -68,7 +71,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const vlera = useMemo<VleraKontekstit>(() => {
     const emriNgaRegjistrimi = sesioni?.user.user_metadata?.emri;
+    const roliILlogarise = sesioni?.user.user_metadata?.roli;
     return {
+      roli: roliILlogarise === "klient" || roliILlogarise === "biznes" ? roliILlogarise : null,
       sesioni,
       profili: profiliAktual,
       emriIShfaqur:

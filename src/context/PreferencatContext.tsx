@@ -9,7 +9,7 @@ import {
 } from "react";
 import { ngarkoGjuhenERuajtur } from "../i18n";
 
-// I njëjti përdorues mund të jetë klient dhe berber; modi vendos cilat tab-e shfaqen.
+// Roli i zgjedhur para hyrjes: vendos cilat tab-e shfaqen dhe ruhet në llogari gjatë regjistrimit.
 export type Modi = "klient" | "biznes";
 
 const CELESI_MODIT = "trimtime.modi";

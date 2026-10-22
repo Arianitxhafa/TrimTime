@@ -1,8 +1,8 @@
 import { Redirect } from "expo-router";
-import { usePreferencat } from "../context/PreferencatContext";
+import { useModiAktiv } from "../hooks/useModiAktiv";
 
-// Hyrja e aplikacionit pas autentikimit: dërgon te tab-et e modit aktiv.
+// Hyrja e aplikacionit pas autentikimit: dërgon te tab-et e rolit.
 export default function Index() {
-  const { modi } = usePreferencat();
+  const modi = useModiAktiv();
   return <Redirect href={modi === "biznes" ? "/sot" : "/zbulo"} />;
 }
