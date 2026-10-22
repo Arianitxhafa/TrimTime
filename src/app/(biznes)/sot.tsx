@@ -1,70 +1,107 @@
 import { router } from "expo-router";
 import { useMemo, useState } from "react";
-import { FlatList, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { useTranslation } from "react-i18next";
+import {
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useLokaliIm } from "../../api/lokalet";
+import { useTerminetELokalit, useTerminetLiveILokalit } from "../../api/terminet";
 import Butoni from "../../components/Butoni";
 import Ikona, { ikonat } from "../../components/Ikona";
 import KartaTerminit from "../../components/KartaTerminit";
-import { useTerminet } from "../../context/TerminetContext";
-import { gjejSherbimin, statuset, type StatusiTerminit } from "../../data/terminet";
+import ZgjedhesiIDites from "../../components/ZgjedhesiIDites";
 import { useStilet, useTema } from "../../context/TemaContext";
+import { dataISO, ditetEArdhshme, formatoDaten } from "../../lib/datat";
+import { formatoCmimin } from "../../lib/formatimi";
+import { STATUSET, type StatusiTerminit } from "../../lib/tipet";
 import { hapesira, rrezja, type Ngjyrat } from "../../theme";
 
-type Filtri = "Të gjitha" | StatusiTerminit;
+type Filtri = "te_gjitha" | StatusiTerminit;
 
-const ditet = ["E diel", "E hënë", "E martë", "E mërkurë", "E enjte", "E premte", "E shtunë"];
-const muajt = [
-  "janar", "shkurt", "mars", "prill", "maj", "qershor",
-  "korrik", "gusht", "shtator", "tetor", "nëntor", "dhjetor",
-];
-
-function dataESotme(): string {
-  const sot = new Date();
-  return `${ditet[sot.getDay()]}, ${sot.getDate()} ${muajt[sot.getMonth()]}`;
-}
-
-function hapTerminin(id: string) {
-  router.push({ pathname: "/termini/[id]", params: { id } });
+function hapTerminin(id: string, data: string) {
+  router.push({ pathname: "/termini/[id]", params: { id, data } });
 }
 
 export default function Sot() {
-  const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { ngjyrat, statusetMeta } = useTema();
   const styles = useStilet(krijoStilet);
-  const { terminet } = useTerminet();
-  const [filtri, setFiltri] = useState<Filtri>("Të gjitha");
+  const insets = useSafeAreaInsets();
+  const lokaliIm = useLokaliIm();
+  const lokali = lokaliIm.data?.lokali;
+
+  const ditet = useMemo(() => ditetEArdhshme(14), []);
+  const [data, setData] = useState(ditet[0]);
+  const [filtri, setFiltri] = useState<Filtri>("te_gjitha");
   const [kerkimi, setKerkimi] = useState("");
 
-  const numri = (statusi: StatusiTerminit) => terminet.filter((t) => t.statusi === statusi).length;
+  const terminet = useTerminetELokalit(lokali?.id, data);
+  useTerminetLiveILokalit(lokali?.id);
 
-  const teArdhurat = terminet
-    .filter((t) => t.statusi === "Përfunduar")
-    .reduce((shuma, t) => shuma + (gjejSherbimin(t.sherbimi)?.cmimi ?? 0), 0);
+  const lista = useMemo(() => terminet.data ?? [], [terminet.data]);
+  const numri = (s: StatusiTerminit) => lista.filter((x) => x.statusi === s).length;
+  const teArdhurat = lista
+    .filter((x) => x.statusi === "perfunduar")
+    .reduce((shuma, x) => shuma + x.cmimi_centa, 0);
 
-  const iRadhes = terminet.find((t) => t.statusi === "Konfirmuar" || t.statusi === "Në pritje");
+  const tani = new Date().toISOString();
+  const iRadhes = lista.find(
+    (x) => (x.statusi === "konfirmuar" || x.statusi === "ne_pritje") && (data !== dataISO(new Date()) || x.fillon_me >= tani),
+  );
 
   const teFiltruara = useMemo(() => {
     const k = kerkimi.trim().toLowerCase();
-    return terminet.filter(
-      (t) =>
-        (filtri === "Të gjitha" || t.statusi === filtri) &&
-        (k === "" || t.klienti.toLowerCase().includes(k) || t.sherbimi.toLowerCase().includes(k)),
+    return lista.filter(
+      (x) =>
+        (filtri === "te_gjitha" || x.statusi === filtri) &&
+        (k === "" || x.klienti_emri.toLowerCase().includes(k) || x.sherbimi_emri.toLowerCase().includes(k)),
     );
-  }, [terminet, filtri, kerkimi]);
+  }, [lista, filtri, kerkimi]);
 
-  const kaFiltra = filtri !== "Të gjitha" || kerkimi.trim() !== "";
+  const kaFiltra = filtri !== "te_gjitha" || kerkimi.trim() !== "";
+
+  if (lokaliIm.isPending) {
+    return (
+      <View style={[styles.container, styles.qendra]}>
+        <ActivityIndicator color={ngjyrat.ari} />
+      </View>
+    );
+  }
+
+  if (!lokali) {
+    return (
+      <View style={[styles.container, styles.qendra, { paddingTop: insets.top }]}>
+        <View style={styles.boshIkona}>
+          <Ikona emri={ikonat.lokali} madhesia={28} ngjyra={ngjyrat.ari} />
+        </View>
+        <Text style={styles.boshTeksti}>{t("sot.paLokal")}</Text>
+        <Butoni titulli={t("sot.hapLokalin")} ikona={ikonat.lokali} onPress={() => router.navigate("/lokali")} />
+      </View>
+    );
+  }
 
   const koka = (
     <View>
       <View style={styles.koka}>
         <View style={styles.kokaTeksti}>
-          <Text style={styles.data}>{dataESotme()}</Text>
-          <Text style={styles.titulli}>TrimTime</Text>
+          <Text style={styles.data}>{formatoDaten(data, t)}</Text>
+          <Text style={styles.titulli} numberOfLines={1}>
+            {lokali.emri}
+          </Text>
         </View>
         <View style={styles.kokaButonat}>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Cilësimet"
+            accessibilityLabel={t("cilesimet.titulli")}
             onPress={() => router.push("/cilesimet")}
             style={({ pressed }) => [styles.butoniCilesimet, pressed && styles.shtypur]}
           >
@@ -72,8 +109,8 @@ export default function Sot() {
           </Pressable>
           <Pressable
             accessibilityRole="button"
-            accessibilityLabel="Shto termin të ri"
-            onPress={() => router.push("/shto")}
+            accessibilityLabel={t("sot.shtoTermin")}
+            onPress={() => router.push({ pathname: "/shto", params: { data } })}
             style={({ pressed }) => [styles.butoniShto, pressed && styles.shtypur]}
           >
             <Ikona emri={ikonat.shto} madhesia={22} ngjyra={ngjyrat.mbiAri} />
@@ -81,49 +118,53 @@ export default function Sot() {
         </View>
       </View>
 
+      <View style={styles.ditet}>
+        <ZgjedhesiIDites ditet={ditet} zgjedhur={data} onZgjidh={setData} />
+      </View>
+
       {iRadhes ? (
         <Pressable
           accessibilityRole="button"
-          onPress={() => hapTerminin(iRadhes.id)}
+          onPress={() => hapTerminin(iRadhes.id, data)}
           style={({ pressed }) => [styles.iRadhes, pressed && styles.shtypur]}
         >
           <View style={styles.iRadhesKoka}>
-            <Text style={styles.iRadhesEtiketa}>TERMINI I RADHËS</Text>
+            <Text style={styles.iRadhesEtiketa}>{t("sot.terminiIRadhes").toUpperCase()}</Text>
             <Ikona emri={ikonat.djathtas} madhesia={18} ngjyra={ngjyrat.mbiAri} />
           </View>
-          <Text style={styles.iRadhesOra}>{iRadhes.ora}</Text>
-          <Text style={styles.iRadhesKlienti}>{iRadhes.klienti}</Text>
+          <Text style={styles.iRadhesOra}>{iRadhes.ora_lokale}</Text>
+          <Text style={styles.iRadhesKlienti}>{iRadhes.klienti_emri}</Text>
           <Text style={styles.iRadhesSherbimi}>
-            {iRadhes.sherbimi} · {iRadhes.statusi}
+            {iRadhes.sherbimi_emri} · {t(`statuset.${iRadhes.statusi}`)}
           </Text>
         </Pressable>
       ) : (
         <View style={[styles.iRadhes, styles.iRadhesBosh]}>
-          <Text style={styles.iRadhesBoshTeksti}>Nuk ka termine të hapura për sot 🎉</Text>
+          <Text style={styles.iRadhesBoshTeksti}>{t("sot.asnjeIHapur")}</Text>
         </View>
       )}
 
       <View style={styles.statistikat}>
         <Statistika
-          etiketa="Në pritje"
-          vlera={String(numri("Në pritje"))}
-          ngjyra={statusetMeta["Në pritje"].ngjyra}
-          aktiv={filtri === "Në pritje"}
-          onPress={() => setFiltri(filtri === "Në pritje" ? "Të gjitha" : "Në pritje")}
+          etiketa={t("statuset.ne_pritje")}
+          vlera={String(numri("ne_pritje"))}
+          ngjyra={statusetMeta.ne_pritje.ngjyra}
+          aktiv={filtri === "ne_pritje"}
+          onPress={() => setFiltri(filtri === "ne_pritje" ? "te_gjitha" : "ne_pritje")}
         />
         <Statistika
-          etiketa="Konfirmuar"
-          vlera={String(numri("Konfirmuar"))}
-          ngjyra={statusetMeta.Konfirmuar.ngjyra}
-          aktiv={filtri === "Konfirmuar"}
-          onPress={() => setFiltri(filtri === "Konfirmuar" ? "Të gjitha" : "Konfirmuar")}
+          etiketa={t("statuset.konfirmuar")}
+          vlera={String(numri("konfirmuar"))}
+          ngjyra={statusetMeta.konfirmuar.ngjyra}
+          aktiv={filtri === "konfirmuar"}
+          onPress={() => setFiltri(filtri === "konfirmuar" ? "te_gjitha" : "konfirmuar")}
         />
         <Statistika
-          etiketa="Të ardhura"
-          vlera={`€${teArdhurat}`}
-          ngjyra={statusetMeta.Përfunduar.ngjyra}
-          aktiv={filtri === "Përfunduar"}
-          onPress={() => setFiltri(filtri === "Përfunduar" ? "Të gjitha" : "Përfunduar")}
+          etiketa={t("sot.teArdhura")}
+          vlera={formatoCmimin(teArdhurat)}
+          ngjyra={statusetMeta.perfunduar.ngjyra}
+          aktiv={filtri === "perfunduar"}
+          onPress={() => setFiltri(filtri === "perfunduar" ? "te_gjitha" : "perfunduar")}
         />
       </View>
 
@@ -132,19 +173,15 @@ export default function Sot() {
         <TextInput
           value={kerkimi}
           onChangeText={setKerkimi}
-          placeholder="Kërko klientin ose shërbimin"
+          placeholder={t("sot.kerko")}
           placeholderTextColor={ngjyrat.tekstiZbehte}
           style={styles.kerkimiInput}
           returnKeyType="search"
           autoCorrect={false}
+          accessibilityLabel={t("sot.kerko")}
         />
         {kerkimi !== "" && (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Pastro kërkimin"
-            onPress={() => setKerkimi("")}
-            hitSlop={10}
-          >
+          <Pressable accessibilityRole="button" onPress={() => setKerkimi("")} hitSlop={10}>
             <Ikona emri={ikonat.pastro} madhesia={18} ngjyra={ngjyrat.tekstiDyte} />
           </Pressable>
         )}
@@ -156,9 +193,9 @@ export default function Sot() {
         contentContainerStyle={styles.filtrat}
         style={styles.filtratScroll}
       >
-        {(["Të gjitha", ...statuset] as Filtri[]).map((f) => {
+        {(["te_gjitha", ...STATUSET] as Filtri[]).map((f) => {
           const aktiv = filtri === f;
-          const sasia = f === "Të gjitha" ? terminet.length : numri(f);
+          const sasia = f === "te_gjitha" ? lista.length : numri(f);
           return (
             <Pressable
               key={f}
@@ -167,7 +204,9 @@ export default function Sot() {
               onPress={() => setFiltri(f)}
               style={[styles.chip, aktiv && styles.chipAktiv]}
             >
-              <Text style={[styles.chipTeksti, aktiv && styles.chipTekstiAktiv]}>{f}</Text>
+              <Text style={[styles.chipTeksti, aktiv && styles.chipTekstiAktiv]}>
+                {f === "te_gjitha" ? t("sot.teGjitha") : t(`statuset.${f}`)}
+              </Text>
               <Text style={[styles.chipNumri, aktiv && styles.chipTekstiAktiv]}>{sasia}</Text>
             </Pressable>
           );
@@ -175,7 +214,7 @@ export default function Sot() {
       </ScrollView>
 
       <Text style={styles.seksioni}>
-        {filtri === "Të gjitha" ? "Orari i ditës" : filtri} · {teFiltruara.length}
+        {filtri === "te_gjitha" ? t("sot.orariIDites") : t(`statuset.${filtri}`)} · {teFiltruara.length}
       </Text>
     </View>
   );
@@ -183,42 +222,50 @@ export default function Sot() {
   return (
     <FlatList
       style={styles.container}
-      contentContainerStyle={[
-        styles.lista,
-        { paddingTop: insets.top + hapesira.lg, paddingBottom: hapesira.xxl },
-      ]}
+      contentContainerStyle={[styles.lista, { paddingTop: insets.top + hapesira.lg, paddingBottom: hapesira.xxl }]}
       data={teFiltruara}
       keyExtractor={(item) => item.id}
       keyboardShouldPersistTaps="handled"
       ListHeaderComponent={koka}
-      renderItem={({ item }) => <KartaTerminit termini={item} onPress={() => hapTerminin(item.id)} />}
+      refreshControl={
+        <RefreshControl refreshing={terminet.isRefetching} onRefresh={terminet.refetch} tintColor={ngjyrat.ari} />
+      }
+      renderItem={({ item }) => <KartaTerminit termini={item} onPress={() => hapTerminin(item.id, data)} />}
       ListEmptyComponent={
-        <View style={styles.bosh}>
-          <View style={styles.boshIkona}>
-            <Ikona emri={ikonat.bosh} madhesia={28} ngjyra={ngjyrat.tekstiDyte} />
+        terminet.isPending ? (
+          <ActivityIndicator color={ngjyrat.ari} style={styles.ngarkimi} />
+        ) : terminet.isError ? (
+          <View style={styles.bosh}>
+            <Ikona emri={ikonat.gabim} madhesia={28} ngjyra={ngjyrat.tekstiDyte} />
+            <Text style={styles.boshTeksti}>{t("pergjithshme.gabimPapritur")}</Text>
+            <Butoni titulli={t("zbulo.provoPerseri")} varianti="dytesor" ikona={ikonat.kthe} onPress={() => terminet.refetch()} />
           </View>
-          <Text style={styles.boshTitulli}>
-            {kaFiltra ? "Asnjë termin nuk përputhet" : "Nuk ka termine ende"}
-          </Text>
-          <Text style={styles.boshTeksti}>
-            {kaFiltra
-              ? "Provo një kërkim tjetër ose hiq filtrat."
-              : "Shto terminin e parë për ta nisur ditën."}
-          </Text>
-          {kaFiltra ? (
-            <Butoni
-              titulli="Pastro filtrat"
-              varianti="dytesor"
-              ikona={ikonat.kthe}
-              onPress={() => {
-                setFiltri("Të gjitha");
-                setKerkimi("");
-              }}
-            />
-          ) : (
-            <Butoni titulli="Shto termin" ikona={ikonat.shto} onPress={() => router.push("/shto")} />
-          )}
-        </View>
+        ) : (
+          <View style={styles.bosh}>
+            <View style={styles.boshIkona}>
+              <Ikona emri={ikonat.bosh} madhesia={28} ngjyra={ngjyrat.tekstiDyte} />
+            </View>
+            <Text style={styles.boshTitulli}>{kaFiltra ? t("sot.asnjePerputhet") : t("sot.paTermine")}</Text>
+            <Text style={styles.boshTeksti}>{kaFiltra ? t("sot.provoKerkim") : t("sot.paTermineTeksti")}</Text>
+            {kaFiltra ? (
+              <Butoni
+                titulli={t("sot.pastroFiltrat")}
+                varianti="dytesor"
+                ikona={ikonat.kthe}
+                onPress={() => {
+                  setFiltri("te_gjitha");
+                  setKerkimi("");
+                }}
+              />
+            ) : (
+              <Butoni
+                titulli={t("sot.shtoTermin")}
+                ikona={ikonat.shto}
+                onPress={() => router.push({ pathname: "/shto", params: { data } })}
+              />
+            )}
+          </View>
+        )
       }
     />
   );
@@ -239,11 +286,7 @@ function Statistika({ etiketa, vlera, ngjyra, aktiv, onPress }: StatistikaProps)
       accessibilityRole="button"
       accessibilityState={{ selected: aktiv }}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.statistika,
-        aktiv && { borderColor: ngjyra },
-        pressed && styles.shtypur,
-      ]}
+      style={({ pressed }) => [styles.statistika, aktiv && { borderColor: ngjyra }, pressed && styles.shtypur]}
     >
       <View style={[styles.statistikaPika, { backgroundColor: ngjyra }]} />
       <Text style={styles.statistikaVlera}>{vlera}</Text>
@@ -254,223 +297,237 @@ function Statistika({ etiketa, vlera, ngjyra, aktiv, onPress }: StatistikaProps)
 
 const krijoStilet = (ngjyrat: Ngjyrat) =>
   StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: ngjyrat.sfondi,
-  },
-  lista: {
-    paddingHorizontal: hapesira.xl,
-  },
-  shtypur: {
-    opacity: 0.85,
-    transform: [{ scale: 0.98 }],
-  },
-  koka: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: hapesira.xl,
-  },
-  kokaTeksti: {
-    gap: 2,
-  },
-  data: {
-    color: ngjyrat.tekstiDyte,
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  titulli: {
-    color: ngjyrat.teksti,
-    fontSize: 32,
-    fontWeight: "800",
-    letterSpacing: -0.5,
-  },
-  kokaButonat: {
-    flexDirection: "row",
-    gap: hapesira.sm,
-  },
-  butoniCilesimet: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: ngjyrat.siperfaqja,
-    borderWidth: 1,
-    borderColor: ngjyrat.kufiri,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  butoniShto: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: ngjyrat.ari,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  iRadhes: {
-    backgroundColor: ngjyrat.ari,
-    borderRadius: rrezja.lg,
-    padding: hapesira.xl,
-    marginBottom: hapesira.lg,
-  },
-  iRadhesKoka: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: hapesira.sm,
-  },
-  iRadhesEtiketa: {
-    color: ngjyrat.mbiAri,
-    fontSize: 12,
-    fontWeight: "800",
-    letterSpacing: 1.2,
-    opacity: 0.7,
-  },
-  iRadhesOra: {
-    color: ngjyrat.mbiAri,
-    fontSize: 36,
-    fontWeight: "800",
-    letterSpacing: -1,
-    fontVariant: ["tabular-nums"],
-  },
-  iRadhesKlienti: {
-    color: ngjyrat.mbiAri,
-    fontSize: 18,
-    fontWeight: "700",
-    marginTop: 2,
-  },
-  iRadhesSherbimi: {
-    color: ngjyrat.mbiAri,
-    fontSize: 14,
-    opacity: 0.75,
-    marginTop: 2,
-  },
-  iRadhesBosh: {
-    backgroundColor: ngjyrat.siperfaqja,
-    borderWidth: 1,
-    borderColor: ngjyrat.kufiri,
-  },
-  iRadhesBoshTeksti: {
-    color: ngjyrat.tekstiDyte,
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  statistikat: {
-    flexDirection: "row",
-    gap: hapesira.sm,
-    marginBottom: hapesira.lg,
-  },
-  statistika: {
-    flex: 1,
-    backgroundColor: ngjyrat.siperfaqja,
-    borderRadius: rrezja.md,
-    borderWidth: 1,
-    borderColor: ngjyrat.kufiri,
-    padding: hapesira.md,
-  },
-  statistikaPika: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginBottom: hapesira.sm,
-  },
-  statistikaVlera: {
-    color: ngjyrat.teksti,
-    fontSize: 22,
-    fontWeight: "800",
-    fontVariant: ["tabular-nums"],
-  },
-  statistikaEtiketa: {
-    color: ngjyrat.tekstiDyte,
-    fontSize: 12,
-    fontWeight: "600",
-    marginTop: 2,
-  },
-  kerkimi: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: hapesira.sm,
-    backgroundColor: ngjyrat.siperfaqja,
-    borderRadius: rrezja.md,
-    borderWidth: 1,
-    borderColor: ngjyrat.kufiri,
-    paddingHorizontal: hapesira.md,
-    height: 48,
-    marginBottom: hapesira.md,
-  },
-  kerkimiInput: {
-    flex: 1,
-    color: ngjyrat.teksti,
-    fontSize: 15,
-    height: "100%",
-  },
-  filtratScroll: {
-    marginHorizontal: -hapesira.xl,
-    marginBottom: hapesira.lg,
-  },
-  filtrat: {
-    paddingHorizontal: hapesira.xl,
-    gap: hapesira.sm,
-  },
-  chip: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: 14,
-    height: 36,
-    borderRadius: rrezja.plote,
-    backgroundColor: ngjyrat.siperfaqja,
-    borderWidth: 1,
-    borderColor: ngjyrat.kufiri,
-  },
-  chipAktiv: {
-    backgroundColor: ngjyrat.teksti,
-    borderColor: ngjyrat.teksti,
-  },
-  chipTeksti: {
-    color: ngjyrat.tekstiDyte,
-    fontSize: 13,
-    fontWeight: "700",
-  },
-  chipNumri: {
-    color: ngjyrat.tekstiZbehte,
-    fontSize: 12,
-    fontWeight: "700",
-  },
-  chipTekstiAktiv: {
-    color: ngjyrat.sfondi,
-  },
-  seksioni: {
-    color: ngjyrat.tekstiDyte,
-    fontSize: 13,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-    marginBottom: hapesira.md,
-  },
-  bosh: {
-    alignItems: "center",
-    paddingVertical: hapesira.xxl,
-    gap: hapesira.sm,
-  },
-  boshIkona: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: ngjyrat.siperfaqja,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: hapesira.sm,
-  },
-  boshTitulli: {
-    color: ngjyrat.teksti,
-    fontSize: 17,
-    fontWeight: "700",
-  },
-  boshTeksti: {
-    color: ngjyrat.tekstiDyte,
-    fontSize: 14,
-    textAlign: "center",
-    marginBottom: hapesira.md,
-  },
-});
+    container: {
+      flex: 1,
+      backgroundColor: ngjyrat.sfondi,
+    },
+    qendra: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingHorizontal: hapesira.xxl,
+      gap: hapesira.md,
+    },
+    lista: {
+      paddingHorizontal: hapesira.xl,
+    },
+    shtypur: {
+      opacity: 0.85,
+      transform: [{ scale: 0.98 }],
+    },
+    koka: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: hapesira.md,
+      marginBottom: hapesira.lg,
+    },
+    kokaTeksti: {
+      flex: 1,
+      gap: 2,
+    },
+    data: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 14,
+      fontWeight: "600",
+    },
+    titulli: {
+      color: ngjyrat.teksti,
+      fontSize: 28,
+      fontWeight: "800",
+      letterSpacing: -0.5,
+    },
+    kokaButonat: {
+      flexDirection: "row",
+      gap: hapesira.sm,
+    },
+    butoniCilesimet: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    butoniShto: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: ngjyrat.ari,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    ditet: {
+      marginBottom: hapesira.lg,
+    },
+    iRadhes: {
+      backgroundColor: ngjyrat.ari,
+      borderRadius: rrezja.lg,
+      padding: hapesira.xl,
+      marginBottom: hapesira.lg,
+    },
+    iRadhesKoka: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: hapesira.sm,
+    },
+    iRadhesEtiketa: {
+      color: ngjyrat.mbiAri,
+      fontSize: 12,
+      fontWeight: "800",
+      letterSpacing: 1.2,
+      opacity: 0.7,
+    },
+    iRadhesOra: {
+      color: ngjyrat.mbiAri,
+      fontSize: 36,
+      fontWeight: "800",
+      letterSpacing: -1,
+      fontVariant: ["tabular-nums"],
+    },
+    iRadhesKlienti: {
+      color: ngjyrat.mbiAri,
+      fontSize: 18,
+      fontWeight: "700",
+      marginTop: 2,
+    },
+    iRadhesSherbimi: {
+      color: ngjyrat.mbiAri,
+      fontSize: 14,
+      opacity: 0.75,
+      marginTop: 2,
+    },
+    iRadhesBosh: {
+      backgroundColor: ngjyrat.siperfaqja,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
+    },
+    iRadhesBoshTeksti: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 15,
+      fontWeight: "600",
+    },
+    statistikat: {
+      flexDirection: "row",
+      gap: hapesira.sm,
+      marginBottom: hapesira.lg,
+    },
+    statistika: {
+      flex: 1,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderRadius: rrezja.md,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
+      padding: hapesira.md,
+    },
+    statistikaPika: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      marginBottom: hapesira.sm,
+    },
+    statistikaVlera: {
+      color: ngjyrat.teksti,
+      fontSize: 22,
+      fontWeight: "800",
+      fontVariant: ["tabular-nums"],
+    },
+    statistikaEtiketa: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 12,
+      fontWeight: "600",
+      marginTop: 2,
+    },
+    kerkimi: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: hapesira.sm,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderRadius: rrezja.md,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
+      paddingHorizontal: hapesira.md,
+      height: 48,
+      marginBottom: hapesira.md,
+    },
+    kerkimiInput: {
+      flex: 1,
+      color: ngjyrat.teksti,
+      fontSize: 15,
+      height: "100%",
+    },
+    filtratScroll: {
+      marginHorizontal: -hapesira.xl,
+      marginBottom: hapesira.lg,
+    },
+    filtrat: {
+      paddingHorizontal: hapesira.xl,
+      gap: hapesira.sm,
+    },
+    chip: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingHorizontal: 14,
+      height: 36,
+      borderRadius: rrezja.plote,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
+    },
+    chipAktiv: {
+      backgroundColor: ngjyrat.teksti,
+      borderColor: ngjyrat.teksti,
+    },
+    chipTeksti: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 13,
+      fontWeight: "700",
+    },
+    chipNumri: {
+      color: ngjyrat.tekstiZbehte,
+      fontSize: 12,
+      fontWeight: "700",
+    },
+    chipTekstiAktiv: {
+      color: ngjyrat.sfondi,
+    },
+    seksioni: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 13,
+      fontWeight: "700",
+      textTransform: "uppercase",
+      letterSpacing: 0.8,
+      marginBottom: hapesira.md,
+    },
+    ngarkimi: {
+      marginTop: hapesira.xl,
+    },
+    bosh: {
+      alignItems: "center",
+      paddingVertical: hapesira.xxl,
+      gap: hapesira.sm,
+    },
+    boshIkona: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      backgroundColor: ngjyrat.siperfaqja,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: hapesira.sm,
+    },
+    boshTitulli: {
+      color: ngjyrat.teksti,
+      fontSize: 17,
+      fontWeight: "700",
+    },
+    boshTeksti: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 14,
+      textAlign: "center",
+      marginBottom: hapesira.md,
+    },
+  });

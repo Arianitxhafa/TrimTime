@@ -1,358 +1,299 @@
-import { router } from "expo-router";
-import { useState, type ReactNode } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
+  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useLokaliIm } from "../api/lokalet";
+import { useSherbimet } from "../api/sherbimet";
+import { useStafi } from "../api/stafi";
+import { mesazhiIGabimitTeRezervimit, useOraretELira, useShtoTerminNgaStafi } from "../api/terminet";
 import Butoni from "../components/Butoni";
+import FushaTekstit from "../components/FushaTekstit";
 import { ikonat } from "../components/Ikona";
-import { useTerminet } from "../context/TerminetContext";
-import { oraretEPunes, sherbimet } from "../data/terminet";
+import { GabimiIFormes } from "../components/KornizaAuth";
+import RrjetaEOrareve from "../components/RrjetaEOrareve";
+import ZgjedhesiIDites from "../components/ZgjedhesiIDites";
 import { useStilet, useTema } from "../context/TemaContext";
+import { ditetEArdhshme } from "../lib/datat";
+import { formatoCmimin, formatoKohezgjatjen } from "../lib/formatimi";
+import type { OraELire } from "../lib/tipet";
 import { hapesira, rrezja, type Ngjyrat } from "../theme";
 
 function kthehu() {
-  if (router.canGoBack()) {
-    router.back();
-  } else {
-    router.replace("/");
-  }
+  if (router.canGoBack()) router.back();
+  else router.replace("/");
 }
 
+// Termin i shtuar nga stafi: klient pa llogari (walk-in ose rezervim me telefon).
 export default function ShtoTermin() {
-  const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
-  const { terminet, shtoTermin } = useTerminet();
+  const insets = useSafeAreaInsets();
+  const { data: dataNgaParametri } = useLocalSearchParams<{ data?: string }>();
+  const lokaliIm = useLokaliIm();
+  const lokaliId = lokaliIm.data?.lokali.id;
+  const sherbimet = useSherbimet(lokaliId);
+  const stafi = useStafi(lokaliId);
+  const shto = useShtoTerminNgaStafi();
 
+  const ditet = useMemo(() => ditetEArdhshme(14), []);
   const [klienti, setKlienti] = useState("");
   const [telefoni, setTelefoni] = useState("");
-  const [sherbimi, setSherbimi] = useState<string | null>(null);
-  const [ora, setOra] = useState<string | null>(null);
+  const [sherbimiId, setSherbimiId] = useState<string | null>(null);
+  const [berberiId, setBerberiId] = useState<string | null>(null);
+  const [data, setData] = useState(dataNgaParametri && ditet.includes(dataNgaParametri) ? dataNgaParametri : ditet[0]);
+  const [ora, setOra] = useState<OraELire | null>(null);
   const [shenime, setShenime] = useState("");
   const [provuar, setProvuar] = useState(false);
 
-  const oretEZena = new Set(terminet.filter((t) => t.statusi !== "Anuluar").map((t) => t.ora));
+  const oraret = useOraretELira({ lokaliId: lokaliId ?? "", sherbimiId, data, berberiId, perStafin: true });
 
   const gabimet = {
-    klienti: klienti.trim().length < 2 ? "Shkruaj emrin e klientit." : null,
-    sherbimi: sherbimi ? null : "Zgjidh një shërbim.",
-    ora: ora ? null : "Zgjidh një orë të lirë.",
+    klienti: klienti.trim().length >= 2 ? null : t("terminIRi.gabimEmri"),
+    sherbimi: sherbimiId ? null : t("terminIRi.gabimSherbimi"),
+    ora: ora ? null : t("terminIRi.gabimOra"),
   };
-  const iVlefshem = !gabimet.klienti && !gabimet.sherbimi && !gabimet.ora;
 
   function ruaj() {
     setProvuar(true);
-    if (!iVlefshem || !sherbimi || !ora) return;
-
-    shtoTermin({
-      klienti: klienti.trim(),
-      sherbimi,
-      ora,
-      telefoni: telefoni.trim() || undefined,
-      shenime: shenime.trim() || undefined,
-    });
-    kthehu();
+    if (!lokaliId || !sherbimiId || !ora || gabimet.klienti) return;
+    shto.mutate(
+      {
+        lokaliId,
+        sherbimiId,
+        fillonMe: ora.fillon_me,
+        berberiId: berberiId ?? ora.berberi_id,
+        emriKlientit: klienti.trim(),
+        telefoni: telefoni.trim() || null,
+        shenime: shenime.trim() || null,
+      },
+      { onSuccess: kthehu, onError: () => setOra(null) },
+    );
   }
 
+  if (!lokaliId || !sherbimet.data || !stafi.data) {
+    return (
+      <View style={[styles.container, styles.qendra]}>
+        <ActivityIndicator color={ngjyrat.ari} />
+      </View>
+    );
+  }
+
+  const berberet = stafi.data.filter((a) => a.aktiv);
+
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <ScrollView
-        contentContainerStyle={styles.permbajtja}
-        keyboardShouldPersistTaps="handled"
-      >
-        <Fusha etiketa="Emri i klientit" gabimi={provuar ? gabimet.klienti : null}>
-          <TextInput
-            value={klienti}
-            onChangeText={setKlienti}
-            placeholder="p.sh. Arben Krasniqi"
-            placeholderTextColor={ngjyrat.tekstiZbehte}
-            style={[styles.input, provuar && gabimet.klienti && styles.inputGabim]}
-            autoCapitalize="words"
-            returnKeyType="next"
-          />
-        </Fusha>
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <ScrollView contentContainerStyle={styles.permbajtja} keyboardShouldPersistTaps="handled">
+        {shto.isError && <GabimiIFormes mesazhi={mesazhiIGabimitTeRezervimit(shto.error, t)} />}
 
-        <Fusha etiketa="Telefoni (opsional)">
-          <TextInput
-            value={telefoni}
-            onChangeText={setTelefoni}
-            placeholder="+383 4x xxx xxx"
-            placeholderTextColor={ngjyrat.tekstiZbehte}
-            style={styles.input}
-            keyboardType="phone-pad"
-          />
-        </Fusha>
+        <FushaTekstit
+          etiketa={t("terminIRi.klienti")}
+          ikona={ikonat.personi}
+          value={klienti}
+          onChangeText={setKlienti}
+          placeholder={t("terminIRi.klientiShembull")}
+          autoCapitalize="words"
+          maxLength={80}
+          gabimi={provuar ? gabimet.klienti : null}
+        />
+        <FushaTekstit
+          etiketa={t("terminIRi.telefoni")}
+          ikona={ikonat.telefoni}
+          value={telefoni}
+          onChangeText={setTelefoni}
+          placeholder="+383 4x xxx xxx"
+          keyboardType="phone-pad"
+          maxLength={30}
+        />
 
-        <Fusha etiketa="Shërbimi" gabimi={provuar ? gabimet.sherbimi : null}>
-          <View style={styles.sherbimet}>
-            {sherbimet.map((s) => {
-              const aktiv = sherbimi === s.emri;
+        <Text style={styles.etiketa}>{t("rezervimi.sherbimi")}</Text>
+        <View style={styles.zgjedhjet}>
+          {sherbimet.data
+            .filter((s) => s.aktiv)
+            .map((s) => {
+              const aktiv = s.id === sherbimiId;
               return (
                 <Pressable
-                  key={s.emri}
+                  key={s.id}
                   accessibilityRole="radio"
                   accessibilityState={{ selected: aktiv }}
-                  onPress={() => setSherbimi(s.emri)}
-                  style={({ pressed }) => [
-                    styles.sherbimi,
-                    aktiv && styles.sherbimiAktiv,
-                    pressed && styles.shtypur,
-                  ]}
+                  onPress={() => {
+                    setSherbimiId(s.id);
+                    setOra(null);
+                  }}
+                  style={[styles.zgjedhja, aktiv && styles.zgjedhjaAktive]}
                 >
-                  <View style={[styles.radio, aktiv && styles.radioAktiv]}>
-                    {aktiv && <View style={styles.radioPika} />}
-                  </View>
-                  <View style={styles.sherbimiTeksti}>
-                    <Text style={styles.sherbimiEmri}>{s.emri}</Text>
-                    <Text style={styles.sherbimiDetaje}>{s.kohezgjatja} min</Text>
-                  </View>
-                  <Text style={[styles.sherbimiCmimi, aktiv && styles.tekstiAri]}>€{s.cmimi}</Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        </Fusha>
-
-        <Fusha etiketa="Ora" gabimi={provuar ? gabimet.ora : null}>
-          <View style={styles.oret}>
-            {oraretEPunes.map((o) => {
-              const eZene = oretEZena.has(o);
-              const aktiv = ora === o;
-              return (
-                <Pressable
-                  key={o}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: aktiv, disabled: eZene }}
-                  disabled={eZene}
-                  onPress={() => setOra(o)}
-                  style={({ pressed }) => [
-                    styles.ora,
-                    aktiv && styles.oraAktiv,
-                    eZene && styles.oraEZene,
-                    pressed && styles.shtypur,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.oraTeksti,
-                      aktiv && styles.oraTekstiAktiv,
-                      eZene && styles.oraTekstiEZene,
-                    ]}
-                  >
-                    {o}
+                  <Text style={[styles.zgjedhjaTeksti, aktiv && styles.zgjedhjaTekstiAktiv]}>{s.emri}</Text>
+                  <Text style={[styles.zgjedhjaDetaje, aktiv && styles.zgjedhjaTekstiAktiv]}>
+                    {formatoKohezgjatjen(s.kohezgjatja_min)} · {formatoCmimin(s.cmimi_centa)}
                   </Text>
                 </Pressable>
               );
             })}
-          </View>
-          <Text style={styles.ndihme}>Oraret e vijëzuara janë tashmë të zëna.</Text>
-        </Fusha>
+        </View>
+        {provuar && gabimet.sherbimi ? <Text style={styles.gabimi}>{gabimet.sherbimi}</Text> : null}
 
-        <Fusha etiketa="Shënime (opsional)">
-          <TextInput
+        <Text style={styles.etiketa}>{t("rezervimi.berberi")}</Text>
+        <View style={styles.zgjedhjet}>
+          {[{ profili_id: null, emri: t("rezervimi.kushdo") }, ...berberet].map((b) => {
+            const aktiv = berberiId === b.profili_id;
+            return (
+              <Pressable
+                key={b.profili_id ?? "kushdo"}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: aktiv }}
+                onPress={() => {
+                  setBerberiId(b.profili_id);
+                  setOra(null);
+                }}
+                style={[styles.zgjedhja, aktiv && styles.zgjedhjaAktive]}
+              >
+                <Text style={[styles.zgjedhjaTeksti, aktiv && styles.zgjedhjaTekstiAktiv]}>
+                  {b.emri.split(" ")[0] || "—"}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
+        <Text style={styles.etiketa}>{t("rezervimi.dita")}</Text>
+        <View style={styles.ditet}>
+          <ZgjedhesiIDites
+            ditet={ditet}
+            zgjedhur={data}
+            onZgjidh={(d) => {
+              setData(d);
+              setOra(null);
+            }}
+          />
+        </View>
+
+        {sherbimiId && (
+          <>
+            <Text style={styles.etiketa}>{t("rezervimi.ora")}</Text>
+            <RrjetaEOrareve
+              oraret={oraret.data}
+              ngarkohet={oraret.isFetching}
+              zgjedhur={ora?.fillon_me ?? null}
+              onZgjidh={setOra}
+            />
+            {provuar && gabimet.ora ? <Text style={styles.gabimi}>{gabimet.ora}</Text> : null}
+          </>
+        )}
+
+        <View style={styles.shenime}>
+          <FushaTekstit
+            etiketa={t("rezervimi.shenime")}
             value={shenime}
             onChangeText={setShenime}
-            placeholder="Preferencat e klientit…"
-            placeholderTextColor={ngjyrat.tekstiZbehte}
-            style={[styles.input, styles.inputShenime]}
-            multiline
-            textAlignVertical="top"
+            shumeRreshta
+            maxLength={500}
           />
-        </Fusha>
+        </View>
       </ScrollView>
 
       <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>
-        <Butoni titulli="Anulo" varianti="dytesor" onPress={kthehu} style={styles.butoniAnulo} />
-        <Butoni titulli="Ruaj terminin" ikona={ikonat.konfirmo} onPress={ruaj} style={styles.butoniRuaj} />
+        <Butoni titulli={t("pergjithshme.anulo")} varianti="dytesor" onPress={kthehu} style={styles.butoniAnulo} />
+        <Butoni
+          titulli={t("terminIRi.ruaj")}
+          ikona={ikonat.konfirmo}
+          ngarkohet={shto.isPending}
+          onPress={ruaj}
+          style={styles.butoniRuaj}
+        />
       </View>
     </KeyboardAvoidingView>
   );
 }
 
-type FushaProps = {
-  etiketa: string;
-  gabimi?: string | null;
-  children: ReactNode;
-};
-
-function Fusha({ etiketa, gabimi, children }: FushaProps) {
-  const styles = useStilet(krijoStilet);
-  return (
-    <View style={styles.fusha}>
-      <Text style={styles.etiketa}>{etiketa}</Text>
-      {children}
-      {gabimi ? <Text style={styles.gabimi}>{gabimi}</Text> : null}
-    </View>
-  );
-}
-
 const krijoStilet = (ngjyrat: Ngjyrat) =>
   StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: ngjyrat.sfondi,
-  },
-  permbajtja: {
-    padding: hapesira.xl,
-    paddingBottom: hapesira.xxl,
-  },
-  shtypur: {
-    opacity: 0.85,
-  },
-  fusha: {
-    marginBottom: hapesira.xl,
-  },
-  etiketa: {
-    color: ngjyrat.tekstiDyte,
-    fontSize: 13,
-    fontWeight: "700",
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-    marginBottom: hapesira.sm,
-  },
-  gabimi: {
-    color: ngjyrat.rrezik,
-    fontSize: 13,
-    fontWeight: "600",
-    marginTop: hapesira.sm,
-  },
-  ndihme: {
-    color: ngjyrat.tekstiZbehte,
-    fontSize: 12,
-    marginTop: hapesira.sm,
-  },
-  input: {
-    backgroundColor: ngjyrat.siperfaqja,
-    borderRadius: rrezja.md,
-    borderWidth: 1,
-    borderColor: ngjyrat.kufiri,
-    color: ngjyrat.teksti,
-    fontSize: 16,
-    paddingHorizontal: hapesira.lg,
-    height: 52,
-  },
-  inputGabim: {
-    borderColor: ngjyrat.rrezik,
-  },
-  inputShenime: {
-    height: 100,
-    paddingTop: hapesira.md,
-  },
-  sherbimet: {
-    gap: hapesira.sm,
-  },
-  sherbimi: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: hapesira.md,
-    backgroundColor: ngjyrat.siperfaqja,
-    borderRadius: rrezja.md,
-    borderWidth: 1,
-    borderColor: ngjyrat.kufiri,
-    padding: hapesira.md,
-  },
-  sherbimiAktiv: {
-    borderColor: ngjyrat.ari,
-    backgroundColor: ngjyrat.ariIErret,
-  },
-  radio: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: ngjyrat.tekstiZbehte,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  radioAktiv: {
-    borderColor: ngjyrat.ari,
-  },
-  radioPika: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: ngjyrat.ari,
-  },
-  sherbimiTeksti: {
-    flex: 1,
-  },
-  sherbimiEmri: {
-    color: ngjyrat.teksti,
-    fontSize: 15,
-    fontWeight: "700",
-  },
-  sherbimiDetaje: {
-    color: ngjyrat.tekstiZbehte,
-    fontSize: 12,
-    marginTop: 2,
-  },
-  sherbimiCmimi: {
-    color: ngjyrat.teksti,
-    fontSize: 16,
-    fontWeight: "800",
-  },
-  tekstiAri: {
-    color: ngjyrat.ari,
-  },
-  oret: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: hapesira.sm,
-  },
-  ora: {
-    width: "23%",
-    flexGrow: 1,
-    height: 44,
-    borderRadius: rrezja.sm,
-    borderWidth: 1,
-    borderColor: ngjyrat.kufiri,
-    backgroundColor: ngjyrat.siperfaqja,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  oraAktiv: {
-    backgroundColor: ngjyrat.ari,
-    borderColor: ngjyrat.ari,
-  },
-  oraEZene: {
-    opacity: 0.35,
-  },
-  oraTeksti: {
-    color: ngjyrat.teksti,
-    fontSize: 14,
-    fontWeight: "700",
-    fontVariant: ["tabular-nums"],
-  },
-  oraTekstiAktiv: {
-    color: ngjyrat.mbiAri,
-  },
-  oraTekstiEZene: {
-    textDecorationLine: "line-through",
-  },
-  fundi: {
-    flexDirection: "row",
-    gap: hapesira.md,
-    paddingHorizontal: hapesira.xl,
-    paddingTop: hapesira.md,
-    borderTopWidth: 1,
-    borderTopColor: ngjyrat.kufiri,
-    backgroundColor: ngjyrat.sfondi,
-  },
-  butoniAnulo: {
-    flex: 1,
-  },
-  butoniRuaj: {
-    flex: 2,
-  },
-});
+    container: {
+      flex: 1,
+      backgroundColor: ngjyrat.sfondi,
+    },
+    qendra: {
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    permbajtja: {
+      padding: hapesira.xl,
+      paddingBottom: hapesira.xxl,
+    },
+    etiketa: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 13,
+      fontWeight: "700",
+      marginTop: hapesira.sm,
+      marginBottom: hapesira.sm,
+    },
+    zgjedhjet: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: hapesira.sm,
+      marginBottom: hapesira.md,
+    },
+    zgjedhja: {
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+      borderRadius: rrezja.md,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
+      backgroundColor: ngjyrat.siperfaqja,
+      gap: 2,
+    },
+    zgjedhjaAktive: {
+      backgroundColor: ngjyrat.ari,
+      borderColor: ngjyrat.ari,
+    },
+    zgjedhjaTeksti: {
+      color: ngjyrat.teksti,
+      fontSize: 14,
+      fontWeight: "700",
+    },
+    zgjedhjaDetaje: {
+      color: ngjyrat.tekstiZbehte,
+      fontSize: 12,
+    },
+    zgjedhjaTekstiAktiv: {
+      color: ngjyrat.mbiAri,
+    },
+    ditet: {
+      marginBottom: hapesira.md,
+    },
+    gabimi: {
+      color: ngjyrat.rrezik,
+      fontSize: 13,
+      fontWeight: "600",
+      marginTop: -4,
+      marginBottom: hapesira.md,
+    },
+    shenime: {
+      marginTop: hapesira.lg,
+    },
+    fundi: {
+      flexDirection: "row",
+      gap: hapesira.md,
+      paddingHorizontal: hapesira.xl,
+      paddingTop: hapesira.md,
+      borderTopWidth: 1,
+      borderTopColor: ngjyrat.kufiri,
+      backgroundColor: ngjyrat.sfondi,
+    },
+    butoniAnulo: {
+      flex: 1,
+    },
+    butoniRuaj: {
+      flex: 2,
+    },
+  });

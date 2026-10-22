@@ -8,7 +8,6 @@ import { klientiIQuery } from "../api/klienti";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { PreferencatProvider, usePreferencat } from "../context/PreferencatContext";
 import { TemaProvider, useTema } from "../context/TemaContext";
-import { TerminetProvider } from "../context/TerminetContext";
 import { useModiAktiv } from "../hooks/useModiAktiv";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -19,9 +18,7 @@ export default function RootLayout() {
       <PreferencatProvider>
         <QueryClientProvider client={klientiIQuery}>
           <AuthProvider>
-            <TerminetProvider>
-              <Navigimi />
-            </TerminetProvider>
+            <Navigimi />
           </AuthProvider>
         </QueryClientProvider>
       </PreferencatProvider>
@@ -83,12 +80,14 @@ function Navigimi() {
 
           <Stack.Protected guard={modi === "klient"}>
             <Stack.Screen name="(klient)" options={{ headerShown: false, animation: "fade" }} />
+            <Stack.Screen name="rezervo/[lokaliId]" options={{ title: t("rezervimi.titulli"), presentation: "modal" }} />
+            <Stack.Screen name="riplanifiko/[id]" options={{ title: t("terminetEMia.ndryshoTitulli") }} />
           </Stack.Protected>
 
           <Stack.Protected guard={modi === "biznes"}>
             <Stack.Screen name="(biznes)" options={{ headerShown: false, animation: "fade" }} />
-            <Stack.Screen name="termini/[id]" options={{ title: "Detajet e terminit" }} />
-            <Stack.Screen name="shto" options={{ title: "Termin i ri", presentation: "modal" }} />
+            <Stack.Screen name="termini/[id]" options={{ title: t("termini.titulli") }} />
+            <Stack.Screen name="shto" options={{ title: t("terminIRi.titulli"), presentation: "modal" }} />
             <Stack.Screen name="lokali-i-ri" options={{ title: t("wizard.titulli"), presentation: "modal" }} />
             <Stack.Screen name="bashkohu" options={{ title: "", presentation: "modal" }} />
             <Stack.Screen name="menaxho/info" options={{ title: t("info.titulli") }} />
