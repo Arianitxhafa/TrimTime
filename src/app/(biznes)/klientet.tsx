@@ -91,7 +91,7 @@ export default function Klientet() {
         keyboardShouldPersistTaps="handled"
         ItemSeparatorComponent={() => <View style={styles.ndarja} />}
         refreshControl={
-          <RefreshControl refreshing={klientet.isRefetching} onRefresh={klientet.refetch} tintColor={ngjyrat.ari} />
+          <RefreshControl refreshing={klientet.isRefetching} onRefresh={() => void klientet.refetch()} tintColor={ngjyrat.ari} />
         }
         renderItem={({ item }) => <Rreshti klienti={item} />}
         ListEmptyComponent={

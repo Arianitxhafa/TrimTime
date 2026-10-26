@@ -133,11 +133,11 @@ export default function Zbulo() {
       ListFooterComponent={
         (lokalet.data ?? []).some((l) => l.burimi === "osm") ? (
           <Text style={styles.atribuimi}>{t("pergjithshme.atribuimiOsm")}</Text>
-        ) : null
+        ) : undefined
       }
       renderItem={({ item }) => <KartaELokalit lokali={item} />}
       refreshControl={
-        <RefreshControl refreshing={lokalet.isRefetching} onRefresh={lokalet.refetch} tintColor={ngjyrat.ari} />
+        <RefreshControl refreshing={lokalet.isRefetching} onRefresh={() => void lokalet.refetch()} tintColor={ngjyrat.ari} />
       }
       ListEmptyComponent={
         lokalet.isPending ? (

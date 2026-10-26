@@ -49,6 +49,8 @@ async function anuloTeRuajturat(terminiId: string) {
 async function planifiko(termini: TerminiPerKujtese, t: TFunction) {
   await Notifications.setNotificationChannelAsync(KANALI, {
     name: t("kujtesat.kanali"),
+    // AndroidImportance eksportohet si enum i kompiluar, që eslint-plugin-import nuk e njeh.
+    // eslint-disable-next-line import/namespace
     importance: Notifications.AndroidImportance.HIGH,
   });
 

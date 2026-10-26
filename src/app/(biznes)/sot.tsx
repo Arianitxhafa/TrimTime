@@ -227,7 +227,7 @@ export default function Sot() {
       keyboardShouldPersistTaps="handled"
       ListHeaderComponent={koka}
       refreshControl={
-        <RefreshControl refreshing={terminet.isRefetching} onRefresh={terminet.refetch} tintColor={ngjyrat.ari} />
+        <RefreshControl refreshing={terminet.isRefetching} onRefresh={() => void terminet.refetch()} tintColor={ngjyrat.ari} />
       }
       renderItem={({ item }) => <KartaTerminit termini={item} onPress={() => hapTerminin(item.id, data)} />}
       ListEmptyComponent={

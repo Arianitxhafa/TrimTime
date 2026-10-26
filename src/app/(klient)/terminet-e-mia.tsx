@@ -94,7 +94,7 @@ export default function TerminetEMia() {
         contentContainerStyle={styles.lista}
         ItemSeparatorComponent={() => <View style={{ height: hapesira.md }} />}
         refreshControl={
-          <RefreshControl refreshing={terminet.isRefetching} onRefresh={terminet.refetch} tintColor={ngjyrat.ari} />
+          <RefreshControl refreshing={terminet.isRefetching} onRefresh={() => void terminet.refetch()} tintColor={ngjyrat.ari} />
         }
         renderItem={({ item }) => (
           <KartaETerminit termini={item} iArdhshem={skeda === "teArdhshme"} onAnulo={() => setPerTeAnuluar(item)} />
