@@ -52,8 +52,9 @@ function Navigimi() {
 
   const kaHyre = sesioni !== null;
 
-  // Stack.Protected fsheh ekranet që nuk lejohen. Kur një kusht ndryshon (p.sh. pas
-  // hyrjes ose ndërrimit të modit), Expo Router kalon vetë te ekrani i parë i lejuar.
+  // Stack.Protected ridrejton nga ekranet që nuk lejohen. Që nga SDK 58, pa `redirectTo` Expo Router
+  // shkon te route-i i parë i lejuar, që për grupin (auth) do të ishte "/(auth)", pa ekran.
+  const hyrjaPerTeLejuarit = onboardingIPare ? "/roli" : "/onboarding";
   return (
     <>
       <StatusBar style={eshteErret ? "light" : "dark"} />
@@ -63,28 +64,30 @@ function Navigimi() {
           headerTintColor: ngjyrat.ari,
           headerTitleStyle: { color: ngjyrat.teksti, fontWeight: "700" },
           headerShadowVisible: false,
+          // Në iOS 26+ SDK 58 i bën header-at transparentë dhe përmbajtja hyn poshtë tyre.
+          headerTransparent: false,
           headerBackButtonDisplayMode: "minimal",
           contentStyle: { backgroundColor: ngjyrat.sfondi },
         }}
       >
-        <Stack.Protected guard={!onboardingIPare}>
+        <Stack.Protected guard={!onboardingIPare} redirectTo={kaHyre ? "/" : "/roli"}>
           <Stack.Screen name="onboarding" options={{ headerShown: false, animation: "fade" }} />
         </Stack.Protected>
 
-        <Stack.Protected guard={onboardingIPare && !kaHyre}>
+        <Stack.Protected guard={onboardingIPare && !kaHyre} redirectTo={onboardingIPare ? "/" : "/onboarding"}>
           <Stack.Screen name="(auth)" options={{ headerShown: false, animation: "fade" }} />
         </Stack.Protected>
 
-        <Stack.Protected guard={onboardingIPare && kaHyre}>
+        <Stack.Protected guard={onboardingIPare && kaHyre} redirectTo={hyrjaPerTeLejuarit}>
           <Stack.Screen name="index" options={{ headerShown: false }} />
 
-          <Stack.Protected guard={modi === "klient"}>
+          <Stack.Protected guard={modi === "klient"} redirectTo="/sot">
             <Stack.Screen name="(klient)" options={{ headerShown: false, animation: "fade" }} />
             <Stack.Screen name="rezervo/[lokaliId]" options={{ title: t("rezervimi.titulli"), presentation: "modal" }} />
             <Stack.Screen name="riplanifiko/[id]" options={{ title: t("terminetEMia.ndryshoTitulli") }} />
           </Stack.Protected>
 
-          <Stack.Protected guard={modi === "biznes"}>
+          <Stack.Protected guard={modi === "biznes"} redirectTo="/zbulo">
             <Stack.Screen name="(biznes)" options={{ headerShown: false, animation: "fade" }} />
             <Stack.Screen name="termini/[id]" options={{ title: t("termini.titulli") }} />
             <Stack.Screen name="termini/zhvendos" options={{ title: t("zhvendos.titulli"), presentation: "modal" }} />
