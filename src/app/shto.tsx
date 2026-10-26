@@ -39,7 +39,9 @@ export default function ShtoTermin() {
   const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
   const insets = useSafeAreaInsets();
-  const { data: dataNgaParametri } = useLocalSearchParams<{ data?: string }>();
+  // Nga kalendari vjen data; nga profili i klientit vijnë emri dhe telefoni.
+  const parametrat = useLocalSearchParams<{ data?: string; emri?: string; telefoni?: string }>();
+  const dataNgaParametri = parametrat.data;
   const lokaliIm = useLokaliIm();
   const lokaliId = lokaliIm.data?.lokali.id;
   const sherbimet = useSherbimet(lokaliId);
@@ -47,8 +49,8 @@ export default function ShtoTermin() {
   const shto = useShtoTerminNgaStafi();
 
   const ditet = useMemo(() => ditetEArdhshme(14), []);
-  const [klienti, setKlienti] = useState("");
-  const [telefoni, setTelefoni] = useState("");
+  const [klienti, setKlienti] = useState(parametrat.emri ?? "");
+  const [telefoni, setTelefoni] = useState(parametrat.telefoni ?? "");
   const [sherbimiId, setSherbimiId] = useState<string | null>(null);
   const [berberiId, setBerberiId] = useState<string | null>(null);
   const [data, setData] = useState(dataNgaParametri && ditet.includes(dataNgaParametri) ? dataNgaParametri : ditet[0]);
