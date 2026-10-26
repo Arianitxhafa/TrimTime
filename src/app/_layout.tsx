@@ -87,6 +87,10 @@ function Navigimi() {
           <Stack.Protected guard={modi === "biznes"}>
             <Stack.Screen name="(biznes)" options={{ headerShown: false, animation: "fade" }} />
             <Stack.Screen name="termini/[id]" options={{ title: t("termini.titulli") }} />
+            <Stack.Screen name="termini/zhvendos" options={{ title: t("zhvendos.titulli"), presentation: "modal" }} />
+            <Stack.Screen name="klienti/[celesi]" options={{ title: "" }} />
+            <Stack.Screen name="menaxho/analitika" options={{ title: t("analitika.titulli") }} />
+            <Stack.Screen name="menaxho/berberi/[id]" options={{ title: t("berberi.orariIm") }} />
             <Stack.Screen name="shto" options={{ title: t("terminIRi.titulli"), presentation: "modal" }} />
             <Stack.Screen name="lokali-i-ri" options={{ title: t("wizard.titulli"), presentation: "modal" }} />
             <Stack.Screen name="bashkohu" options={{ title: "", presentation: "modal" }} />

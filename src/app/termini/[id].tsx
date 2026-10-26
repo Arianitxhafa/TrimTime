@@ -133,6 +133,15 @@ export default function DetajetTerminit() {
             />
           )}
 
+          {(statusi === "ne_pritje" || statusi === "konfirmuar") && (
+            <Butoni
+              titulli={t("zhvendos.butoni")}
+              varianti="dytesor"
+              ikona={ikonat.zhvendos}
+              onPress={() => router.push({ pathname: "/termini/zhvendos", params: { id: termini.id, data } })}
+            />
+          )}
+
           {termini.klienti_telefoni && (
             <Butoni
               titulli={t("termini.telefono")}
