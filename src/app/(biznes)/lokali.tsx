@@ -8,6 +8,7 @@ import { useOrari } from "../../api/orari";
 import { useSherbimet } from "../../api/sherbimet";
 import Butoni from "../../components/Butoni";
 import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
+import { useAuth } from "../../context/AuthContext";
 import { useStilet, useTema } from "../../context/TemaContext";
 import type { Lokali } from "../../lib/tipet";
 import { hapesira, rrezja, type Ngjyrat } from "../../theme";
@@ -73,6 +74,7 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
   const sherbimet = useSherbimet(lokali.id);
   const orari = useOrari(lokali.id);
   const perditeso = usePerditesoLokalin(lokali.id);
+  const perdoruesiId = useAuth().sesioni?.user.id;
 
   const kaSherbime = (sherbimet.data ?? []).some((s) => s.aktiv);
   const kaOrar = (orari.data ?? []).length > 0;
@@ -161,6 +163,17 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
             </>
           )}
           <Rreshti ikona={ikonat.klientet} titulli={t("lokali.stafi")} href="/menaxho/stafi" meKufi={eshtePronar} />
+          {perdoruesiId && (
+            <Rreshti
+              ikona={ikonat.ora}
+              titulli={t("berberi.orariIm")}
+              href={{ pathname: "/menaxho/berberi/[id]", params: { id: perdoruesiId } }}
+              meKufi
+            />
+          )}
+          {eshtePronar && (
+            <Rreshti ikona={ikonat.grafik} titulli={t("analitika.titulli")} href="/menaxho/analitika" meKufi />
+          )}
           <Rreshti
             ikona={ikonat.zbulo}
             titulli={t("lokali.shikoPublik")}
