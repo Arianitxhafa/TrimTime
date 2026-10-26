@@ -64,6 +64,8 @@ function useInvalidoTerminet() {
     klienti.invalidateQueries({ queryKey: ["oraret-e-lira"] });
     klienti.invalidateQueries({ queryKey: celesat.teMiat });
     klienti.invalidateQueries({ queryKey: ["terminet-e-lokalit"] });
+    klienti.invalidateQueries({ queryKey: ["terminet-e-periudhes"] });
+    klienti.invalidateQueries({ queryKey: ["klientet"] });
   };
 }
 
@@ -191,6 +193,7 @@ export function useShtoTerminNgaStafi() {
 }
 
 // Rifreskon terminet e lokalit sa herë që dikush rezervon, anulon ose ndryshon një termin.
+// Thirret një herë, te _layout i biznesit, që mbetet i hapur nën të gjitha ekranet e stafit.
 export function useTerminetLiveILokalit(lokaliId: string | undefined) {
   const klienti = useQueryClient();
 
@@ -203,6 +206,9 @@ export function useTerminetLiveILokalit(lokaliId: string | undefined) {
         { event: "*", schema: "public", table: "terminet", filter: `lokali_id=eq.${lokaliId}` },
         () => {
           klienti.invalidateQueries({ queryKey: ["terminet-e-lokalit", lokaliId] });
+          klienti.invalidateQueries({ queryKey: ["terminet-e-periudhes", lokaliId] });
+          klienti.invalidateQueries({ queryKey: ["klientet", lokaliId] });
+          klienti.invalidateQueries({ queryKey: ["analitika", lokaliId] });
           klienti.invalidateQueries({ queryKey: ["oraret-e-lira"] });
         },
       )

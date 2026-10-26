@@ -139,3 +139,69 @@ export type TerminiILokalit = {
   cmimi_centa: number;
   shenime: string | null;
 };
+
+export type TerminiIKalendarit = {
+  id: string;
+  klienti_emri: string;
+  sherbimi_emri: string;
+  kohezgjatja_min: number;
+  berberi_id: string;
+  berberi_emri: string;
+  fillon_me: string;
+  data_lokale: string;
+  ora_lokale: string;
+  // Minutat nga mesnata sipas orës së lokalit, për pozicionin në kalendar.
+  minuta_e_dites: number;
+  statusi: StatusiTerminit;
+  cmimi_centa: number;
+};
+
+export type Pushimi = {
+  id: string;
+  profili_id: string;
+  fillon_me: string;
+  mbaron_me: string;
+  arsyeja: string | null;
+};
+
+export type KlientiILokalit = {
+  // "id:…", "tel:…" ose "emri:…" (shih celesi_i_klientit në databazë).
+  celesi: string;
+  emri: string;
+  telefoni: string | null;
+  klienti_id: string | null;
+  vizita: number;
+  shpenzuar_centa: number;
+  vizita_e_fundit: string | null;
+  termini_i_ardhshem: string | null;
+  nuk_erdhi: number;
+  vip: boolean;
+  shenime: string | null;
+};
+
+export type VizitaEKlientit = {
+  id: string;
+  data_lokale: string;
+  ora_lokale: string;
+  sherbimi_emri: string;
+  berberi_emri: string;
+  statusi: StatusiTerminit;
+  cmimi_centa: number;
+  shenime: string | null;
+};
+
+type RreshtiIAnalitikes = { emri: string; termine: number; te_ardhura: number };
+
+export type Analitika = {
+  te_ardhura: number;
+  termine: number;
+  perfunduar: number;
+  anuluar: number;
+  nuk_erdhi: number;
+  klientet_e_rinj: number;
+  klientet_qe_kthehen: number;
+  sipas_dites: { data: string; termine: number; te_ardhura: number }[];
+  sherbimet: RreshtiIAnalitikes[];
+  berberet: RreshtiIAnalitikes[];
+  oret: { ora: number; termine: number }[];
+};
