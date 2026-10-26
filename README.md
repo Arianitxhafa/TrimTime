@@ -28,9 +28,14 @@ The project is being developed as part of a university Mobile Applications cours
 - **Reminders** — Local notifications 24 h and 2 h before each appointment.
 - **Today (business)** — Real bookings per day with live updates, confirm / complete / no-show / cancel, and walk-in or phone bookings added by staff.
 - **Booking rules** — Each shop chooses automatic confirmation and the free-cancellation window.
+- **Calendar (business)** — Day view with a column per barber and week view per barber, time off and a now-line; staff can move appointments to another time or barber.
+- **Clients (business)** — CRM with visits, spend, no-shows, VIP tag, private notes and full history, including walk-in clients.
+- **Analytics (business)** — Revenue, appointments, no-show rate, new vs returning clients, revenue by day, top services, barbers and busiest hours.
+- **Barber schedules** — Each barber can follow the shop’s hours or have their own, plus time off (full days or a few hours).
+- **Pending badge** — The Today tab shows how many of today’s bookings are waiting for confirmation, live.
 - **Database foundation** — Supabase/Postgres schema with Row Level Security and database-level protection against double bookings.
 
-> **Development status:** Phase 3 of 7 done. The Calendar and Clients tabs (Phase 4) are still to come.
+> **Development status:** Phase 4 of 7 done. Next: payments, reviews and growth tools (Phase 5).
 
 ---
 
@@ -85,7 +90,7 @@ npm install
 ### 4. Configure Supabase
 
 1. Copy `.env.example` to `.env` and fill in the **Project URL** and the **publishable (anon) key** from Supabase → Project Settings → API Keys. Never put a secret / `service_role` key in the app.
-2. In Supabase → **SQL Editor**, run each file in `supabase/migrations/` **in order** (once per project): `20261021120000_themeli.sql`, `20261022090000_lokalet_dhe_zbulimi.sql`, `20261022150000_lokalet_osm.sql`, then `20261023090000_rezervimet.sql`.
+2. In Supabase → **SQL Editor**, run each file in `supabase/migrations/` **in order** (once per project): `20261021120000_themeli.sql`, `20261022090000_lokalet_dhe_zbulimi.sql`, `20261022150000_lokalet_osm.sql`, `20261023090000_rezervimet.sql`, then `20261026090000_mjetet_e_biznesit.sql`.
    Then run `supabase/seed/lokalet_osm_kosove.sql` to load the barbershops of Kosovo. To refresh them later: `npm run importo:osm` and run the regenerated file again.
 3. Optional during development: Authentication → Sign In / Providers → Email → turn off **Confirm email**, so new accounts can sign in immediately.
 
@@ -123,7 +128,9 @@ src/
 │   ├── (biznes)/           # Business tabs: sot, kalendari, klientet, lokali, llogaria
 │   ├── lokali-i-ri.tsx     # New shop wizard
 │   ├── lokali/[id].tsx     # Public shop profile
-│   ├── menaxho/            # Shop management: info, orari, sherbimet, sherbimi, stafi
+│   ├── menaxho/            # Shop management: info, orari, sherbimet, sherbimi, stafi, analitika, berberi/[id]
+│   ├── klienti/[celesi].tsx    # Client profile (CRM)
+│   ├── termini/zhvendos.tsx    # Move an appointment (staff)
 │   ├── bashkohu.tsx        # Join a shop with an invite code
 │   ├── rezervo/[lokaliId].tsx  # Booking flow (client)
 │   ├── riplanifiko/[id].tsx    # Change booking time (client)
@@ -173,8 +180,8 @@ This approach demonstrates how TypeScript union types can restrict accepted valu
 | 1 · Foundation | Design system, dark/light mode, i18n, Supabase, auth, role-based navigation, onboarding | ✅ Done |
 | 2 · Shops & Discovery | Shop setup wizard, services, staff, map, search & filters, shop profile | ✅ Done |
 | 3 · Booking Engine | Available slots, booking flow, cancel/reschedule, realtime, reminders | ✅ Done |
-| 4 · Business Tools | Calendar, bookings inbox, walk-ins, client CRM, analytics | ⏳ Next |
-| 5 · Payments & Growth | Stripe, reviews, loyalty, promotions, subscriptions | |
+| 4 · Business Tools | Calendar, bookings inbox, walk-ins, client CRM, analytics | ✅ Done |
+| 5 · Payments & Growth | Stripe, reviews, loyalty, promotions, subscriptions | ⏳ Next |
 | 6 · AI Assistant | In-app assistant for barbers and clients | |
 | 7 · Polish & Launch | Accessibility, performance, tests, store builds | |
 
