@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { useLokaliIm } from "../../api/lokalet";
@@ -41,14 +42,21 @@ export default function MenaxhoStafin() {
           const uneVete = a.profili_id === sesioni?.user.id;
           return (
             <View key={a.profili_id} style={[styles.rreshti, i > 0 && styles.rreshtiMeKufi]}>
-              <Avatar emri={a.emri || "?"} madhesia={44} />
-              <View style={styles.rreshtiTeksti}>
-                <Text style={[styles.emri, !a.aktiv && styles.zbehur]}>{a.emri || "—"}</Text>
-                <Text style={styles.roli}>
-                  {a.roli === "pronar" ? t("stafi.pronar") : t("stafi.berber")}
-                  {!a.aktiv ? ` · ${t("stafi.joAktiv")}` : ""}
-                </Text>
-              </View>
+              <Pressable
+                accessibilityRole="button"
+                disabled={!eshtePronar && !uneVete}
+                onPress={() => router.push({ pathname: "/menaxho/berberi/[id]", params: { id: a.profili_id } })}
+                style={({ pressed }) => [styles.personi, pressed && styles.shtypur]}
+              >
+                <Avatar emri={a.emri || "?"} madhesia={44} />
+                <View style={styles.rreshtiTeksti}>
+                  <Text style={[styles.emri, !a.aktiv && styles.zbehur]}>{a.emri || "—"}</Text>
+                  <Text style={styles.roli}>
+                    {a.roli === "pronar" ? t("stafi.pronar") : t("stafi.berber")}
+                    {!a.aktiv ? ` · ${t("stafi.joAktiv")}` : ""}
+                  </Text>
+                </View>
+              </Pressable>
               {eshtePronar && !uneVete && a.roli !== "pronar" && (
                 <Pressable
                   accessibilityRole="button"
@@ -120,6 +128,15 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     rreshtiMeKufi: {
       borderTopWidth: 1,
       borderTopColor: ngjyrat.kufiri,
+    },
+    personi: {
+      flex: 1,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: hapesira.md,
+    },
+    shtypur: {
+      opacity: 0.7,
     },
     rreshtiTeksti: {
       flex: 1,
