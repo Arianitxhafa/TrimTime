@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokaliIm } from "../../api/lokalet";
-import { useTerminetELokalit, useTerminetLiveILokalit } from "../../api/terminet";
+import { useTerminetELokalit } from "../../api/terminet";
 import Butoni from "../../components/Butoni";
 import Ikona, { ikonat } from "../../components/Ikona";
 import KartaTerminit from "../../components/KartaTerminit";
@@ -45,7 +45,6 @@ export default function Sot() {
   const [kerkimi, setKerkimi] = useState("");
 
   const terminet = useTerminetELokalit(lokali?.id, data);
-  useTerminetLiveILokalit(lokali?.id);
 
   const lista = useMemo(() => terminet.data ?? [], [terminet.data]);
   const numri = (s: StatusiTerminit) => lista.filter((x) => x.statusi === s).length;
