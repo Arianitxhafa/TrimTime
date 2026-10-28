@@ -279,6 +279,7 @@ export const sq = {
   profiliLokalit: {
     thirr: "Thirr",
     udhezimet: "Udhëzimet",
+    ndaj: "Ndaj",
     sherbimet: "Shërbimet",
     berberet: "Berberët",
     orari: "Orari",

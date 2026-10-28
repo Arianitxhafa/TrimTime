@@ -17,6 +17,7 @@ import { useKlientet } from "../../api/biznesi";
 import { useLokaliIm } from "../../api/lokalet";
 import Avatar from "../../components/Avatar";
 import Butoni from "../../components/Butoni";
+import { Drita } from "../../components/Marka";
 import Ikona, { ikonat } from "../../components/Ikona";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { dataISO, formatoDaten } from "../../lib/datat";
@@ -50,6 +51,7 @@ export default function Klientet() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + hapesira.lg }]}>
+      <Drita lartesia={260} />
       <Text style={styles.titulli}>{t("tabs.klientet")}</Text>
 
       <View style={styles.kerkimi}>

@@ -67,4 +67,10 @@ export const ikonat = {
   etiketa: { ios: "tag.fill", android: "sell" },
   zile: { ios: "bell.fill", android: "notifications" },
   pergjigju: { ios: "arrowshape.turn.up.left.fill", android: "reply" },
+  ndaj: { ios: "square.and.arrow.up", android: "share" },
+  kamera: { ios: "camera.fill", android: "photo_camera" },
+  foto: { ios: "photo.on.rectangle", android: "photo_library" },
+  qr: { ios: "qrcode", android: "qr_code_2" },
+  skano: { ios: "qrcode.viewfinder", android: "qr_code_scanner" },
+  biometria: { ios: "faceid", android: "fingerprint" },
 } satisfies Record<string, EmriIkones>;

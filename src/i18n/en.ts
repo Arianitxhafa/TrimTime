@@ -279,6 +279,7 @@ export const en: Perkthimet = {
   profiliLokalit: {
     thirr: "Call",
     udhezimet: "Directions",
+    ndaj: "Share",
     sherbimet: "Services",
     berberet: "Barbers",
     orari: "Hours",

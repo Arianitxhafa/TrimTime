@@ -1,7 +1,9 @@
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
+import * as LidhjetExpo from "expo-linking";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Linking, Platform, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokali } from "../../api/lokalet";
 import { useOrari } from "../../api/orari";
@@ -73,32 +75,39 @@ export default function ProfiliILokalit() {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: l.emri }} />
+      <Stack.Screen options={{ title: "", headerTransparent: true, headerTintColor: "#FFFFFF" }} />
       <ScrollView contentContainerStyle={{ paddingBottom: (mundTeRezervoje ? 120 : hapesira.xxl) + insets.bottom }}>
-        <View style={styles.kopertina}>
+        <View style={[styles.kopertina, { height: 300 + insets.top }]}>
           {l.kopertina_url ? (
-            <Image source={{ uri: l.kopertina_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+            <Image source={{ uri: l.kopertina_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={250} />
           ) : (
-            <View style={[StyleSheet.absoluteFill, styles.kopertinaBosh]}>
-              <Ikona emri={ikonat.gershere} madhesia={48} ngjyra={ngjyrat.ari} />
-            </View>
+            <LinearGradient
+              colors={[ngjyrat.siperfaqja2, ngjyrat.ariIErret]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[StyleSheet.absoluteFill, styles.kopertinaBosh]}
+            >
+              <Ikona emri={ikonat.gershere} madhesia={56} ngjyra={ngjyrat.ari} />
+            </LinearGradient>
           )}
-        </View>
+          <LinearGradient colors={["rgba(11,11,15,0.55)", "rgba(11,11,15,0)"]} style={styles.hijaLart} />
+          <LinearGradient colors={ngjyrat.hijaEFotos} style={styles.hijaPoshte} />
 
-        <View style={styles.permbajtja}>
           <View style={styles.koka}>
             <View style={styles.logo}>
               {l.logo_url ? (
                 <Image source={{ uri: l.logo_url }} style={StyleSheet.absoluteFill} contentFit="cover" />
               ) : (
-                <Text style={styles.logoShkronja}>{l.emri.charAt(0).toUpperCase()}</Text>
+                <LinearGradient colors={ngjyrat.gradientiAri} style={[StyleSheet.absoluteFill, styles.logoBosh]}>
+                  <Text style={styles.logoShkronja}>{l.emri.charAt(0).toUpperCase()}</Text>
+                </LinearGradient>
               )}
             </View>
             <View style={styles.kokaTeksti}>
               <Text style={styles.emri}>{l.emri}</Text>
               <View style={styles.statusiRreshti}>
-                <View style={[styles.pika, { backgroundColor: l.i_hapur_tani ? "#3DD68C" : ngjyrat.tekstiZbehte }]} />
-                <Text style={[styles.statusi, { color: l.i_hapur_tani ? "#3DD68C" : ngjyrat.tekstiDyte }]}>
+                <View style={[styles.pika, { backgroundColor: l.i_hapur_tani ? "#3DD68C" : "#A1A1AE" }]} />
+                <Text style={[styles.statusi, { color: l.i_hapur_tani ? "#3DD68C" : "rgba(255,255,255,0.75)" }]}>
                   {l.i_hapur_tani ? t("lokali.hapur") : t("lokali.mbyllur")}
                 </Text>
                 {l.vleresimi_mesatar != null && l.nr_vleresimeve > 0 && (
@@ -117,7 +126,9 @@ export default function ProfiliILokalit() {
               </View>
             </View>
           </View>
+        </View>
 
+        <View style={styles.permbajtja}>
           <View style={styles.adresaRreshti}>
             <Ikona emri={ikonat.harta} madhesia={16} ngjyra={ngjyrat.tekstiDyte} />
             <Text style={styles.adresa}>
@@ -137,6 +148,11 @@ export default function ProfiliILokalit() {
               ikona={ikonat.harta}
               teksti={t("profiliLokalit.udhezimet")}
               onPress={() => Linking.openURL(lidhjaEUdhezimeve(l, Platform.OS))}
+            />
+            <Veprimi
+              ikona={ikonat.ndaj}
+              teksti={t("profiliLokalit.ndaj")}
+              onPress={() => Share.share({ message: `${l.emri} · ${l.adresa}, ${l.qyteti}\n${LidhjetExpo.createURL(`/lokali/${l.id}`)}` })}
             />
           </View>
 
@@ -381,50 +397,66 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.md,
     },
     kopertina: {
-      height: 220,
       backgroundColor: ngjyrat.siperfaqja2,
+      justifyContent: "flex-end",
     },
     kopertinaBosh: {
       alignItems: "center",
       justifyContent: "center",
-      backgroundColor: ngjyrat.ariIErret,
+    },
+    hijaLart: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      height: 120,
+    },
+    hijaPoshte: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      bottom: 0,
+      height: "65%",
     },
     permbajtja: {
       paddingHorizontal: hapesira.xl,
+      paddingTop: hapesira.lg,
     },
     koka: {
       flexDirection: "row",
       alignItems: "flex-end",
       gap: hapesira.md,
-      marginTop: -32,
-      marginBottom: hapesira.md,
+      paddingHorizontal: hapesira.xl,
+      paddingBottom: hapesira.lg,
     },
     logo: {
-      width: 76,
-      height: 76,
+      width: 72,
+      height: 72,
       borderRadius: 22,
       backgroundColor: ngjyrat.ari,
-      borderWidth: 4,
-      borderColor: ngjyrat.sfondi,
+      borderWidth: 2,
+      borderColor: "rgba(255,255,255,0.85)",
+      overflow: "hidden",
+    },
+    logoBosh: {
       alignItems: "center",
       justifyContent: "center",
-      overflow: "hidden",
     },
     logoShkronja: {
       color: ngjyrat.mbiAri,
       fontSize: 30,
-      fontWeight: "800",
+      fontWeight: "900",
     },
     kokaTeksti: {
       flex: 1,
-      paddingBottom: 4,
+      paddingBottom: 2,
       gap: 4,
     },
     emri: {
-      color: ngjyrat.teksti,
-      fontSize: 24,
+      color: "#FFFFFF",
+      fontSize: 28,
       fontWeight: "800",
-      letterSpacing: -0.4,
+      letterSpacing: -0.6,
     },
     statusiRreshti: {
       flexDirection: "row",
@@ -458,19 +490,18 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     veprimi: {
       flex: 1,
-      flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      gap: hapesira.sm,
-      height: 46,
-      borderRadius: rrezja.md,
+      gap: 6,
+      height: 68,
+      borderRadius: rrezja.lg,
       backgroundColor: ngjyrat.siperfaqja,
       borderWidth: 1,
       borderColor: ngjyrat.kufiri,
     },
     veprimiTeksti: {
       color: ngjyrat.teksti,
-      fontSize: 14,
+      fontSize: 13,
       fontWeight: "700",
     },
     shtypur: {

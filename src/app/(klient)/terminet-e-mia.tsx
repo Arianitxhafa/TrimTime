@@ -19,6 +19,7 @@ import { mesazhiIGabimitTeRezervimit, useAnuloTerminin, useTerminetEMia } from "
 import BadgeStatusi from "../../components/BadgeStatusi";
 import Butoni from "../../components/Butoni";
 import DialogKonfirmimi from "../../components/DialogKonfirmimi";
+import { Drita } from "../../components/Marka";
 import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
 import { GabimiIFormes } from "../../components/KornizaAuth";
 import Yjet from "../../components/Yjet";
@@ -65,6 +66,7 @@ export default function TerminetEMia() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + hapesira.lg }]}>
+      <Drita lartesia={260} />
       <Text style={styles.titulli}>{t("tabs.terminet")}</Text>
 
       <View style={styles.skedat}>

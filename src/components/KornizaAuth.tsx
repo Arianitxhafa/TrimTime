@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStilet, useTema } from "../context/TemaContext";
 import { hapesira, rrezja, type Ngjyrat } from "../theme";
 import Ikona, { ikonat } from "./Ikona";
+import Marka, { Drita } from "./Marka";
 
 type Props = {
   titulli: string;
@@ -14,12 +15,12 @@ type Props = {
 
 // Pamja e përbashkët e ekraneve të hyrjes dhe regjistrimit.
 export default function KornizaAuth({ titulli, nentitulli, children, fundi }: Props) {
-  const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
   const insets = useSafeAreaInsets();
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+      <Drita />
       <ScrollView
         contentContainerStyle={[
           styles.permbajtja,
@@ -28,10 +29,7 @@ export default function KornizaAuth({ titulli, nentitulli, children, fundi }: Pr
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.marka}>
-          <View style={styles.logo}>
-            <Ikona emri={ikonat.gershere} madhesia={22} ngjyra={ngjyrat.mbiAri} />
-          </View>
-          <Text style={styles.emriMarkes}>TrimTime</Text>
+          <Marka />
         </View>
 
         <Text style={styles.titulli}>{titulli}</Text>

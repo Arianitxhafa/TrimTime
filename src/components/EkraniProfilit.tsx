@@ -9,6 +9,7 @@ import { useModiAktiv } from "../hooks/useModiAktiv";
 import { hapesira, rrezja, type Ngjyrat } from "../theme";
 import Avatar from "./Avatar";
 import DialogKonfirmimi from "./DialogKonfirmimi";
+import { Drita } from "./Marka";
 import Ikona, { ikonat, type EmriIkones } from "./Ikona";
 
 export default function EkraniProfilit() {
@@ -22,6 +23,7 @@ export default function EkraniProfilit() {
 
   return (
     <View style={styles.container}>
+      <Drita lartesia={300} />
       <ScrollView
         contentContainerStyle={[styles.permbajtja, { paddingTop: insets.top + hapesira.xl }]}
       >

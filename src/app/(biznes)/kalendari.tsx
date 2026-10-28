@@ -15,6 +15,7 @@ import { usePushimet, useTerminetEPeriudhes } from "../../api/biznesi";
 import { useLokaliIm } from "../../api/lokalet";
 import { useOrari } from "../../api/orari";
 import { useStafi } from "../../api/stafi";
+import { Drita } from "../../components/Marka";
 import Ikona, { ikonat } from "../../components/Ikona";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { dataISO, emriShkurterIDites, formatoDaten, ngaISO, shtoDite } from "../../lib/datat";
@@ -130,6 +131,7 @@ export default function Kalendari() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + hapesira.md }]}>
+      <Drita lartesia={260} />
       <View style={styles.koka}>
         <View style={styles.pamjet}>
           {(["dita", "java"] as const).map((p) => (

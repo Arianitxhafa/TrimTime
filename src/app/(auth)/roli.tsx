@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
+import Marka, { Drita } from "../../components/Marka";
 import { usePreferencat, type Modi } from "../../context/PreferencatContext";
+import { prekja } from "../../lib/prekja";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { hapesira, rrezja, type Ngjyrat } from "../../theme";
 
@@ -21,23 +23,22 @@ export default function ZgjidhRolin() {
   const { ndryshoModin } = usePreferencat();
 
   function zgjidh(roli: Modi) {
+    prekja.lehte();
     ndryshoModin(roli);
     router.push("/hyrja");
   }
 
   return (
+    <View style={styles.container}>
+    <Drita lartesia={420} />
     <ScrollView
-      style={styles.container}
       contentContainerStyle={[
         styles.permbajtja,
         { paddingTop: insets.top + hapesira.xxl, paddingBottom: insets.bottom + hapesira.xl },
       ]}
     >
       <View style={styles.marka}>
-        <View style={styles.logo}>
-          <Ikona emri={ikonat.gershere} madhesia={22} ngjyra={ngjyrat.mbiAri} />
-        </View>
-        <Text style={styles.emriMarkes}>TrimTime</Text>
+        <Marka />
       </View>
 
       <Text style={styles.titulli}>{t("roli.titulli")}</Text>
@@ -63,6 +64,7 @@ export default function ZgjidhRolin() {
         ))}
       </View>
     </ScrollView>
+    </View>
   );
 }
 
