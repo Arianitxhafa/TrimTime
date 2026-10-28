@@ -19,8 +19,8 @@ The project is being developed as part of a university Mobile Applications cours
 - **Shop setup (business)** — A 4-step wizard: details, location picked on a map (address filled in automatically), weekly hours with lunch breaks, and first services.
 - **Shop management** — Edit details, cover photo and logo (Supabase Storage), hours, services (price, duration, hide/delete) and staff. Publish the shop when it has services and hours.
 - **Staff invites** — The owner creates an 8-character code; a barber enters it to join the shop.
-- **Discover (client)** — Nearby published shops ranked by distance or price, with search (shop, service or city) and “Open now” / price filters. Falls back to Prishtina without location permission.
-- **All barbershops in Kosovo** — 379 shops imported from OpenStreetMap appear on the map and in search, marked as not yet on TrimTime (© OpenStreetMap contributors, ODbL).
+- **Discover (client)** — Shops in the city you're in (GPS → nearest city) plus 10 km around you, so in Mitrovica you don't see Peja. Pick another city by hand any time. Ranked by distance, price or rating, with search and “Open now” / price filters.
+- **All barbershops in Kosovo** — 379 shops and 31 cities imported from OpenStreetMap; women-only salons are hidden from clients (TrimTime is for barbers). Marked as not yet on TrimTime (© OpenStreetMap contributors, ODbL).
 - **Map (client)** — Shops on a map with price markers and “Search this area” (phone only; react-native-maps doesn’t run on web).
 - **Shop profile** — Cover, open/closed status in the shop’s time zone, call, directions, services, barbers, weekly hours and description.
 - **Online booking (client)** — Pick a service, a barber or “Anyone”, a day and a free time; prices and end times are calculated on the server and double bookings are impossible.
@@ -37,10 +37,16 @@ The project is being developed as part of a university Mobile Applications cours
 - **Reviews** — Clients rate completed visits (1–5 stars + comment); shops show the average and latest reviews, and the owner can reply. Discover can sort by rating.
 - **Promotions** — % discounts for a service, days of the week or hours (happy hour). The discount is applied on the server when booking and shown on cards, the shop profile and the booking total.
 - **Loyalty card** — A reward after N completed visits (e.g. a free haircut). Clients see their progress; staff turn a visit into a free one when a reward is ready.
+- **Permissions after sign-in** — A one-time screen explains and asks for location and notifications.
+- **Premium design** — Dark gold (#D4A853) theme with gradients, blurred glass (iOS), deep shadows, press animations, haptics and skeleton loaders.
+- **Portfolio with camera** — Barbers photograph their cuts in the app; clients see them on the shop profile as a full-screen gallery.
+- **Style photo** — When booking, clients can take or pick a photo of the cut they want; only that shop's staff can see it (private bucket, temporary links).
+- **QR codes** — Each shop has a printable QR: clients scan it on arrival to check in (staff see “Arrived” live). Staff invites also have a QR to join a shop.
+- **Face ID / fingerprint lock** — Optional app lock in Settings (Face ID on iPhone needs a development build).
 - **Waitlist** — When a day is full, clients can ask to be notified; a cancellation or move that day notifies them instantly (realtime + local notification).
 - **Database foundation** — Supabase/Postgres schema with Row Level Security and database-level protection against double bookings.
 
-> **Development status:** Phase 5 of 7 done. Next: the in-app AI assistant (Phase 6).
+> **Development status:** Phase 5 of 7 done, plus the premium & mobile update. Next: the in-app AI assistant (Phase 6).
 
 ---
 
@@ -95,8 +101,8 @@ npm install
 ### 4. Configure Supabase
 
 1. Copy `.env.example` to `.env` and fill in the **Project URL** and the **publishable (anon) key** from Supabase → Project Settings → API Keys. Never put a secret / `service_role` key in the app.
-2. In Supabase → **SQL Editor**, run each file in `supabase/migrations/` **in order** (once per project): `20261021120000_themeli.sql`, `20261022090000_lokalet_dhe_zbulimi.sql`, `20261022150000_lokalet_osm.sql`, `20261023090000_rezervimet.sql`, `20261026090000_mjetet_e_biznesit.sql`, then `20261028090000_rritja.sql`.
-   Then run `supabase/seed/lokalet_osm_kosove.sql` to load the barbershops of Kosovo. To refresh them later: `npm run importo:osm` and run the regenerated file again.
+2. In Supabase → **SQL Editor**, run each file in `supabase/migrations/` **in order** (once per project): `20261021120000_themeli.sql`, `20261022090000_lokalet_dhe_zbulimi.sql`, `20261022150000_lokalet_osm.sql`, `20261023090000_rezervimet.sql`, `20261026090000_mjetet_e_biznesit.sql`, `20261028090000_rritja.sql`, then `20261028150000_zona_dhe_kamera.sql`.
+   Then run `supabase/seed/lokalet_osm_kosove.sql` to load the cities and barbershops of Kosovo (after the last migration). To refresh them later: `npm run importo:osm` and run the regenerated file again.
 3. Optional during development: Authentication → Sign In / Providers → Email → turn off **Confirm email**, so new accounts can sign in immediately.
 
 ### 5. Start the Development Server
@@ -134,7 +140,7 @@ src/
 │   ├── lokali-i-ri.tsx     # New shop wizard
 │   ├── lokali/[id].tsx     # Public shop profile
 │   ├── menaxho/            # Shop management: info, orari, sherbimet, sherbimi, stafi, analitika, berberi/[id],
-│   │                       #   promocionet, promocioni, besnikeria
+│   │                       #   promocionet, promocioni, besnikeria, portofoli, qr
 │   ├── klienti/[celesi].tsx    # Client profile (CRM)
 │   ├── termini/zhvendos.tsx    # Move an appointment (staff)
 │   ├── bashkohu.tsx        # Join a shop with an invite code
@@ -143,6 +149,8 @@ src/
 │   ├── vlereso/[terminiId].tsx # Rate a visit (client)
 │   ├── vleresimet/[lokaliId].tsx # All reviews of a shop (owner can reply)
 │   ├── kartat.tsx          # The client's loyalty cards
+│   ├── lejet.tsx           # Location & notification permissions after sign-in
+│   ├── skano.tsx           # QR scanner (check-in, staff invites)
 │   ├── termini/[id].tsx    # Appointment details (staff)
 │   ├── shto.tsx            # Walk-in / phone booking (staff)
 │   └── cilesimet.tsx       # Settings (theme, language)

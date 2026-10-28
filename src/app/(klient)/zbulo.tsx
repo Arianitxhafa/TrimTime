@@ -277,6 +277,8 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     pershendetja: {
       flex: 1,
+      // Pa këtë, teksti nuk ngushtohet dhe shtyn qytetin jashtë ekranit.
+      minWidth: 0,
       color: ngjyrat.tekstiDyte,
       fontSize: 15,
       fontWeight: "600",
@@ -285,7 +287,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
-      maxWidth: 190,
+      maxWidth: 170,
       paddingHorizontal: 12,
       height: 36,
       borderRadius: rrezja.plote,
