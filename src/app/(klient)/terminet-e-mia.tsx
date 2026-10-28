@@ -14,6 +14,7 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useLargohuNgaLista, useListaImeEPritjes } from "../../api/listaEPritjes";
 import { mesazhiIGabimitTeRezervimit, useAnuloTerminin, useTerminetEMia } from "../../api/terminet";
 import BadgeStatusi from "../../components/BadgeStatusi";
 import Butoni from "../../components/Butoni";
@@ -97,6 +98,7 @@ export default function TerminetEMia() {
         refreshControl={
           <RefreshControl refreshing={terminet.isRefetching} onRefresh={() => void terminet.refetch()} tintColor={ngjyrat.ari} />
         }
+        ListHeaderComponent={skeda === "teArdhshme" ? <ListaEPritjes /> : undefined}
         renderItem={({ item }) => (
           <KartaETerminit termini={item} iArdhshem={skeda === "teArdhshme"} onAnulo={() => setPerTeAnuluar(item)} />
         )}
@@ -147,6 +149,60 @@ export default function TerminetEMia() {
           }}
         />
       )}
+    </View>
+  );
+}
+
+// Ditët ku klienti pret një orë të lirë; kur lirohet, karta theksohet me "Rezervo".
+function ListaEPritjes() {
+  const { t } = useTranslation();
+  const { ngjyrat } = useTema();
+  const styles = useStilet(krijoStilet);
+  const lista = useListaImeEPritjes();
+  const largohu = useLargohuNgaLista();
+
+  if (!lista.data?.length) return null;
+
+  return (
+    <View style={styles.pritja}>
+      <Text style={styles.pritjaTitulli}>{t("listaEPritjes.titulli")}</Text>
+      {lista.data.map((h) => {
+        const uLirua = h.njoftuar_me !== null;
+        return (
+          <View key={h.id} style={[styles.pritjaKarta, uLirua && styles.pritjaKartaELiruar]}>
+            <View style={styles.pritjaKoka}>
+              <Ikona emri={ikonat.zile} madhesia={16} ngjyra={uLirua ? ngjyrat.ari : ngjyrat.tekstiZbehte} />
+              <View style={styles.kokaTeksti}>
+                <Text style={styles.lokali} numberOfLines={1}>
+                  {h.lokali_emri}
+                </Text>
+                <Text style={styles.sherbimi} numberOfLines={1}>
+                  {h.sherbimi_emri} · {formatoDaten(h.data, t)}
+                </Text>
+              </View>
+            </View>
+            <Text style={[styles.pritjaStatusi, uLirua && styles.pritjaStatusiILiruar]}>
+              {uLirua ? `${t("listaEPritjes.uLirua")} ${t("listaEPritjes.uLiruaTeksti")}` : t("listaEPritjes.pret")}
+            </Text>
+            <View style={styles.veprimet}>
+              {uLirua && (
+                <Veprimi
+                  ikona={ikonat.kalendar}
+                  teksti={t("listaEPritjes.rezervo")}
+                  theksuar
+                  onPress={() =>
+                    router.push({
+                      pathname: "/rezervo/[lokaliId]",
+                      params: { lokaliId: h.lokali_id, sherbimiId: h.sherbimi_id, data: h.data },
+                    })
+                  }
+                />
+              )}
+              <Veprimi ikona={ikonat.mbyll} teksti={t("listaEPritjes.largohu")} onPress={() => largohu.mutate(h.id)} />
+            </View>
+          </View>
+        );
+      })}
     </View>
   );
 }
@@ -405,6 +461,44 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       color: ngjyrat.tekstiZbehte,
       fontSize: 12,
       textDecorationLine: "line-through",
+    },
+    pritja: {
+      gap: hapesira.md,
+      marginBottom: hapesira.lg,
+    },
+    pritjaTitulli: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 13,
+      fontWeight: "700",
+      textTransform: "uppercase",
+      letterSpacing: 0.8,
+    },
+    pritjaKarta: {
+      backgroundColor: ngjyrat.siperfaqja,
+      borderRadius: rrezja.lg,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
+      borderStyle: "dashed",
+      padding: hapesira.lg,
+      gap: hapesira.sm,
+    },
+    pritjaKartaELiruar: {
+      borderStyle: "solid",
+      borderColor: ngjyrat.ari,
+      backgroundColor: ngjyrat.ariIErret,
+    },
+    pritjaKoka: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: hapesira.md,
+    },
+    pritjaStatusi: {
+      color: ngjyrat.tekstiZbehte,
+      fontSize: 13,
+    },
+    pritjaStatusiILiruar: {
+      color: ngjyrat.ari,
+      fontWeight: "700",
     },
     vleresuar: {
       height: 36,

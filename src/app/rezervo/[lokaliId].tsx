@@ -16,7 +16,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokali } from "../../api/lokalet";
 import { useSherbimet } from "../../api/sherbimet";
 import { useStafi } from "../../api/stafi";
-import { mesazhiIGabimitTeRezervimit, useOraretELira, useRezervoTermin } from "../../api/terminet";
+import { useListaImeEPritjes, useShtoNeListenEPritjes } from "../../api/listaEPritjes";
+import {
+  mesazhiIGabimitTeRezervimit,
+  useCmimiITerminit,
+  useOraretELira,
+  useRezervoTermin,
+} from "../../api/terminet";
 import Avatar from "../../components/Avatar";
 import Butoni from "../../components/Butoni";
 import FushaTekstit from "../../components/FushaTekstit";
@@ -40,9 +46,15 @@ export default function Rezervo() {
   const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
   const insets = useSafeAreaInsets();
-  const { lokaliId, sherbimiId: sherbimiNgaParametri } = useLocalSearchParams<{
+  const {
+    lokaliId,
+    sherbimiId: sherbimiNgaParametri,
+    data: dataNgaParametri,
+  } = useLocalSearchParams<{
     lokaliId: string;
     sherbimiId?: string;
+    // Nga lista e pritjes: hapet direkt dita kur u lirua ora.
+    data?: string;
   }>();
 
   const lokali = useLokali(lokaliId);
@@ -53,12 +65,14 @@ export default function Rezervo() {
   const ditet = useMemo(() => ditetEArdhshme(DITET_PERPARA), []);
   const [sherbimiId, setSherbimiId] = useState<string | null>(sherbimiNgaParametri ?? null);
   const [berberiId, setBerberiId] = useState<string | null>(null);
-  const [data, setData] = useState(ditet[0]);
+  const [data, setData] = useState(dataNgaParametri && ditet.includes(dataNgaParametri) ? dataNgaParametri : ditet[0]);
   const [ora, setOra] = useState<OraELire | null>(null);
   const [shenime, setShenime] = useState("");
   const [suksesi, setSuksesi] = useState<Suksesi | null>(null);
 
   const oraret = useOraretELira({ lokaliId, sherbimiId, data, berberiId });
+  // Çmimi me promocionin e orës së zgjedhur (i njëjti llogaritje si gjatë rezervimit).
+  const cmimi = useCmimiITerminit(lokaliId, sherbimiId, ora?.fillon_me ?? null);
 
   const sherbimetAktive = (sherbimet.data ?? []).filter((s) => s.aktiv);
   const sherbimi = sherbimetAktive.find((s) => s.id === sherbimiId) ?? null;
@@ -221,6 +235,10 @@ export default function Rezervo() {
               onZgjidh={setOra}
             />
 
+            {oraret.data?.length === 0 && !oraret.isFetching && (
+              <ListaEPritjes lokaliId={lokaliId} sherbimiId={sherbimi.id} data={data} berberiId={berberiId} />
+            )}
+
             <View style={styles.shenime}>
               <FushaTekstit
                 etiketa={t("rezervimi.shenime")}
@@ -247,8 +265,19 @@ export default function Rezervo() {
 
       <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>
         <View style={styles.fundiTeksti}>
-          <Text style={styles.fundiEtiketa}>{t("rezervimi.totali")}</Text>
-          <Text style={styles.fundiCmimi}>{sherbimi ? formatoCmimin(sherbimi.cmimi_centa) : "—"}</Text>
+          <Text style={styles.fundiEtiketa}>
+            {cmimi.data?.promocioni_titulli
+              ? `${t("rezervimi.totali")} · ${t("promocionet.etiketa", { perqindja: cmimi.data.perqindja })}`
+              : t("rezervimi.totali")}
+          </Text>
+          <View style={styles.fundiCmimet}>
+            {cmimi.data && cmimi.data.zbritja_centa > 0 && (
+              <Text style={styles.fundiCmimiIVjeter}>{formatoCmimin(cmimi.data.cmimi_baze_centa)}</Text>
+            )}
+            <Text style={styles.fundiCmimi}>
+              {cmimi.data ? formatoCmimin(cmimi.data.cmimi_centa) : sherbimi ? formatoCmimin(sherbimi.cmimi_centa) : "—"}
+            </Text>
+          </View>
           {ora ? (
             <Text style={styles.fundiKoha}>
               {formatoDaten(data, t)} · {ora.ora}
@@ -264,6 +293,38 @@ export default function Rezervo() {
         />
       </View>
     </KeyboardAvoidingView>
+  );
+}
+
+type ListaEPritjesProps = { lokaliId: string; sherbimiId: string; data: string; berberiId: string | null };
+
+// Kur dita është e plotë, klienti hyn në listën e pritjes dhe njoftohet kur lirohet një orë.
+function ListaEPritjes({ lokaliId, sherbimiId, data, berberiId }: ListaEPritjesProps) {
+  const { t } = useTranslation();
+  const { ngjyrat } = useTema();
+  const styles = useStilet(krijoStilet);
+  const lista = useListaImeEPritjes();
+  const shto = useShtoNeListenEPritjes();
+  const neListe = lista.data?.some((h) => h.lokali_id === lokaliId && h.sherbimi_id === sherbimiId && h.data === data);
+
+  return (
+    <View style={styles.pritja}>
+      <View style={styles.pritjaKoka}>
+        <Ikona emri={ikonat.zile} madhesia={18} ngjyra={ngjyrat.ari} />
+        <Text style={styles.pritjaTitulli}>{neListe ? t("listaEPritjes.neListe") : t("listaEPritjes.meNjofto")}</Text>
+      </View>
+      <Text style={styles.pritjaTeksti}>{t("listaEPritjes.meNjoftoTeksti")}</Text>
+      {!neListe && (
+        <Butoni
+          titulli={t("listaEPritjes.meNjofto")}
+          varianti="dytesor"
+          ikona={ikonat.zile}
+          ngarkohet={shto.isPending}
+          onPress={() => shto.mutate({ lokaliId, sherbimiId, data, berberiId })}
+        />
+      )}
+      {shto.isError && <GabimiIFormes mesazhi={mesazhiIGabimitTeRezervimit(shto.error, t)} />}
+    </View>
   );
 }
 
@@ -456,6 +517,42 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       color: ngjyrat.teksti,
       fontSize: 20,
       fontWeight: "800",
+    },
+    fundiCmimet: {
+      flexDirection: "row",
+      alignItems: "baseline",
+      gap: 6,
+    },
+    fundiCmimiIVjeter: {
+      color: ngjyrat.tekstiZbehte,
+      fontSize: 14,
+      textDecorationLine: "line-through",
+    },
+    pritja: {
+      backgroundColor: ngjyrat.siperfaqja,
+      borderRadius: rrezja.lg,
+      borderWidth: 1,
+      borderColor: ngjyrat.ari,
+      padding: hapesira.lg,
+      gap: hapesira.sm,
+      marginTop: hapesira.md,
+    },
+    pritjaKoka: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: hapesira.sm,
+    },
+    pritjaTitulli: {
+      flex: 1,
+      color: ngjyrat.teksti,
+      fontSize: 15,
+      fontWeight: "800",
+    },
+    pritjaTeksti: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 13,
+      lineHeight: 18,
+      marginBottom: hapesira.sm,
     },
     fundiKoha: {
       color: ngjyrat.ari,

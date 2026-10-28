@@ -87,6 +87,26 @@ export async function planifikoKujtesat(termini: TerminiPerKujtese, t: TFunction
   }
 }
 
+// Njoftim i menjëhershëm kur lirohet një orë në listën e pritjes. Pa server push, vjen vetëm
+// kur aplikacioni është i hapur ose në sfond; push nga serveri shtohet me development build.
+export async function njoftoOrenELire(titulli: string, teksti: string, te: { lokaliId: string; data: string }) {
+  try {
+    if (!(await kaLeje(false))) return;
+    await Notifications.setNotificationChannelAsync(KANALI, {
+      name: titulli,
+      // AndroidImportance eksportohet si enum i kompiluar, që eslint-plugin-import nuk e njeh.
+      // eslint-disable-next-line import/namespace
+      importance: Notifications.AndroidImportance.HIGH,
+    });
+    await Notifications.scheduleNotificationAsync({
+      content: { title: titulli, body: teksti, data: te },
+      trigger: null,
+    });
+  } catch {
+    // Lista në ekran tregon gjithsesi orën e liruar.
+  }
+}
+
 export async function anuloKujtesat(terminiId: string) {
   if (Platform.OS === "web") return;
   await anuloTeRuajturat(terminiId).catch(() => {});
