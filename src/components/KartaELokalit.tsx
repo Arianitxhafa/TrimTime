@@ -41,6 +41,12 @@ export default function KartaELokalit({ lokali, kompakte = false }: Props) {
               {lokali.i_hapur_tani ? t("lokali.hapur") : t("lokali.mbyllur")}
             </Text>
           </View>
+          {lokali.promocioni_max ? (
+            <View style={styles.promo}>
+              <Ikona emri={ikonat.etiketa} madhesia={12} ngjyra={ngjyrat.mbiAri} />
+              <Text style={styles.promoTeksti}>{t("promocionet.etiketa", { perqindja: lokali.promocioni_max })}</Text>
+            </View>
+          ) : null}
         </View>
       )}
 
@@ -53,9 +59,23 @@ export default function KartaELokalit({ lokali, kompakte = false }: Props) {
           )}
         </View>
         <View style={styles.teksti}>
-          <Text style={styles.emri} numberOfLines={1}>
-            {lokali.emri}
-          </Text>
+          <View style={styles.emriRreshti}>
+            <Text style={styles.emri} numberOfLines={1}>
+              {lokali.emri}
+            </Text>
+            {lokali.vleresimi_mesatar != null && lokali.nr_vleresimeve > 0 && (
+              <View style={styles.vleresimi}>
+                <Ikona emri={ikonat.yll} madhesia={12} ngjyra={ngjyrat.ari} />
+                <Text style={styles.vleresimiTeksti}>
+                  {Number(lokali.vleresimi_mesatar).toFixed(1)}
+                  <Text style={styles.vleresimiNumri}> ({lokali.nr_vleresimeve})</Text>
+                </Text>
+              </View>
+            )}
+            {kompakte && lokali.promocioni_max ? (
+              <Text style={styles.promoKompakte}>{t("promocionet.etiketa", { perqindja: lokali.promocioni_max })}</Text>
+            ) : null}
+          </View>
           <Text style={styles.adresa} numberOfLines={1}>
             {lokali.adresa}, {lokali.qyteti} · {formatoDistancen(lokali.distanca_m)}
           </Text>
@@ -152,9 +172,51 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       flex: 1,
       gap: 3,
     },
+    emriRreshti: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: hapesira.sm,
+    },
     emri: {
+      flexShrink: 1,
       color: ngjyrat.teksti,
       fontSize: 16,
+      fontWeight: "800",
+    },
+    vleresimi: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 3,
+    },
+    vleresimiTeksti: {
+      color: ngjyrat.teksti,
+      fontSize: 13,
+      fontWeight: "700",
+    },
+    vleresimiNumri: {
+      color: ngjyrat.tekstiZbehte,
+      fontWeight: "500",
+    },
+    promo: {
+      position: "absolute",
+      top: hapesira.md,
+      right: hapesira.md,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: rrezja.plote,
+      backgroundColor: ngjyrat.ari,
+    },
+    promoTeksti: {
+      color: ngjyrat.mbiAri,
+      fontSize: 12,
+      fontWeight: "800",
+    },
+    promoKompakte: {
+      color: ngjyrat.ari,
+      fontSize: 12,
       fontWeight: "800",
     },
     adresa: {

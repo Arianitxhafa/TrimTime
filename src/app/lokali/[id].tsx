@@ -7,9 +7,11 @@ import { useLokali } from "../../api/lokalet";
 import { useOrari } from "../../api/orari";
 import { useSherbimet } from "../../api/sherbimet";
 import { useStafi } from "../../api/stafi";
+import { useVleresimetELokalit } from "../../api/vleresimet";
 import Avatar from "../../components/Avatar";
 import Butoni from "../../components/Butoni";
 import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
+import KartaEVleresimit from "../../components/KartaEVleresimit";
 import { celesiIDites, RENDI_I_DITEVE } from "../../components/RedaktoriIOrarit";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { useModiAktiv } from "../../hooks/useModiAktiv";
@@ -92,6 +94,19 @@ export default function ProfiliILokalit() {
                 <Text style={[styles.statusi, { color: l.i_hapur_tani ? "#3DD68C" : ngjyrat.tekstiDyte }]}>
                   {l.i_hapur_tani ? t("lokali.hapur") : t("lokali.mbyllur")}
                 </Text>
+                {l.vleresimi_mesatar != null && l.nr_vleresimeve > 0 && (
+                  <Pressable
+                    accessibilityRole="link"
+                    onPress={() => router.push({ pathname: "/vleresimet/[lokaliId]", params: { lokaliId: l.id } })}
+                    style={styles.vleresimi}
+                    hitSlop={8}
+                  >
+                    <Ikona emri={ikonat.yll} madhesia={13} ngjyra={ngjyrat.ari} />
+                    <Text style={styles.vleresimiTeksti}>
+                      {Number(l.vleresimi_mesatar).toFixed(1)} ({l.nr_vleresimeve})
+                    </Text>
+                  </Pressable>
+                )}
               </View>
             </View>
           </View>
@@ -196,6 +211,8 @@ export default function ProfiliILokalit() {
             })}
           </View>
 
+          {!ngaOsm && <VleresimetEFundit lokaliId={l.id} numri={l.nr_vleresimeve} />}
+
           {l.pershkrimi ? (
             <>
               <Text style={styles.seksioni}>{t("profiliLokalit.rreth")}</Text>
@@ -221,6 +238,40 @@ export default function ProfiliILokalit() {
         </View>
       )}
     </View>
+  );
+}
+
+// Dy vlerësimet më të fundit dhe lidhja për të gjitha.
+function VleresimetEFundit({ lokaliId, numri }: { lokaliId: string; numri: number }) {
+  const { t } = useTranslation();
+  const styles = useStilet(krijoStilet);
+  const vleresimet = useVleresimetELokalit(lokaliId);
+  const teFundit = vleresimet.data?.pages[0]?.slice(0, 2) ?? [];
+
+  return (
+    <>
+      <View style={styles.seksioniRreshti}>
+        <Text style={[styles.seksioni, styles.seksioniNeRresht]}>{t("vleresimet.titulli")}</Text>
+        {numri > 2 && (
+          <Pressable
+            accessibilityRole="link"
+            onPress={() => router.push({ pathname: "/vleresimet/[lokaliId]", params: { lokaliId } })}
+            hitSlop={8}
+          >
+            <Text style={styles.lidhja}>{t("vleresimet.shikoTeGjitha")}</Text>
+          </Pressable>
+        )}
+      </View>
+      {teFundit.length === 0 ? (
+        <Text style={styles.paTeDhena}>{vleresimet.isPending ? " " : t("vleresimet.paVleresime")}</Text>
+      ) : (
+        <View style={styles.vleresimet}>
+          {teFundit.map((v) => (
+            <KartaEVleresimit key={v.id} vleresimi={v} />
+          ))}
+        </View>
+      )}
+    </>
   );
 }
 
@@ -370,6 +421,36 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     paTeDhena: {
       color: ngjyrat.tekstiZbehte,
       fontSize: 14,
+    },
+    seksioniRreshti: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginTop: hapesira.lg,
+      marginBottom: hapesira.md,
+    },
+    seksioniNeRresht: {
+      marginTop: 0,
+      marginBottom: 0,
+    },
+    lidhja: {
+      color: ngjyrat.ari,
+      fontSize: 14,
+      fontWeight: "700",
+    },
+    vleresimet: {
+      gap: hapesira.md,
+    },
+    vleresimi: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      marginLeft: hapesira.sm,
+    },
+    vleresimiTeksti: {
+      color: ngjyrat.teksti,
+      fontSize: 14,
+      fontWeight: "700",
     },
     grupi: {
       backgroundColor: ngjyrat.siperfaqja,

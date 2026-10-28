@@ -36,7 +36,7 @@ export default function Zbulo() {
 
   const [kerkimi, setKerkimi] = useState("");
   const [vetemHapur, setVetemHapur] = useState(false);
-  const [meLire, setMeLire] = useState(false);
+  const [renditja, setRenditja] = useState<"distanca" | "cmimi" | "vleresimi">("distanca");
   const [deri10, setDeri10] = useState(false);
   const kerkimiIVonuar = useVonesa(kerkimi);
 
@@ -47,7 +47,7 @@ export default function Zbulo() {
       kerkimi: kerkimiIVonuar,
       vetemHapur,
       cmimiMax: deri10 ? CMIMI_MAX_FILTRI : null,
-      renditja: meLire ? "cmimi" : "distanca",
+      renditja,
     },
     // Pret derisa të dihet vendndodhja, që të mos bëhen dy kërkesa.
     kaLeje !== null,
@@ -60,7 +60,7 @@ export default function Zbulo() {
     setKerkimi("");
     setVetemHapur(false);
     setDeri10(false);
-    setMeLire(false);
+    setRenditja("distanca");
   }
 
   const koka = (
@@ -101,8 +101,13 @@ export default function Zbulo() {
           aktiv={deri10}
           onPress={() => setDeri10(!deri10)}
         />
-        <Chip teksti={t("zbulo.meAfer")} aktiv={!meLire} onPress={() => setMeLire(false)} />
-        <Chip teksti={t("zbulo.meLire")} aktiv={meLire} onPress={() => setMeLire(true)} />
+        <Chip teksti={t("zbulo.meAfer")} aktiv={renditja === "distanca"} onPress={() => setRenditja("distanca")} />
+        <Chip teksti={t("zbulo.meLire")} aktiv={renditja === "cmimi"} onPress={() => setRenditja("cmimi")} />
+        <Chip
+          teksti={t("zbulo.meTeVleresuar")}
+          aktiv={renditja === "vleresimi"}
+          onPress={() => setRenditja("vleresimi")}
+        />
       </ScrollView>
 
       {kaLeje === false && (

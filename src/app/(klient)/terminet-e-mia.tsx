@@ -20,6 +20,7 @@ import Butoni from "../../components/Butoni";
 import DialogKonfirmimi from "../../components/DialogKonfirmimi";
 import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
 import { GabimiIFormes } from "../../components/KornizaAuth";
+import Yjet from "../../components/Yjet";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { formatoDaten } from "../../lib/datat";
 import { formatoCmimin } from "../../lib/formatimi";
@@ -195,7 +196,14 @@ function KartaETerminit({ termini, iArdhshem, onAnulo }: KartaProps) {
           <Ikona emri={ikonat.ora} madhesia={16} ngjyra={ngjyrat.ari} />
           <Text style={styles.kohaTeksti}>{termini.ora_lokale}</Text>
         </View>
-        <Text style={styles.cmimi}>{formatoCmimin(termini.cmimi_centa)}</Text>
+        <View style={styles.cmimet}>
+          {termini.zbritja_centa > 0 && !termini.shperblim && (
+            <Text style={styles.cmimiIVjeter}>{formatoCmimin(termini.cmimi_baze_centa)}</Text>
+          )}
+          <Text style={styles.cmimi}>
+            {termini.shperblim ? t("pagesa.falas") : formatoCmimin(termini.cmimi_centa)}
+          </Text>
+        </View>
       </View>
 
       {iArdhshem ? (
@@ -225,6 +233,18 @@ function KartaETerminit({ termini, iArdhshem, onAnulo }: KartaProps) {
         )
       ) : (
         <View style={styles.veprimet}>
+          {termini.vleresimi_yjet ? (
+            <View style={styles.vleresuar}>
+              <Yjet vlera={termini.vleresimi_yjet} madhesia={15} />
+            </View>
+          ) : termini.mund_te_vleresohet ? (
+            <Veprimi
+              ikona={ikonat.yll}
+              teksti={t("vleresimet.vlereso")}
+              theksuar
+              onPress={() => router.push({ pathname: "/vlereso/[terminiId]", params: { terminiId: termini.id } })}
+            />
+          ) : null}
           <Veprimi
             ikona={ikonat.kthe}
             teksti={t("terminetEMia.rezervoPerseri")}
@@ -241,17 +261,17 @@ function KartaETerminit({ termini, iArdhshem, onAnulo }: KartaProps) {
   );
 }
 
-type VeprimiProps = { ikona: EmriIkones; teksti: string; rrezik?: boolean; onPress: () => void };
+type VeprimiProps = { ikona: EmriIkones; teksti: string; rrezik?: boolean; theksuar?: boolean; onPress: () => void };
 
-function Veprimi({ ikona, teksti, rrezik = false, onPress }: VeprimiProps) {
+function Veprimi({ ikona, teksti, rrezik = false, theksuar = false, onPress }: VeprimiProps) {
   const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
-  const ngjyra = rrezik ? ngjyrat.rrezik : ngjyrat.teksti;
+  const ngjyra = rrezik ? ngjyrat.rrezik : theksuar ? ngjyrat.ari : ngjyrat.teksti;
   return (
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => [styles.veprimi, pressed && styles.shtypur]}
+      style={({ pressed }) => [styles.veprimi, theksuar && styles.veprimiITheksuar, pressed && styles.shtypur]}
     >
       <Ikona emri={ikona} madhesia={15} ngjyra={ngjyra} />
       <Text style={[styles.veprimiTeksti, { color: ngjyra }]}>{teksti}</Text>
@@ -370,11 +390,30 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontSize: 14,
       fontWeight: "700",
     },
-    cmimi: {
+    cmimet: {
       marginLeft: "auto",
+      flexDirection: "row",
+      alignItems: "baseline",
+      gap: 6,
+    },
+    cmimi: {
       color: ngjyrat.teksti,
       fontSize: 15,
       fontWeight: "800",
+    },
+    cmimiIVjeter: {
+      color: ngjyrat.tekstiZbehte,
+      fontSize: 12,
+      textDecorationLine: "line-through",
+    },
+    vleresuar: {
+      height: 36,
+      justifyContent: "center",
+      paddingHorizontal: 4,
+    },
+    veprimiITheksuar: {
+      borderColor: ngjyrat.ari,
+      backgroundColor: ngjyrat.ariIErret,
     },
     veprimet: {
       flexDirection: "row",

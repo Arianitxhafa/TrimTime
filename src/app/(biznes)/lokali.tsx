@@ -171,6 +171,17 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
               meKufi
             />
           )}
+          <Rreshti
+            ikona={ikonat.yll}
+            titulli={t("lokali.vleresimet")}
+            vlera={
+              lokali.vleresimi_mesatar != null && lokali.nr_vleresimeve > 0
+                ? `★ ${Number(lokali.vleresimi_mesatar).toFixed(1)} · ${lokali.nr_vleresimeve}`
+                : undefined
+            }
+            href={{ pathname: "/vleresimet/[lokaliId]", params: { lokaliId: lokali.id } }}
+            meKufi
+          />
           {eshtePronar && (
             <Rreshti ikona={ikonat.grafik} titulli={t("analitika.titulli")} href="/menaxho/analitika" meKufi />
           )}
