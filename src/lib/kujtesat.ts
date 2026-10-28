@@ -87,6 +87,21 @@ export async function planifikoKujtesat(termini: TerminiPerKujtese, t: TFunction
   }
 }
 
+export type GjendjaELejes = "lejuar" | "refuzuar" | "pa_pyetur";
+
+export async function gjendjaENjoftimeve(): Promise<GjendjaELejes> {
+  if (Platform.OS === "web") return "refuzuar";
+  const leja = await Notifications.getPermissionsAsync();
+  return leja.granted ? "lejuar" : leja.canAskAgain ? "pa_pyetur" : "refuzuar";
+}
+
+// Thirret nga ekrani i lejeve pas hyrjes së parë.
+export async function kerkoLejenENjoftimeve(): Promise<GjendjaELejes> {
+  if (Platform.OS === "web") return "refuzuar";
+  const leja = await Notifications.requestPermissionsAsync();
+  return leja.granted ? "lejuar" : leja.canAskAgain ? "pa_pyetur" : "refuzuar";
+}
+
 // Njoftim i menjëhershëm kur lirohet një orë në listën e pritjes. Pa server push, vjen vetëm
 // kur aplikacioni është i hapur ose në sfond; push nga serveri shtohet me development build.
 export async function njoftoOrenELire(titulli: string, teksti: string, te: { lokaliId: string; data: string }) {

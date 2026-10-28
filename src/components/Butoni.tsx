@@ -1,6 +1,10 @@
+import { LinearGradient } from "expo-linear-gradient";
 import { ActivityIndicator, Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from "react-native";
+import Animated from "react-native-reanimated";
 import { useTema } from "../context/TemaContext";
-import { rrezja, type Ngjyrat } from "../theme";
+import { useShtypja } from "../hooks/useShtypja";
+import { prekja } from "../lib/prekja";
+import { hijet, rrezja, type Ngjyrat } from "../theme";
 import Ikona, { type EmriIkones } from "./Ikona";
 
 type Varianti = "kryesor" | "dytesor" | "rrezik";
@@ -21,7 +25,7 @@ function ngjyratEVariantit(
 ): { sfondi: string; teksti: string; kufiri: string } {
   switch (varianti) {
     case "kryesor":
-      return { sfondi: ngjyrat.ari, teksti: ngjyrat.mbiAri, kufiri: ngjyrat.ari };
+      return { sfondi: ngjyrat.ari, teksti: ngjyrat.mbiAri, kufiri: "transparent" };
     case "dytesor":
       return { sfondi: ngjyrat.siperfaqja2, teksti: ngjyrat.teksti, kufiri: ngjyrat.kufiri };
     case "rrezik":
@@ -29,6 +33,9 @@ function ngjyratEVariantit(
   }
 }
 
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+// Butoni kryesor ka gradient ari dhe hije të artë; çdo buton "shtypet" me animacion dhe dridhje.
 export default function Butoni({
   titulli,
   onPress,
@@ -40,51 +47,69 @@ export default function Butoni({
 }: Props) {
   const { ngjyrat } = useTema();
   const s = ngjyratEVariantit(ngjyrat, varianti);
+  const shtypja = useShtypja();
+  const kryesor = varianti === "kryesor";
 
   return (
-    <Pressable
+    <AnimatedPressable
       accessibilityRole="button"
       accessibilityState={{ disabled: joAktiv || ngarkohet, busy: ngarkohet }}
       disabled={joAktiv || ngarkohet}
-      onPress={onPress}
-      style={({ pressed }) => [
+      onPressIn={shtypja.onPressIn}
+      onPressOut={shtypja.onPressOut}
+      onPress={() => {
+        if (varianti === "rrezik") prekja.mesatare();
+        else prekja.lehte();
+        onPress();
+      }}
+      style={[
         styles.butoni,
         { backgroundColor: s.sfondi, borderColor: s.kufiri },
-        pressed && styles.shtypur,
+        kryesor && !joAktiv && hijet.ari,
         joAktiv && styles.joAktiv,
+        shtypja.stili,
         style,
       ]}
     >
+      {kryesor && (
+        <LinearGradient
+          colors={ngjyrat.gradientiAri}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[StyleSheet.absoluteFill, styles.gradienti]}
+        />
+      )}
       {ngarkohet ? (
         <ActivityIndicator color={s.teksti} />
       ) : (
         ikona && <Ikona emri={ikona} madhesia={18} ngjyra={s.teksti} />
       )}
       <Text style={[styles.teksti, { color: s.teksti }]}>{titulli}</Text>
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
 const styles = StyleSheet.create({
   butoni: {
-    minHeight: 52,
-    paddingHorizontal: 18,
+    minHeight: 54,
+    paddingHorizontal: 20,
     borderRadius: rrezja.md,
     borderWidth: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
+    overflow: "visible",
   },
-  shtypur: {
-    opacity: 0.85,
-    transform: [{ scale: 0.98 }],
+  gradienti: {
+    borderRadius: rrezja.md,
   },
   joAktiv: {
     opacity: 0.4,
   },
   teksti: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: 16,
+    fontWeight: "800",
+    letterSpacing: 0.2,
   },
 });

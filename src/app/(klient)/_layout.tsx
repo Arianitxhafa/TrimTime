@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useListaEPritjesLive } from "../../api/listaEPritjes";
 import { ikonat } from "../../components/Ikona";
-import { ikonaETabit, useOpsionetETabeve } from "../../components/opsionetETabeve";
+import { degjuesitETabeve, ikonaETabit, useOpsionetETabeve } from "../../components/opsionetETabeve";
 import { formatoDaten } from "../../lib/datat";
 import { njoftoOrenELire } from "../../lib/kujtesat";
 import type { NeListenEPritjes } from "../../lib/tipet";
@@ -32,7 +32,7 @@ export default function KlientLayout() {
   useListaEPritjesLive(kurLirohet);
 
   return (
-    <Tabs screenOptions={opsionet}>
+    <Tabs screenOptions={opsionet} screenListeners={degjuesitETabeve}>
       <Tabs.Screen name="zbulo" options={{ title: t("tabs.zbulo"), tabBarIcon: ikonaETabit(ikonat.zbulo) }} />
       <Tabs.Screen name="harta" options={{ title: t("tabs.harta"), tabBarIcon: ikonaETabit(ikonat.harta) }} />
       <Tabs.Screen

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
   FlatList,
   Pressable,
   RefreshControl,
@@ -12,19 +11,30 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
 import { useLokaletPrane } from "../../api/lokalet";
 import Butoni from "../../components/Butoni";
 import Ikona, { ikonat } from "../../components/Ikona";
 import KartaELokalit from "../../components/KartaELokalit";
+import { SkeletiIKartes } from "../../components/Skeleti";
+import Xham from "../../components/Xham";
+import ZgjedhesiIQytetit from "../../components/ZgjedhesiIQytetit";
 import { useAuth } from "../../context/AuthContext";
 import { useStilet, useTema } from "../../context/TemaContext";
-import { useVendndodhjaIme } from "../../hooks/useVendndodhjaIme";
 import { useVonesa } from "../../hooks/useVonesa";
+import { useZonaIme } from "../../hooks/useZonaIme";
 import { formatoCmimin } from "../../lib/formatimi";
+import { prekja } from "../../lib/prekja";
 import { hapesira, rrezja, type Ngjyrat } from "../../theme";
 
 const CMIMI_MAX_FILTRI = 1000;
-const RREZJA_KM = 30;
+// Përveç qytetit, shfaqen edhe lokalet brenda kësaj rrezeje nga klienti (lagjet në periferi).
+const RREZJA_KM = 10;
+
+function pershendetjaESotme(): "zbulo.mirmengjes" | "zbulo.mirdita" | "zbulo.mirembrema" {
+  const ora = new Date().getHours();
+  return ora < 11 ? "zbulo.mirmengjes" : ora < 18 ? "zbulo.mirdita" : "zbulo.mirembrema";
+}
 
 export default function Zbulo() {
   const { t } = useTranslation();
@@ -32,7 +42,9 @@ export default function Zbulo() {
   const styles = useStilet(krijoStilet);
   const insets = useSafeAreaInsets();
   const { emriIShfaqur } = useAuth();
-  const { pika, kaLeje, kerkoLeje } = useVendndodhjaIme();
+  const zona = useZonaIme();
+  const { pika, kaLeje, kerkoLeje } = zona;
+  const [zgjedhesi, setZgjedhesi] = useState(false);
 
   const [kerkimi, setKerkimi] = useState("");
   const [vetemHapur, setVetemHapur] = useState(false);
@@ -48,9 +60,10 @@ export default function Zbulo() {
       vetemHapur,
       cmimiMax: deri10 ? CMIMI_MAX_FILTRI : null,
       renditja,
+      qytetiId: zona.qyteti?.id ?? null,
     },
-    // Pret derisa të dihet vendndodhja, që të mos bëhen dy kërkesa.
-    kaLeje !== null,
+    // Pret derisa të dihet qyteti, që të mos ngarkohen lokalet e një qyteti tjetër.
+    zona.gati,
   );
 
   const kaFiltra = vetemHapur || deri10 || kerkimi.trim() !== "";
@@ -65,10 +78,30 @@ export default function Zbulo() {
 
   const koka = (
     <View>
-      <Text style={styles.pershendetja}>
-        {emriIPare ? t("zbulo.pershendetje", { emri: emriIPare }) : t("zbulo.pershendetjePaEmer")}
-      </Text>
-      <Text style={styles.titulli}>{t("zbulo.pyetja")}</Text>
+      <View style={styles.shiriti}>
+        <Text style={styles.pershendetja} numberOfLines={1}>
+          {t(pershendetjaESotme())}
+          {emriIPare ? `, ${emriIPare}` : ""}
+        </Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("zona.zgjidhQytetin")}
+          onPress={() => {
+            prekja.lehte();
+            setZgjedhesi(true);
+          }}
+          hitSlop={6}
+        >
+          <Xham style={styles.qyteti}>
+            <Ikona emri={ikonat.harta} madhesia={14} ngjyra={ngjyrat.ari} />
+            <Text style={styles.qytetiTeksti} numberOfLines={1}>
+              {zona.qyteti?.emri ?? t("zona.zgjidhQytetin")}
+            </Text>
+            <Ikona emri={ikonat.djathtas} madhesia={12} ngjyra={ngjyrat.tekstiDyte} />
+          </Xham>
+        </Pressable>
+      </View>
+      <Text style={styles.titulli}>{t("zbulo.gatiPerLook")}</Text>
 
       <View style={styles.kerkimi}>
         <Ikona emri={ikonat.kerko} madhesia={18} ngjyra={ngjyrat.tekstiZbehte} />
@@ -110,7 +143,7 @@ export default function Zbulo() {
         />
       </ScrollView>
 
-      {kaLeje === false && (
+      {kaLeje === false && !zona.qyteti && (
         <View style={styles.leja}>
           <Ikona emri={ikonat.harta} madhesia={18} ngjyra={ngjyrat.ari} />
           <Text style={styles.lejaTeksti}>{t("zbulo.paLeje")}</Text>
@@ -121,20 +154,33 @@ export default function Zbulo() {
       )}
 
       {lokalet.data && lokalet.data.length > 0 && (
-        <Text style={styles.seksioni}>{t("zbulo.rezultatet", { numri: lokalet.data.length })}</Text>
+        <View style={styles.seksioniRreshti}>
+          <Text style={styles.seksioni} numberOfLines={1}>
+            {zona.qyteti ? t("zona.lokaletNe", { qyteti: zona.qyteti.emri }) : t("tabs.zbulo")}
+          </Text>
+          <Text style={styles.numri}>{t("zbulo.rezultatet", { numri: lokalet.data.length })}</Text>
+        </View>
       )}
     </View>
   );
 
   return (
+    <View style={styles.container}>
+      <LinearGradient colors={[ngjyrat.ariIErret, ngjyrat.sfondi]} style={styles.drita} pointerEvents="none" />
+      <ZgjedhesiIQytetit
+        iDukshem={zgjedhesi}
+        qytetiAktual={zona.qyteti?.id ?? null}
+        onMbyll={() => setZgjedhesi(false)}
+        onVendndodhjaIme={() => void kerkoLeje()}
+      />
     <FlatList
-      style={styles.container}
+      style={styles.lista0}
       contentContainerStyle={[styles.lista, { paddingTop: insets.top + hapesira.lg }]}
       data={lokalet.data ?? []}
       keyExtractor={(l) => l.id}
       keyboardShouldPersistTaps="handled"
       ListHeaderComponent={koka}
-      ItemSeparatorComponent={() => <View style={{ height: hapesira.lg }} />}
+      ItemSeparatorComponent={() => <View style={{ height: hapesira.xl }} />}
       ListFooterComponent={
         (lokalet.data ?? []).some((l) => l.burimi === "osm") ? (
           <Text style={styles.atribuimi}>{t("pergjithshme.atribuimiOsm")}</Text>
@@ -146,7 +192,10 @@ export default function Zbulo() {
       }
       ListEmptyComponent={
         lokalet.isPending ? (
-          <ActivityIndicator color={ngjyrat.ari} style={styles.ngarkimi} />
+          <View style={styles.skeletet}>
+            <SkeletiIKartes />
+            <SkeletiIKartes />
+          </View>
         ) : (
           <View style={styles.bosh}>
             <View style={styles.boshIkona}>
@@ -165,6 +214,7 @@ export default function Zbulo() {
         )
       }
     />
+    </View>
   );
 }
 
@@ -174,7 +224,10 @@ function Chip({ teksti, aktiv, onPress }: { teksti: string; aktiv: boolean; onPr
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected: aktiv }}
-      onPress={onPress}
+      onPress={() => {
+        prekja.zgjedhje();
+        onPress();
+      }}
       style={[styles.chip, aktiv && styles.chipAktiv]}
     >
       <Text style={[styles.chipTeksti, aktiv && styles.chipTekstiAktiv]}>{teksti}</Text>
@@ -188,33 +241,66 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
     },
+    drita: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      height: 320,
+    },
+    lista0: {
+      flex: 1,
+    },
     lista: {
       paddingHorizontal: hapesira.xl,
       paddingBottom: hapesira.xxl,
     },
+    shiriti: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      gap: hapesira.md,
+    },
     pershendetja: {
+      flex: 1,
       color: ngjyrat.tekstiDyte,
       fontSize: 15,
       fontWeight: "600",
     },
+    qyteti: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      maxWidth: 190,
+      paddingHorizontal: 12,
+      height: 36,
+      borderRadius: rrezja.plote,
+    },
+    qytetiTeksti: {
+      flexShrink: 1,
+      color: ngjyrat.teksti,
+      fontSize: 14,
+      fontWeight: "700",
+    },
     titulli: {
       color: ngjyrat.teksti,
-      fontSize: 28,
+      fontSize: 32,
       fontWeight: "800",
-      letterSpacing: -0.6,
-      marginTop: 2,
-      marginBottom: hapesira.lg,
+      letterSpacing: -1,
+      lineHeight: 38,
+      marginTop: hapesira.md,
+      marginBottom: hapesira.xl,
     },
     kerkimi: {
       flexDirection: "row",
       alignItems: "center",
       gap: hapesira.sm,
       backgroundColor: ngjyrat.siperfaqja,
-      borderRadius: rrezja.md,
+      borderRadius: rrezja.lg,
       borderWidth: 1,
       borderColor: ngjyrat.kufiri,
-      paddingHorizontal: hapesira.md,
-      height: 50,
+      paddingHorizontal: hapesira.lg,
+      height: 54,
       marginBottom: hapesira.md,
     },
     kerkimiInput: {
@@ -241,8 +327,8 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       justifyContent: "center",
     },
     chipAktiv: {
-      backgroundColor: ngjyrat.teksti,
-      borderColor: ngjyrat.teksti,
+      backgroundColor: ngjyrat.ari,
+      borderColor: ngjyrat.ari,
     },
     chipTeksti: {
       color: ngjyrat.tekstiDyte,
@@ -250,7 +336,22 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontWeight: "700",
     },
     chipTekstiAktiv: {
-      color: ngjyrat.sfondi,
+      color: ngjyrat.mbiAri,
+    },
+    seksioniRreshti: {
+      flexDirection: "row",
+      alignItems: "baseline",
+      justifyContent: "space-between",
+      gap: hapesira.md,
+      marginBottom: hapesira.md,
+    },
+    numri: {
+      color: ngjyrat.tekstiZbehte,
+      fontSize: 13,
+      fontWeight: "600",
+    },
+    skeletet: {
+      gap: hapesira.xl,
     },
     leja: {
       flexDirection: "row",
@@ -273,12 +374,11 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontWeight: "800",
     },
     seksioni: {
-      color: ngjyrat.tekstiDyte,
-      fontSize: 13,
-      fontWeight: "700",
-      textTransform: "uppercase",
-      letterSpacing: 0.8,
-      marginBottom: hapesira.md,
+      flexShrink: 1,
+      color: ngjyrat.teksti,
+      fontSize: 20,
+      fontWeight: "800",
+      letterSpacing: -0.3,
     },
     ngarkimi: {
       marginTop: hapesira.xxl,

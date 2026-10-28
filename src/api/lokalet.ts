@@ -78,7 +78,40 @@ export type ParametratEKerkimit = {
   renditja: "distanca" | "cmimi" | "vleresimi";
   // Harta kërkon më shumë rezultate se lista (serveri lejon deri në 300).
   limit?: number;
+  // Lista e Zbulo: lokalet e këtij qyteti + ato brenda rrezes. Harta nuk e përdor.
+  qytetiId?: number | null;
 };
+
+export type Qyteti = { id: number; emri: string; lat: number; lng: number; nr_lokaleve: number };
+
+export function useQytetet(aktiv = true) {
+  return useQuery({
+    queryKey: ["qytetet"],
+    enabled: aktiv,
+    staleTime: 60 * 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("qytetet_me_lokale");
+      if (error) throw error;
+      return (data ?? []) as Qyteti[];
+    },
+  });
+}
+
+// Qyteti ku ndodhet një pikë (për titullin "Lokalet në …" dhe filtrin e zonës).
+export function useQytetiPrane(pika: Koordinata, aktiv = true) {
+  return useQuery({
+    queryKey: ["qyteti-prane", Math.round(pika.lat * 100) / 100, Math.round(pika.lng * 100) / 100],
+    enabled: aktiv,
+    staleTime: 10 * 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .rpc("qyteti_prane", { p_lat: pika.lat, p_lng: pika.lng })
+        .maybeSingle<{ id: number; emri: string; distanca_m: number }>();
+      if (error) throw error;
+      return data;
+    },
+  });
+}
 
 export function useLokaletPrane(p: ParametratEKerkimit, aktiv = true) {
   return useQuery({
@@ -96,6 +129,7 @@ export function useLokaletPrane(p: ParametratEKerkimit, aktiv = true) {
         p_cmimi_max: p.cmimiMax,
         p_renditja: p.renditja,
         p_limit: p.limit ?? 50,
+        p_qyteti_id: p.qytetiId ?? null,
       });
       if (error) throw error;
       return (data ?? []) as LokaliPrane[];

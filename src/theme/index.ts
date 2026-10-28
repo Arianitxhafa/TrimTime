@@ -16,23 +16,34 @@ export type Ngjyrat = {
   rrezikKufiri: string;
   mbiAri: string;
   mbulesa: string;
+  // Gradienti i arit (butonat kryesorë, theksimet): nga i ndriçuari te i thelli.
+  gradientiAri: readonly [string, string, string];
+  // Mbushja e kartave "xham" kur blur-i nuk është i disponueshëm (Android, web).
+  xham: string;
+  kufiriXham: string;
+  // Gradienti mbi fotot, që teksti i bardhë të lexohet.
+  hijaEFotos: readonly [string, string];
 };
 
 export const ngjyratErrta: Ngjyrat = {
   sfondi: "#0B0B0F",
-  siperfaqja: "#15151C",
-  siperfaqja2: "#1D1D27",
-  kufiri: "#2A2A36",
-  ari: "#E8B04B",
-  ariIErret: "#2A2213",
-  teksti: "#F5F5F7",
-  tekstiDyte: "#A1A1AE",
-  tekstiZbehte: "#6B6B78",
+  siperfaqja: "#141419",
+  siperfaqja2: "#1C1C23",
+  kufiri: "#26262F",
+  ari: "#D4A853",
+  ariIErret: "#2A2214",
+  teksti: "#F7F5F0",
+  tekstiDyte: "#A6A3AD",
+  tekstiZbehte: "#6C6A75",
   rrezik: "#F04452",
   rrezikSfond: "#2B1418",
   rrezikKufiri: "#4A1E25",
-  mbiAri: "#14110A",
-  mbulesa: "rgba(0,0,0,0.7)",
+  mbiAri: "#17120A",
+  mbulesa: "rgba(0,0,0,0.72)",
+  gradientiAri: ["#F3D79A", "#D4A853", "#A8802F"],
+  xham: "rgba(22,22,28,0.72)",
+  kufiriXham: "rgba(255,255,255,0.09)",
+  hijaEFotos: ["rgba(11,11,15,0)", "rgba(11,11,15,0.92)"],
 };
 
 // Ari është më i errët në modin e çelët që teksti mbi të të ketë kontrast të mjaftueshëm.
@@ -40,8 +51,8 @@ export const ngjyratCelta: Ngjyrat = {
   sfondi: "#F7F5F0",
   siperfaqja: "#FFFFFF",
   siperfaqja2: "#F0EDE6",
-  kufiri: "#E4E0D6",
-  ari: "#C9952F",
+  kufiri: "#E6E1D6",
+  ari: "#B8862B",
   ariIErret: "#F6EBD3",
   teksti: "#15151C",
   tekstiDyte: "#5C5C68",
@@ -49,9 +60,31 @@ export const ngjyratCelta: Ngjyrat = {
   rrezik: "#D92D3A",
   rrezikSfond: "#FDE8EA",
   rrezikKufiri: "#F7C5CA",
-  mbiAri: "#14110A",
+  mbiAri: "#17120A",
   mbulesa: "rgba(21,21,28,0.45)",
+  gradientiAri: ["#EBC77A", "#C9972F", "#9C7222"],
+  xham: "rgba(255,255,255,0.78)",
+  kufiriXham: "rgba(21,21,28,0.08)",
+  hijaEFotos: ["rgba(11,11,15,0)", "rgba(11,11,15,0.85)"],
 };
+
+// Hije e butë dhe e thellë për kartat që "ngrihen" mbi sfond.
+export const hijet = {
+  karte: {
+    shadowColor: "#000",
+    shadowOpacity: 0.28,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 8,
+  },
+  ari: {
+    shadowColor: "#D4A853",
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
+  },
+} as const;
 
 export const hapesira = {
   xs: 4,

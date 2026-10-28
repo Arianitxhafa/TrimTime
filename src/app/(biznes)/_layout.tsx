@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useLokaliIm } from "../../api/lokalet";
 import { useTerminetELokalit, useTerminetLiveILokalit } from "../../api/terminet";
 import { ikonat } from "../../components/Ikona";
-import { ikonaETabit, useOpsionetETabeve } from "../../components/opsionetETabeve";
+import { degjuesitETabeve, ikonaETabit, useOpsionetETabeve } from "../../components/opsionetETabeve";
 import { useTema } from "../../context/TemaContext";
 import { dataISO } from "../../lib/datat";
 
@@ -19,7 +19,7 @@ export default function BiznesLayout() {
   const nePritje = (terminetESotme.data ?? []).filter((x) => x.statusi === "ne_pritje").length;
 
   return (
-    <Tabs screenOptions={opsionet}>
+    <Tabs screenOptions={opsionet} screenListeners={degjuesitETabeve}>
       <Tabs.Screen
         name="sot"
         options={{

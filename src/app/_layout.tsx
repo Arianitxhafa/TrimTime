@@ -30,7 +30,7 @@ function Navigimi() {
   const { t } = useTranslation();
   const { ngjyrat, eshteErret } = useTema();
   const { sesioni, ngarkohet } = useAuth();
-  const { onboardingIPare } = usePreferencat();
+  const { onboardingIPare, lejetEPara } = usePreferencat();
   const modi = useModiAktiv();
 
   useEffect(() => {
@@ -54,7 +54,7 @@ function Navigimi() {
 
   // Stack.Protected ridrejton nga ekranet që nuk lejohen. Që nga SDK 58, pa `redirectTo` Expo Router
   // shkon te route-i i parë i lejuar, që për grupin (auth) do të ishte "/(auth)", pa ekran.
-  const hyrjaPerTeLejuarit = onboardingIPare ? "/roli" : "/onboarding";
+  const hyrjaPerTeLejuarit = !onboardingIPare ? "/onboarding" : !kaHyre ? "/roli" : "/lejet";
   return (
     <>
       <StatusBar style={eshteErret ? "light" : "dark"} />
@@ -78,7 +78,12 @@ function Navigimi() {
           <Stack.Screen name="(auth)" options={{ headerShown: false, animation: "fade" }} />
         </Stack.Protected>
 
-        <Stack.Protected guard={onboardingIPare && kaHyre} redirectTo={hyrjaPerTeLejuarit}>
+        {/* Pas hyrjes së parë: lejo njoftimet dhe vendndodhjen, një herë në këtë telefon. */}
+        <Stack.Protected guard={onboardingIPare && kaHyre && !lejetEPara} redirectTo={hyrjaPerTeLejuarit === "/lejet" ? "/" : hyrjaPerTeLejuarit}>
+          <Stack.Screen name="lejet" options={{ headerShown: false, animation: "fade" }} />
+        </Stack.Protected>
+
+        <Stack.Protected guard={onboardingIPare && kaHyre && lejetEPara} redirectTo={hyrjaPerTeLejuarit}>
           <Stack.Screen name="index" options={{ headerShown: false }} />
 
           <Stack.Protected guard={modi === "klient"} redirectTo="/sot">
