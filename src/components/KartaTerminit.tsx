@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useStilet, useTema } from "../context/TemaContext";
 import { formatoCmimin, formatoKohezgjatjen } from "../lib/formatimi";
@@ -13,6 +14,7 @@ type Props = {
 };
 
 export default function KartaTerminit({ termini, onPress }: Props) {
+  const { t } = useTranslation();
   const { ngjyrat, statusetMeta } = useTema();
   const styles = useStilet(krijoStilet);
   const meta = statusetMeta[termini.statusi];
@@ -49,6 +51,13 @@ export default function KartaTerminit({ termini, onPress }: Props) {
 
         <View style={styles.rreshtiPoshte}>
           <BadgeStatusi statusi={termini.statusi} />
+          {termini.arriti_me && (termini.statusi === "ne_pritje" || termini.statusi === "konfirmuar") ? (
+            <View style={styles.arriti}>
+              <Ikona emri={ikonat.skano} madhesia={12} ngjyra={ngjyrat.mbiAri} />
+              <Text style={styles.arritiTeksti}>{t("qr.arriti")}</Text>
+            </View>
+          ) : null}
+          {termini.foto_stili ? <Ikona emri={ikonat.kamera} madhesia={14} ngjyra={ngjyrat.ari} /> : null}
           <Text style={styles.detaje}>
             {formatoKohezgjatjen(termini.kohezgjatja_min)} · {formatoCmimin(termini.cmimi_centa)}
           </Text>
@@ -73,6 +82,20 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     shtypur: {
       backgroundColor: ngjyrat.siperfaqja2,
       transform: [{ scale: 0.99 }],
+    },
+    arriti: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      paddingHorizontal: 8,
+      height: 24,
+      borderRadius: rrezja.plote,
+      backgroundColor: ngjyrat.ari,
+    },
+    arritiTeksti: {
+      color: ngjyrat.mbiAri,
+      fontSize: 11,
+      fontWeight: "800",
     },
     kolonaOres: {
       alignItems: "center",
@@ -125,9 +148,10 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     rreshtiPoshte: {
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between",
+      gap: hapesira.sm,
     },
     detaje: {
+      marginLeft: "auto",
       color: ngjyrat.tekstiZbehte,
       fontSize: 12,
       fontWeight: "600",

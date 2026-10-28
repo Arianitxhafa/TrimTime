@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text } from "react-native";
@@ -13,7 +13,9 @@ export default function Bashkohu() {
   const { t } = useTranslation();
   const styles = useStilet(krijoStilet);
   const prano = usePranoFtesen();
-  const [kodi, setKodi] = useState("");
+  // Nga skaneri i QR-së vjen kodi i plotësuar.
+  const { kodi: kodiNgaQr } = useLocalSearchParams<{ kodi?: string }>();
+  const [kodi, setKodi] = useState(kodiNgaQr?.toUpperCase().slice(0, 8) ?? "");
 
   const iPlote = /^[A-Z2-9]{8}$/.test(kodi);
 
@@ -39,6 +41,8 @@ export default function Bashkohu() {
           ngarkohet={prano.isPending}
           onPress={() => prano.mutate(kodi, { onSuccess: () => router.back() })}
         />
+        <Text style={styles.ose}>{t("qr.ftesaQr")}</Text>
+        <Butoni titulli={t("qr.skano")} varianti="dytesor" ikona={ikonat.skano} onPress={() => router.push("/skano")} />
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -65,5 +69,12 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       lineHeight: 22,
       marginTop: 6,
       marginBottom: hapesira.xl,
+    },
+    ose: {
+      color: ngjyrat.tekstiZbehte,
+      fontSize: 13,
+      textAlign: "center",
+      marginTop: hapesira.xl,
+      marginBottom: hapesira.sm,
     },
   });

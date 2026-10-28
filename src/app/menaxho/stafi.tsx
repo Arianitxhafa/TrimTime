@@ -6,7 +6,9 @@ import { useKrijoFtesen, useNdryshoAnetarin, useStafi } from "../../api/stafi";
 import Avatar from "../../components/Avatar";
 import Butoni from "../../components/Butoni";
 import { ikonat } from "../../components/Ikona";
+import KartaQr from "../../components/KartaQr";
 import { GabimiIFormes } from "../../components/KornizaAuth";
+import { qrIFteses } from "../../lib/qr";
 import { useAuth } from "../../context/AuthContext";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { hapesira, rrezja, type Ngjyrat } from "../../theme";
@@ -77,6 +79,7 @@ export default function MenaxhoStafin() {
         <View style={styles.ftesa}>
           {fto.data ? (
             <>
+              <KartaQr vlera={qrIFteses(fto.data)} titulli={lokali.emri} nentitulli={fto.data} madhesia={180} />
               <Text style={styles.kodi} selectable>
                 {fto.data}
               </Text>

@@ -73,6 +73,15 @@ export default function DetajetTerminit() {
           <Avatar emri={termini.klienti_emri} madhesia={76} />
           <Text style={styles.emri}>{termini.klienti_emri}</Text>
           <BadgeStatusi statusi={statusi} />
+          {termini.arriti_me && (statusi === "ne_pritje" || statusi === "konfirmuar") ? (
+            <View style={styles.arriti}>
+              <Ikona emri={ikonat.skano} madhesia={14} ngjyra={ngjyrat.mbiAri} />
+              <Text style={styles.arritiTeksti}>
+                {t("qr.arriti")} ·{" "}
+                {new Date(termini.arriti_me).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              </Text>
+            </View>
+          ) : null}
         </View>
 
         {ndrysho.isError && <GabimiIFormes mesazhi={mesazhiIGabimitTeRezervimit(ndrysho.error, t)} />}
@@ -466,6 +475,20 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     veprimet: {
       gap: hapesira.sm,
+    },
+    arriti: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingHorizontal: 12,
+      height: 30,
+      borderRadius: rrezja.plote,
+      backgroundColor: ngjyrat.ari,
+    },
+    arritiTeksti: {
+      color: ngjyrat.mbiAri,
+      fontSize: 13,
+      fontWeight: "800",
     },
     fotoEStilit: {
       width: "100%",

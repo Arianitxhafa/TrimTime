@@ -33,6 +33,8 @@ export function mesazhiIGabimitTeRezervimit(gabimi: unknown, t: TFunction): stri
       return t("vleresimet.gabimNukMundet");
     case "TT006":
       return t("besnikeria.gabimPaShperblim");
+    case "TT007":
+      return t("qr.checkInPaTermin");
     default:
       return t("pergjithshme.gabimPapritur");
   }

@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import { useLokaletPrane } from "../../api/lokalet";
 import Butoni from "../../components/Butoni";
 import Ikona, { ikonat } from "../../components/Ikona";
@@ -98,6 +99,19 @@ export default function Zbulo() {
               {zona.qyteti?.emri ?? t("zona.zgjidhQytetin")}
             </Text>
             <Ikona emri={ikonat.djathtas} madhesia={12} ngjyra={ngjyrat.tekstiDyte} />
+          </Xham>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("qr.skano")}
+          onPress={() => {
+            prekja.lehte();
+            router.push("/skano");
+          }}
+          hitSlop={6}
+        >
+          <Xham style={styles.skano}>
+            <Ikona emri={ikonat.skano} madhesia={18} ngjyra={ngjyrat.ari} />
           </Xham>
         </Pressable>
       </View>
@@ -275,6 +289,13 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingHorizontal: 12,
       height: 36,
       borderRadius: rrezja.plote,
+    },
+    skano: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      alignItems: "center",
+      justifyContent: "center",
     },
     qytetiTeksti: {
       flexShrink: 1,
