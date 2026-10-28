@@ -12,7 +12,7 @@ The project is being developed as part of a university Mobile Applications cours
 
 - **Onboarding** — Three animated intro screens shown on first launch.
 - **Accounts** — Sign up and sign in with email and password (Supabase Auth), with validation and translated error messages.
-- **Client & Business modes** — One account can switch between finding barbers (client) and managing a shop (business). Each mode has its own tab bar.
+- **Client & Business roles** — The role (client or barber/shop) is chosen before signing in and stays linked to the account. Each role has its own tab bar.
 - **Protected navigation** — Screens are only reachable when allowed (onboarding → sign in → tabs), using Expo Router `Stack.Protected`.
 - **Dark & light mode** — Follows the phone, or can be set to light or dark in Settings. The choice is remembered.
 - **Albanian & English** — Albanian is the default; the language follows the phone or can be changed in Settings.
@@ -33,9 +33,14 @@ The project is being developed as part of a university Mobile Applications cours
 - **Analytics (business)** — Revenue, appointments, no-show rate, new vs returning clients, revenue by day, top services, barbers and busiest hours.
 - **Barber schedules** — Each barber can follow the shop’s hours or have their own, plus time off (full days or a few hours).
 - **Pending badge** — The Today tab shows how many of today’s bookings are waiting for confirmation, live.
+- **Payment at the shop** — Staff record cash or card payment on the appointment (one tap, can be undone); analytics show cash, card, unpaid and discounts. Online payments come later (Stripe doesn’t support Kosovo businesses).
+- **Reviews** — Clients rate completed visits (1–5 stars + comment); shops show the average and latest reviews, and the owner can reply. Discover can sort by rating.
+- **Promotions** — % discounts for a service, days of the week or hours (happy hour). The discount is applied on the server when booking and shown on cards, the shop profile and the booking total.
+- **Loyalty card** — A reward after N completed visits (e.g. a free haircut). Clients see their progress; staff turn a visit into a free one when a reward is ready.
+- **Waitlist** — When a day is full, clients can ask to be notified; a cancellation or move that day notifies them instantly (realtime + local notification).
 - **Database foundation** — Supabase/Postgres schema with Row Level Security and database-level protection against double bookings.
 
-> **Development status:** Phase 4 of 7 done. Next: payments, reviews and growth tools (Phase 5).
+> **Development status:** Phase 5 of 7 done. Next: the in-app AI assistant (Phase 6).
 
 ---
 
@@ -72,13 +77,13 @@ Make sure you have installed:
 ### 1. Clone the Repository
 
 ```
-git clone https://github.com/Arianitxhafa/projekti-im.git
+git clone https://github.com/Arianitxhafa/TrimTime.git
 ```
 
 ### 2. Navigate to the Project
 
 ```
-cd projekti-im
+cd TrimTime
 ```
 
 ### 3. Install Dependencies
@@ -90,7 +95,7 @@ npm install
 ### 4. Configure Supabase
 
 1. Copy `.env.example` to `.env` and fill in the **Project URL** and the **publishable (anon) key** from Supabase → Project Settings → API Keys. Never put a secret / `service_role` key in the app.
-2. In Supabase → **SQL Editor**, run each file in `supabase/migrations/` **in order** (once per project): `20261021120000_themeli.sql`, `20261022090000_lokalet_dhe_zbulimi.sql`, `20261022150000_lokalet_osm.sql`, `20261023090000_rezervimet.sql`, then `20261026090000_mjetet_e_biznesit.sql`.
+2. In Supabase → **SQL Editor**, run each file in `supabase/migrations/` **in order** (once per project): `20261021120000_themeli.sql`, `20261022090000_lokalet_dhe_zbulimi.sql`, `20261022150000_lokalet_osm.sql`, `20261023090000_rezervimet.sql`, `20261026090000_mjetet_e_biznesit.sql`, then `20261028090000_rritja.sql`.
    Then run `supabase/seed/lokalet_osm_kosove.sql` to load the barbershops of Kosovo. To refresh them later: `npm run importo:osm` and run the regenerated file again.
 3. Optional during development: Authentication → Sign In / Providers → Email → turn off **Confirm email**, so new accounts can sign in immediately.
 
@@ -128,16 +133,20 @@ src/
 │   ├── (biznes)/           # Business tabs: sot, kalendari, klientet, lokali, llogaria
 │   ├── lokali-i-ri.tsx     # New shop wizard
 │   ├── lokali/[id].tsx     # Public shop profile
-│   ├── menaxho/            # Shop management: info, orari, sherbimet, sherbimi, stafi, analitika, berberi/[id]
+│   ├── menaxho/            # Shop management: info, orari, sherbimet, sherbimi, stafi, analitika, berberi/[id],
+│   │                       #   promocionet, promocioni, besnikeria
 │   ├── klienti/[celesi].tsx    # Client profile (CRM)
 │   ├── termini/zhvendos.tsx    # Move an appointment (staff)
 │   ├── bashkohu.tsx        # Join a shop with an invite code
 │   ├── rezervo/[lokaliId].tsx  # Booking flow (client)
 │   ├── riplanifiko/[id].tsx    # Change booking time (client)
+│   ├── vlereso/[terminiId].tsx # Rate a visit (client)
+│   ├── vleresimet/[lokaliId].tsx # All reviews of a shop (owner can reply)
+│   ├── kartat.tsx          # The client's loyalty cards
 │   ├── termini/[id].tsx    # Appointment details (staff)
 │   ├── shto.tsx            # Walk-in / phone booking (staff)
 │   └── cilesimet.tsx       # Settings (theme, language)
-├── api/                    # React Query hooks (shops, services, hours, staff)
+├── api/                    # React Query hooks (shops, bookings, business, reviews, promotions, loyalty, waitlist)
 ├── components/             # Reusable UI (Butoni, FushaTekstit, KartaTerminit, …)
 ├── context/                # Tema, Preferencat, Auth
 ├── i18n/                   # sq.ts (default), en.ts
@@ -181,8 +190,8 @@ This approach demonstrates how TypeScript union types can restrict accepted valu
 | 2 · Shops & Discovery | Shop setup wizard, services, staff, map, search & filters, shop profile | ✅ Done |
 | 3 · Booking Engine | Available slots, booking flow, cancel/reschedule, realtime, reminders | ✅ Done |
 | 4 · Business Tools | Calendar, bookings inbox, walk-ins, client CRM, analytics | ✅ Done |
-| 5 · Payments & Growth | Stripe, reviews, loyalty, promotions, subscriptions | ⏳ Next |
-| 6 · AI Assistant | In-app assistant for barbers and clients | |
+| 5 · Payments & Growth | Payment at the shop, reviews, loyalty, promotions, waitlist (online payments later) | ✅ Done |
+| 6 · AI Assistant | In-app assistant for barbers and clients | ⏳ Next |
 | 7 · Polish & Launch | Accessibility, performance, tests, store builds | |
 
 ---
