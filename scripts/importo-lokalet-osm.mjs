@@ -10,7 +10,12 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const OVERPASS = "https://overpass-api.de/api/interpreter";
+// Serverët publikë të Overpass ngarkohen shpesh (502/504); provohen me radhë, disa herë.
+const OVERPASS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+  "https://maps.mail.ru/osm/tools/overpass/api/interpreter",
+];
 const DALJA = join(dirname(fileURLToPath(import.meta.url)), "..", "supabase", "seed", "lokalet_osm_kosove.sql");
 
 const PYETJA_LOKALET = `[out:json][timeout:120];
@@ -27,16 +32,28 @@ node["place"~"^(city|town)$"](area.k);
 out;`;
 
 async function pyet(pyetja) {
-  const pergjigjja = await fetch(OVERPASS, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      "User-Agent": "TrimTime-import/1.0 (projekt studentor)",
-    },
-    body: "data=" + encodeURIComponent(pyetja),
-  });
-  if (!pergjigjja.ok) throw new Error(`Overpass ktheu ${pergjigjja.status}`);
-  return (await pergjigjja.json()).elements;
+  let gabimi;
+  for (let tentativa = 0; tentativa < 3; tentativa++) {
+    for (const serveri of OVERPASS) {
+      try {
+        const pergjigjja = await fetch(serveri, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            "User-Agent": "TrimTime-import/1.0 (projekt studentor)",
+          },
+          body: "data=" + encodeURIComponent(pyetja),
+        });
+        if (pergjigjja.ok) return (await pergjigjja.json()).elements;
+        gabimi = new Error(`${serveri} ktheu ${pergjigjja.status}`);
+      } catch (e) {
+        gabimi = e;
+      }
+      console.log(`  ${gabimi.message}; po provoj tjetrin…`);
+    }
+    await new Promise((r) => setTimeout(r, 5000 * (tentativa + 1)));
+  }
+  throw gabimi;
 }
 
 // ── Orari: "Mo-Sa 09:00-20:00; Su off" → [{ dita, hapet, mbyllet }] ─────────
@@ -117,12 +134,24 @@ function distanca(a, b) {
 }
 
 const sql = (v) => (v === null || v === undefined ? "null" : `'${String(v).replace(/'/g, "''")}'`);
+
+// Shumica e lokaleve në OSM nuk kanë etiketë gjinie, ndaj përdoren edhe emrat. Fshihen vetëm ato
+// qartësisht për femra; berberët dhe lokalet e paqarta mbeten (TrimTime është për berberë).
+const FEMRA = /frizere\b|frizerja|p[eë]r femra|beauty|make ?up|estetik|esteticien|massage|masazh|kozmet|nails|thonj|bukuri/i;
+const MESHKUJ = /barber|berber|p[eë]r meshkuj|\bman\b|\bmen\b|gent/i;
+
+function klientela(t, emri) {
+  if (t.unisex === "yes" || (t.male === "yes" && t.female === "yes")) return "unisex";
+  if (t.male === "yes" || t.hairdresser === "barber" || t.shop === "barber" || MESHKUJ.test(emri)) return "meshkuj";
+  if (t.female === "yes" || FEMRA.test(emri)) return "femra";
+  return "meshkuj";
+}
 const shkurto = (v, n) => (v ? String(v).trim().slice(0, n) : null);
 
 // ── Importi ──────────────────────────────────────────────────────────────────
 console.log("Duke marrë qytetet e Kosovës…");
 const qytetet = (await pyet(PYETJA_QYTETET))
-  .map((q) => ({ emri: q.tags["name:sq"] || q.tags.name, lat: q.lat, lng: q.lon }))
+  .map((q) => ({ emri: q.tags["name:sq"] || q.tags.name, lat: q.lat, lng: q.lon, lloji: q.tags.place }))
   .filter((q) => q.emri);
 
 console.log("Duke marrë lokalet e qethjes…");
@@ -157,18 +186,24 @@ for (const e of elementet) {
     adresa: adresa && adresa.length >= 3 ? adresa : "Shiko në hartë",
     qyteti: qyteti.length >= 2 ? qyteti : "Kosovë",
     telefoni: shkurto(t.phone || t["contact:phone"], 30),
+    klientela: klientela(t, t.name || ""),
     pika,
     orari: t.opening_hours ? lexoOrarin(t.opening_hours) : null,
   });
 }
 
 const meOrar = lokalet.filter((l) => l.orari && l.orari.length > 0);
-console.log(`Lokale: ${lokalet.length} (me orar të lexuar: ${meOrar.length})`);
+const perFemra = lokalet.filter((l) => l.klientela === "femra").length;
+console.log(`Lokale: ${lokalet.length} (me orar të lexuar: ${meOrar.length}, vetëm për femra: ${perFemra})`);
+
+const rreshtatQytetet = qytetet.map(
+  (q) => `  (${sql(q.emri)}, '${q.lloji === "city" ? "city" : "town"}', 'SRID=4326;POINT(${q.lng} ${q.lat})')`,
+);
 
 const rreshtatLokalet = lokalet.map(
   (l) =>
     `  (${sql(l.osm_id)}, ${sql(l.emri)}, ${sql(l.adresa)}, ${sql(l.qyteti)}, ${sql(l.telefoni)}, ` +
-    `'SRID=4326;POINT(${l.pika.lng} ${l.pika.lat})')`,
+    `${sql(l.klientela)}, 'SRID=4326;POINT(${l.pika.lng} ${l.pika.lat})')`,
 );
 
 const rreshtatOraret = meOrar.flatMap((l) =>
@@ -179,23 +214,37 @@ const permbajtja = `-- TrimTime · Lokalet e qethjes në Kosovë nga OpenStreetM
 -- Gjeneruar më ${new Date().toISOString()} nga scripts/importo-lokalet-osm.mjs (${lokalet.length} lokale).
 -- Të dhënat: © OpenStreetMap contributors, ODbL — https://www.openstreetmap.org/copyright
 --
--- Ekzekutohet pas migrimit 20261022150000_lokalet_osm.sql. Mund të ekzekutohet sa herë të duash:
+-- Ekzekutohet pas migrimit 20261028150000_zona_dhe_kamera.sql. Mund të ekzekutohet sa herë të duash:
 -- lokalet ekzistuese përditësohen, nuk dyfishohen, dhe lokalet që i ka marrë një pronar nuk preken.
 
 begin;
 
-insert into public.lokalet (osm_id, emri, adresa, qyteti, telefoni, vendndodhja, burimi, i_publikuar)
-select v.osm_id, v.emri, v.adresa, v.qyteti, v.telefoni, v.vendndodhja::extensions.geography, 'osm', true
+-- Qendrat e qyteteve: klienti sheh lokalet e qytetit ku ndodhet.
+insert into public.qytetet (emri, lloji, vendndodhja)
+select v.emri, v.lloji, v.vendndodhja::extensions.geography
+from (values
+${rreshtatQytetet.join(",\n")}
+) as v(emri, lloji, vendndodhja)
+on conflict (emri) do update set
+  lloji = excluded.lloji,
+  vendndodhja = excluded.vendndodhja;
+
+insert into public.lokalet (osm_id, emri, adresa, qyteti, telefoni, klientela, vendndodhja, burimi, i_publikuar)
+select v.osm_id, v.emri, v.adresa, v.qyteti, v.telefoni, v.klientela, v.vendndodhja::extensions.geography, 'osm', true
 from (values
 ${rreshtatLokalet.join(",\n")}
-) as v(osm_id, emri, adresa, qyteti, telefoni, vendndodhja)
+) as v(osm_id, emri, adresa, qyteti, telefoni, klientela, vendndodhja)
 on conflict (osm_id) do update set
   emri = excluded.emri,
   adresa = excluded.adresa,
   qyteti = excluded.qyteti,
   telefoni = excluded.telefoni,
+  klientela = excluded.klientela,
   vendndodhja = excluded.vendndodhja
 where public.lokalet.burimi = 'osm';
+
+-- Çdo lokal (edhe ato të krijuara në TrimTime) lidhet me qytetin më të afërt.
+update public.lokalet set qyteti_id = public.qyteti_me_i_afert(vendndodhja);
 
 delete from public.oraret_e_lokalit o
 using public.lokalet l
