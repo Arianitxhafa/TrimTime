@@ -3,7 +3,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { TFunction } from "i18next";
 import { useEffect } from "react";
 import { supabase } from "../lib/supabase";
-import type { OraELire, StatusiTerminit, TerminiIKlientit, TerminiILokalit } from "../lib/tipet";
+import type {
+  CmimiITerminit,
+  MenyraEPageses,
+  OraELire,
+  StatusiTerminit,
+  TerminiIKlientit,
+  TerminiILokalit,
+} from "../lib/tipet";
 
 const celesat = {
   oraret: (p: object) => ["oraret-e-lira", p] as const,
@@ -22,6 +29,10 @@ export function mesazhiIGabimitTeRezervimit(gabimi: unknown, t: TFunction): stri
       return t("rezervimi.gabimNukMundet");
     case "TT004":
       return t("rezervimi.gabimLokali");
+    case "TT005":
+      return t("vleresimet.gabimNukMundet");
+    case "TT006":
+      return t("besnikeria.gabimPaShperblim");
     default:
       return t("pergjithshme.gabimPapritur");
   }
@@ -66,6 +77,9 @@ function useInvalidoTerminet() {
     klienti.invalidateQueries({ queryKey: ["terminet-e-lokalit"] });
     klienti.invalidateQueries({ queryKey: ["terminet-e-periudhes"] });
     klienti.invalidateQueries({ queryKey: ["klientet"] });
+    klienti.invalidateQueries({ queryKey: ["analitika"] });
+    klienti.invalidateQueries({ queryKey: ["besnikeria"] });
+    klienti.invalidateQueries({ queryKey: ["lista-e-pritjes"] });
   };
 }
 
@@ -159,6 +173,45 @@ export function useNdryshoStatusin() {
       if (error) throw error;
     },
     onSettled: invalido,
+  });
+}
+
+// Pagesa në lokal; `menyra: null` e zhbën shënimin.
+export function useRegjistroPagesen() {
+  const invalido = useInvalidoTerminet();
+  return useMutation({
+    mutationFn: async ({ terminiId, menyra }: { terminiId: string; menyra: MenyraEPageses | null }) => {
+      const { error } = await supabase.rpc("regjistro_pagesen", { p_termini_id: terminiId, p_menyra: menyra });
+      if (error) throw error;
+    },
+    onSettled: invalido,
+  });
+}
+
+export function usePerdorShperblimin() {
+  const invalido = useInvalidoTerminet();
+  return useMutation({
+    mutationFn: async ({ terminiId, perdor }: { terminiId: string; perdor: boolean }) => {
+      const { error } = await supabase.rpc("perdor_shperblimin", { p_termini_id: terminiId, p_perdor: perdor });
+      if (error) throw error;
+    },
+    onSettled: invalido,
+  });
+}
+
+// Çmimi me promocionin e orës së zgjedhur, i llogaritur në server si gjatë rezervimit.
+export function useCmimiITerminit(lokaliId: string, sherbimiId: string | null, fillonMe: string | null) {
+  return useQuery({
+    queryKey: ["cmimi-i-terminit", lokaliId, sherbimiId, fillonMe],
+    enabled: Boolean(sherbimiId && fillonMe),
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .rpc("cmimi_i_terminit", { p_lokali_id: lokaliId, p_sherbimi_id: sherbimiId!, p_fillon_me: fillonMe! })
+        .maybeSingle<CmimiITerminit>();
+      if (error) throw error;
+      return data;
+    },
   });
 }
 
