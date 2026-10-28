@@ -1,9 +1,11 @@
+import { Image } from "expo-image";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Linking, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokaliIm } from "../../api/lokalet";
+import { useFotoEStilit } from "../../api/stili";
 import {
   mesazhiIGabimitTeRezervimit,
   useNdryshoStatusin,
@@ -15,6 +17,7 @@ import Avatar from "../../components/Avatar";
 import BadgeStatusi from "../../components/BadgeStatusi";
 import Butoni from "../../components/Butoni";
 import DialogKonfirmimi from "../../components/DialogKonfirmimi";
+import GaleriaEPlote from "../../components/GaleriaEPlote";
 import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
 import { GabimiIFormes } from "../../components/KornizaAuth";
 import { useStilet, useTema } from "../../context/TemaContext";
@@ -95,6 +98,8 @@ export default function DetajetTerminit() {
             gjere
           />
         </View>
+
+        {termini.foto_stili ? <FotoEStilit shtegu={termini.foto_stili} /> : null}
 
         {termini.shenime ? (
           <View style={styles.shenime}>
@@ -187,6 +192,40 @@ export default function DetajetTerminit() {
           ndryshoNe("anuluar");
         }}
       />
+    </View>
+  );
+}
+
+// Fotoja që klienti bashkëngjiti gjatë rezervimit (nga bucket-i privat, me lidhje të përkohshme).
+function FotoEStilit({ shtegu }: { shtegu: string }) {
+  const { t } = useTranslation();
+  const { ngjyrat } = useTema();
+  const styles = useStilet(krijoStilet);
+  const foto = useFotoEStilit(shtegu);
+  const [eMadhe, setEMadhe] = useState(false);
+
+  return (
+    <View style={styles.shenime}>
+      <View style={styles.shenimeKoka}>
+        <Ikona emri={ikonat.kamera} madhesia={16} ngjyra={ngjyrat.ari} />
+        <Text style={styles.shenimeTitulli}>{t("stili.fotoEStilit")}</Text>
+      </View>
+      {foto.data ? (
+        <Pressable accessibilityRole="imagebutton" accessibilityLabel={t("stili.fotoEStilit")} onPress={() => setEMadhe(true)}>
+          <Image source={{ uri: foto.data }} style={styles.fotoEStilit} contentFit="cover" transition={200} />
+        </Pressable>
+      ) : (
+        <View style={[styles.fotoEStilit, styles.qendra]}>
+          <ActivityIndicator color={ngjyrat.ari} />
+        </View>
+      )}
+      {foto.data ? (
+        <GaleriaEPlote
+          fotot={[{ id: shtegu, lokali_id: "", berberi_id: null, foto_url: foto.data, pershkrimi: null, krijuar_me: "" }]}
+          indeksi={eMadhe ? 0 : null}
+          onMbyll={() => setEMadhe(false)}
+        />
+      ) : null}
     </View>
   );
 }
@@ -427,6 +466,13 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     veprimet: {
       gap: hapesira.sm,
+    },
+    fotoEStilit: {
+      width: "100%",
+      aspectRatio: 3 / 4,
+      maxHeight: 360,
+      borderRadius: rrezja.md,
+      backgroundColor: ngjyrat.siperfaqja2,
     },
     pagesa: {
       backgroundColor: ngjyrat.siperfaqja,

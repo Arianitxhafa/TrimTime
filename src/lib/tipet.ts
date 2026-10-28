@@ -162,6 +162,10 @@ export type TerminiILokalit = {
   menyra_e_pageses: MenyraEPageses | null;
   // null kur lokali nuk ka kartë besnikërie.
   shperblime_te_disponueshme: number | null;
+  // Shtegu në bucket-in privat "stilet" (foto e stilit nga klienti).
+  foto_stili: string | null;
+  // Kur klienti skanoi QR-në e lokalit (check-in).
+  arriti_me: string | null;
 };
 
 export type MenyraEPageses = "kesh" | "karte";

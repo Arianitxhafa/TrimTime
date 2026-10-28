@@ -1,3 +1,4 @@
+import { Image } from "expo-image";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -17,6 +18,10 @@ import { useLokali } from "../../api/lokalet";
 import { useSherbimet } from "../../api/sherbimet";
 import { useStafi } from "../../api/stafi";
 import { useListaImeEPritjes, useShtoNeListenEPritjes } from "../../api/listaEPritjes";
+import { bashkangjitFotonEStilit } from "../../api/stili";
+import { useAuth } from "../../context/AuthContext";
+import { zgjidhFoton, type BurimiIFotos, type Fotoja } from "../../lib/fotot";
+import { prekja } from "../../lib/prekja";
 import {
   mesazhiIGabimitTeRezervimit,
   useCmimiITerminit,
@@ -69,6 +74,21 @@ export default function Rezervo() {
   const [ora, setOra] = useState<OraELire | null>(null);
   const [shenime, setShenime] = useState("");
   const [suksesi, setSuksesi] = useState<Suksesi | null>(null);
+  const { sesioni } = useAuth();
+  const [fotoStili, setFotoStili] = useState<Fotoja | null>(null);
+  const [fotoNgarkohet, setFotoNgarkohet] = useState(false);
+  const [gabimiFotos, setGabimiFotos] = useState(false);
+  const [paLejeKamere, setPaLejeKamere] = useState(false);
+
+  async function merrFotonEStilit(burimi: BurimiIFotos) {
+    setPaLejeKamere(false);
+    const rezultati = await zgjidhFoton(burimi, [3, 4]).catch(() => null);
+    if (rezultati === "pa_leje") setPaLejeKamere(true);
+    else if (rezultati) {
+      prekja.lehte();
+      setFotoStili(rezultati);
+    }
+  }
 
   const oraret = useOraretELira({ lokaliId, sherbimiId, data, berberiId });
   // Çmimi me promocionin e orës së zgjedhur (i njëjti llogaritje si gjatë rezervimit).
@@ -105,7 +125,15 @@ export default function Rezervo() {
       {
         onSuccess: (id) => {
           const konfirmuar = lokali.data!.pranimi_automatik;
+          prekja.sukses();
           setSuksesi({ data, ora: ora.ora, konfirmuar });
+          // Termini është i rezervuar; fotoja e stilit ngarkohet pas tij dhe nuk e bllokon rezervimin.
+          if (fotoStili && sesioni) {
+            setFotoNgarkohet(true);
+            bashkangjitFotonEStilit(id, sesioni.user.id, fotoStili)
+              .catch(() => setGabimiFotos(true))
+              .finally(() => setFotoNgarkohet(false));
+          }
           planifikoKujtesat(
             {
               id,
@@ -151,6 +179,8 @@ export default function Rezervo() {
           <Text style={styles.suksesiLokali}>
             {lokali.data.emri} · {sherbimi?.emri}
           </Text>
+          {fotoNgarkohet ? <ActivityIndicator color={ngjyrat.ari} /> : null}
+          {gabimiFotos ? <Text style={styles.suksesiGabim}>{t("stili.gabimNgarkimi")}</Text> : null}
         </Animated.View>
         <Animated.View entering={FadeInDown.delay(300)} style={styles.suksesiButonat}>
           <Butoni
@@ -238,6 +268,44 @@ export default function Rezervo() {
             {oraret.data?.length === 0 && !oraret.isFetching && (
               <ListaEPritjes lokaliId={lokaliId} sherbimiId={sherbimi.id} data={data} berberiId={berberiId} />
             )}
+
+            <View style={styles.stili}>
+              <Text style={styles.stiliTitulli}>{t("stili.titulli")}</Text>
+              <Text style={styles.stiliTeksti}>{t("stili.teksti")}</Text>
+              {fotoStili ? (
+                <View style={styles.stiliParapamja}>
+                  <Image source={{ uri: fotoStili.uri }} style={styles.stiliFoto} contentFit="cover" />
+                  <Pressable
+                    accessibilityRole="button"
+                    onPress={() => setFotoStili(null)}
+                    style={({ pressed }) => [styles.stiliHiq, pressed && { opacity: 0.7 }]}
+                  >
+                    <Ikona emri={ikonat.mbyll} madhesia={14} ngjyra={ngjyrat.rrezik} />
+                    <Text style={styles.stiliHiqTeksti}>{t("stili.hiq")}</Text>
+                  </Pressable>
+                </View>
+              ) : (
+                <View style={styles.stiliButonat}>
+                  <Pressable
+                    accessibilityRole="button"
+                    onPress={() => merrFotonEStilit("kamera")}
+                    style={({ pressed }) => [styles.stiliButoni, pressed && { opacity: 0.7 }]}
+                  >
+                    <Ikona emri={ikonat.kamera} madhesia={18} ngjyra={ngjyrat.ari} />
+                    <Text style={styles.stiliButoniTeksti}>{t("stili.bejFoto")}</Text>
+                  </Pressable>
+                  <Pressable
+                    accessibilityRole="button"
+                    onPress={() => merrFotonEStilit("galeria")}
+                    style={({ pressed }) => [styles.stiliButoni, pressed && { opacity: 0.7 }]}
+                  >
+                    <Ikona emri={ikonat.foto} madhesia={18} ngjyra={ngjyrat.ari} />
+                    <Text style={styles.stiliButoniTeksti}>{t("stili.ngaGaleria")}</Text>
+                  </Pressable>
+                </View>
+              )}
+              {paLejeKamere ? <Text style={styles.suksesiGabim}>{t("portofoli.paLejeKamere")}</Text> : null}
+            </View>
 
             <View style={styles.shenime}>
               <FushaTekstit
@@ -517,6 +585,71 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       color: ngjyrat.teksti,
       fontSize: 20,
       fontWeight: "800",
+    },
+    stili: {
+      marginTop: hapesira.lg,
+      gap: hapesira.sm,
+    },
+    stiliTitulli: {
+      color: ngjyrat.teksti,
+      fontSize: 15,
+      fontWeight: "800",
+    },
+    stiliTeksti: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 13,
+      lineHeight: 18,
+    },
+    stiliButonat: {
+      flexDirection: "row",
+      gap: hapesira.sm,
+    },
+    stiliButoni: {
+      flex: 1,
+      height: 64,
+      borderRadius: rrezja.md,
+      borderWidth: 1,
+      borderStyle: "dashed",
+      borderColor: ngjyrat.ari,
+      backgroundColor: ngjyrat.ariIErret,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 4,
+    },
+    stiliButoniTeksti: {
+      color: ngjyrat.teksti,
+      fontSize: 13,
+      fontWeight: "700",
+    },
+    stiliParapamja: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: hapesira.md,
+    },
+    stiliFoto: {
+      width: 84,
+      height: 112,
+      borderRadius: rrezja.md,
+      backgroundColor: ngjyrat.siperfaqja2,
+    },
+    stiliHiq: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingHorizontal: hapesira.md,
+      height: 36,
+      borderRadius: rrezja.plote,
+      backgroundColor: ngjyrat.rrezikSfond,
+    },
+    stiliHiqTeksti: {
+      color: ngjyrat.rrezik,
+      fontSize: 13,
+      fontWeight: "700",
+    },
+    suksesiGabim: {
+      color: ngjyrat.rrezik,
+      fontSize: 13,
+      textAlign: "center",
     },
     fundiCmimet: {
       flexDirection: "row",
