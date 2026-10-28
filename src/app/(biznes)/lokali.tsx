@@ -171,6 +171,7 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
               meKufi
             />
           )}
+          <Rreshti ikona={ikonat.kamera} titulli={t("portofoli.titulli")} href="/menaxho/portofoli" meKufi />
           <Rreshti
             ikona={ikonat.yll}
             titulli={t("lokali.vleresimet")}

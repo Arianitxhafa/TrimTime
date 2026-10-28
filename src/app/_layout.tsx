@@ -112,6 +112,7 @@ function Navigimi() {
             <Stack.Screen name="menaxho/promocionet" options={{ title: t("promocionet.titulli") }} />
             <Stack.Screen name="menaxho/promocioni" options={{ title: "", presentation: "modal" }} />
             <Stack.Screen name="menaxho/besnikeria" options={{ title: t("besnikeria.titulli") }} />
+            <Stack.Screen name="menaxho/portofoli" options={{ title: t("portofoli.titulli") }} />
           </Stack.Protected>
 
           <Stack.Screen name="lokali/[id]" options={{ title: "" }} />

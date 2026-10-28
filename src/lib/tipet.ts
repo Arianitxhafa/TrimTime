@@ -296,6 +296,15 @@ export type KartaEBesnikerise = Besnikeria & {
   lokali_logo_url: string | null;
 };
 
+export type FotoEPortofolit = {
+  id: string;
+  lokali_id: string;
+  berberi_id: string | null;
+  foto_url: string;
+  pershkrimi: string | null;
+  krijuar_me: string;
+};
+
 export type NeListenEPritjes = {
   id: string;
   lokali_id: string;

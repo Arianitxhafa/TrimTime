@@ -2,6 +2,7 @@ import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import * as LidhjetExpo from "expo-linking";
 import { router, Stack, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Linking, Platform, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -9,12 +10,14 @@ import { useLokali } from "../../api/lokalet";
 import { useOrari } from "../../api/orari";
 import { useSherbimet } from "../../api/sherbimet";
 import { useBesnikeria } from "../../api/besnikeria";
+import { usePortofoli } from "../../api/portofoli";
 import { usePromocionet } from "../../api/promocionet";
 import { useStafi } from "../../api/stafi";
 import { useVleresimetELokalit } from "../../api/vleresimet";
 import Avatar from "../../components/Avatar";
 import Butoni from "../../components/Butoni";
 import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
+import GaleriaEPlote from "../../components/GaleriaEPlote";
 import KartaEBesnikerise from "../../components/KartaEBesnikerise";
 import KartaEVleresimit from "../../components/KartaEVleresimit";
 import { celesiIDites, RENDI_I_DITEVE } from "../../components/RedaktoriIOrarit";
@@ -194,6 +197,8 @@ export default function ProfiliILokalit() {
 
           {!ngaOsm && <Ofertat lokali={l} sherbimet={sherbimetAktive} kaKarte={modi === "klient"} />}
 
+          {!ngaOsm && <Punimet lokaliId={l.id} />}
+
           {berberet.length > 0 && (
             <>
               <Text style={styles.seksioni}>{t("profiliLokalit.berberet")}</Text>
@@ -320,6 +325,41 @@ function Ofertat({ lokali, sherbimet, kaKarte }: { lokali: Lokali; sherbimet: Sh
           <Text style={styles.ofertaShenimTeksti}>{t("rezervimi.paguanNeLokal")}</Text>
         </View>
       )}
+    </>
+  );
+}
+
+// Fotot e portofolit: rresht horizontal, prekja i hap në ekran të plotë.
+function Punimet({ lokaliId }: { lokaliId: string }) {
+  const { t } = useTranslation();
+  const styles = useStilet(krijoStilet);
+  const portofoli = usePortofoli(lokaliId);
+  const [hapur, setHapur] = useState<number | null>(null);
+  const fotot = portofoli.data ?? [];
+
+  if (fotot.length === 0) return null;
+
+  return (
+    <>
+      <Text style={styles.seksioni}>{t("portofoli.punimet")}</Text>
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.punimetScroll}
+        contentContainerStyle={styles.punimet}
+      >
+        {fotot.slice(0, 12).map((f, i) => (
+          <Pressable
+            key={f.id}
+            accessibilityRole="imagebutton"
+            accessibilityLabel={f.pershkrimi ?? t("portofoli.titulli")}
+            onPress={() => setHapur(i)}
+          >
+            <Image source={{ uri: f.foto_url }} style={styles.punimi} contentFit="cover" transition={200} />
+          </Pressable>
+        ))}
+      </ScrollView>
+      <GaleriaEPlote key={hapur ?? -1} fotot={fotot} indeksi={hapur} onMbyll={() => setHapur(null)} />
     </>
   );
 }
@@ -522,6 +562,19 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     ofertat: {
       gap: hapesira.md,
+    },
+    punimetScroll: {
+      marginHorizontal: -hapesira.xl,
+    },
+    punimet: {
+      paddingHorizontal: hapesira.xl,
+      gap: hapesira.sm,
+    },
+    punimi: {
+      width: 132,
+      height: 165,
+      borderRadius: rrezja.md,
+      backgroundColor: ngjyrat.siperfaqja2,
     },
     oferta: {
       flexDirection: "row",
