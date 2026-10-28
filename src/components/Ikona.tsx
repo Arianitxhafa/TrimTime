@@ -61,4 +61,10 @@ export const ikonat = {
   syriMbyllur: { ios: "eye.slash", android: "visibility_off" },
   dil: { ios: "rectangle.portrait.and.arrow.right", android: "logout" },
   gabim: { ios: "exclamationmark.triangle.fill", android: "warning" },
+  kesh: { ios: "banknote.fill", android: "payments" },
+  karte: { ios: "creditcard.fill", android: "credit_card" },
+  dhurate: { ios: "gift.fill", android: "redeem" },
+  etiketa: { ios: "tag.fill", android: "sell" },
+  zile: { ios: "bell.fill", android: "notifications" },
+  pergjigju: { ios: "arrowshape.turn.up.left.fill", android: "reply" },
 } satisfies Record<string, EmriIkones>;

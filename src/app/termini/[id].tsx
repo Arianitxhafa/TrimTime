@@ -4,7 +4,13 @@ import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Linking, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokaliIm } from "../../api/lokalet";
-import { mesazhiIGabimitTeRezervimit, useNdryshoStatusin, useTerminetELokalit } from "../../api/terminet";
+import {
+  mesazhiIGabimitTeRezervimit,
+  useNdryshoStatusin,
+  usePerdorShperblimin,
+  useRegjistroPagesen,
+  useTerminetELokalit,
+} from "../../api/terminet";
 import Avatar from "../../components/Avatar";
 import BadgeStatusi from "../../components/BadgeStatusi";
 import Butoni from "../../components/Butoni";
@@ -14,7 +20,7 @@ import { GabimiIFormes } from "../../components/KornizaAuth";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { dataISO, formatoDaten } from "../../lib/datat";
 import { formatoCmimin, formatoKohezgjatjen } from "../../lib/formatimi";
-import type { StatusiTerminit } from "../../lib/tipet";
+import type { StatusiTerminit, TerminiILokalit } from "../../lib/tipet";
 import { hapesira, rrezja, type Ngjyrat } from "../../theme";
 
 function kthehu() {
@@ -77,7 +83,11 @@ export default function DetajetTerminit() {
           />
           <Info ikona={ikonat.gershere} etiketa={t("termini.sherbimi")} vlera={termini.sherbimi_emri} gjere />
           <Info ikona={ikonat.personi} etiketa={t("termini.berberi")} vlera={termini.berberi_emri} />
-          <Info ikona={ikonat.cmimi} etiketa={t("termini.cmimi")} vlera={formatoCmimin(termini.cmimi_centa)} />
+          <Info
+            ikona={ikonat.cmimi}
+            etiketa={t("termini.cmimi")}
+            vlera={termini.shperblim ? t("pagesa.falas") : formatoCmimin(termini.cmimi_centa)}
+          />
           <Info
             ikona={ikonat.telefoni}
             etiketa={t("termini.telefoni")}
@@ -95,6 +105,8 @@ export default function DetajetTerminit() {
             <Text style={styles.shenimeTeksti}>{termini.shenime}</Text>
           </View>
         ) : null}
+
+        {statusi !== "anuluar" && statusi !== "nuk_erdhi" && <Pagesa termini={termini} />}
 
         <Text style={styles.seksioni}>{t("termini.veprimet")}</Text>
         <View style={styles.veprimet}>
@@ -124,7 +136,8 @@ export default function DetajetTerminit() {
             </>
           )}
 
-          {(statusi === "perfunduar" || statusi === "nuk_erdhi") && (
+          {/* Një termin i paguar rikthehet vetëm pasi të zhbëhet pagesa. */}
+          {((statusi === "perfunduar" && !termini.paguar_me) || statusi === "nuk_erdhi") && (
             <Butoni
               titulli={t("termini.rikthe")}
               varianti="dytesor"
@@ -175,6 +188,119 @@ export default function DetajetTerminit() {
         }}
       />
     </View>
+  );
+}
+
+// Pagesa në lokal: përmbledhja e çmimit, shënimi kesh/kartë dhe shpërblimi i besnikërisë.
+function Pagesa({ termini }: { termini: TerminiILokalit }) {
+  const { t } = useTranslation();
+  const { ngjyrat, statusetMeta } = useTema();
+  const styles = useStilet(krijoStilet);
+  const pagesa = useRegjistroPagesen();
+  const shperblimi = usePerdorShperblimin();
+  const iPaguar = termini.paguar_me !== null;
+  const gabimi = pagesa.error ?? shperblimi.error;
+
+  return (
+    <>
+      <Text style={styles.seksioni}>{t("pagesa.titulli")}</Text>
+      <View style={styles.pagesa}>
+        {termini.zbritja_centa > 0 && !termini.shperblim && (
+          <View style={styles.pagesaRreshti}>
+            <Ikona emri={ikonat.etiketa} madhesia={15} ngjyra={ngjyrat.ari} />
+            <Text style={styles.pagesaTeksti}>
+              {t("pagesa.zbritja", {
+                shuma: formatoCmimin(termini.zbritja_centa),
+                promocioni: termini.promocioni_titulli ?? t("promocionet.titulli"),
+              })}
+            </Text>
+            <Text style={styles.cmimiIVjeter}>{formatoCmimin(termini.cmimi_baze_centa)}</Text>
+          </View>
+        )}
+        {termini.shperblim && (
+          <View style={styles.pagesaRreshti}>
+            <Ikona emri={ikonat.dhurate} madhesia={15} ngjyra={ngjyrat.ari} />
+            <Text style={styles.pagesaTeksti}>{t("pagesa.shperblimi")}</Text>
+          </View>
+        )}
+
+        <View style={styles.pagesaStatusi}>
+          <Ikona
+            emri={iPaguar ? ikonat.perfundo : ikonat.ora}
+            madhesia={18}
+            ngjyra={iPaguar ? statusetMeta.perfunduar.ngjyra : ngjyrat.tekstiZbehte}
+          />
+          <Text style={[styles.pagesaStatusiTeksti, iPaguar && { color: statusetMeta.perfunduar.ngjyra }]}>
+            {iPaguar
+              ? t("pagesa.ePaguar", { menyra: t(termini.menyra_e_pageses === "karte" ? "pagesa.karte" : "pagesa.kesh") })
+              : t("pagesa.paPaguar")}
+          </Text>
+          <Text style={styles.pagesaTotali}>
+            {termini.shperblim ? t("pagesa.falas") : formatoCmimin(termini.cmimi_centa)}
+          </Text>
+        </View>
+
+        {gabimi && <GabimiIFormes mesazhi={mesazhiIGabimitTeRezervimit(gabimi, t)} />}
+
+        {iPaguar ? (
+          <Butoni
+            titulli={t("pagesa.zhbej")}
+            varianti="dytesor"
+            ikona={ikonat.kthe}
+            ngarkohet={pagesa.isPending}
+            onPress={() => pagesa.mutate({ terminiId: termini.id, menyra: null })}
+          />
+        ) : (
+          <>
+            <Text style={styles.pagesaNdihma}>{t("pagesa.paguanTeksti")}</Text>
+            <View style={styles.pagesaButonat}>
+              <View style={styles.pagesaButoni}>
+                <Butoni
+                  titulli={t("pagesa.kesh")}
+                  ikona={ikonat.kesh}
+                  ngarkohet={pagesa.isPending && pagesa.variables?.menyra === "kesh"}
+                  joAktiv={pagesa.isPending}
+                  onPress={() => pagesa.mutate({ terminiId: termini.id, menyra: "kesh" })}
+                />
+              </View>
+              <View style={styles.pagesaButoni}>
+                <Butoni
+                  titulli={t("pagesa.karte")}
+                  varianti="dytesor"
+                  ikona={ikonat.karte}
+                  ngarkohet={pagesa.isPending && pagesa.variables?.menyra === "karte"}
+                  joAktiv={pagesa.isPending}
+                  onPress={() => pagesa.mutate({ terminiId: termini.id, menyra: "karte" })}
+                />
+              </View>
+            </View>
+
+            {termini.shperblim ? (
+              <Butoni
+                titulli={t("besnikeria.hiq")}
+                varianti="dytesor"
+                ikona={ikonat.dhurate}
+                ngarkohet={shperblimi.isPending}
+                onPress={() => shperblimi.mutate({ terminiId: termini.id, perdor: false })}
+              />
+            ) : (termini.shperblime_te_disponueshme ?? 0) > 0 ? (
+              <>
+                <Text style={styles.pagesaNdihma}>
+                  {t("besnikeria.gati", { numri: termini.shperblime_te_disponueshme })}
+                </Text>
+                <Butoni
+                  titulli={t("besnikeria.perdor")}
+                  varianti="dytesor"
+                  ikona={ikonat.dhurate}
+                  ngarkohet={shperblimi.isPending}
+                  onPress={() => shperblimi.mutate({ terminiId: termini.id, perdor: true })}
+                />
+              </>
+            ) : null}
+          </>
+        )}
+      </View>
+    </>
   );
 }
 
@@ -301,6 +427,58 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     veprimet: {
       gap: hapesira.sm,
+    },
+    pagesa: {
+      backgroundColor: ngjyrat.siperfaqja,
+      borderRadius: rrezja.md,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
+      padding: hapesira.lg,
+      gap: hapesira.md,
+      marginBottom: hapesira.lg,
+    },
+    pagesaRreshti: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: hapesira.sm,
+    },
+    pagesaTeksti: {
+      flex: 1,
+      color: ngjyrat.tekstiDyte,
+      fontSize: 14,
+    },
+    cmimiIVjeter: {
+      color: ngjyrat.tekstiZbehte,
+      fontSize: 14,
+      textDecorationLine: "line-through",
+    },
+    pagesaStatusi: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: hapesira.sm,
+    },
+    pagesaStatusiTeksti: {
+      flex: 1,
+      color: ngjyrat.teksti,
+      fontSize: 15,
+      fontWeight: "700",
+    },
+    pagesaTotali: {
+      color: ngjyrat.teksti,
+      fontSize: 20,
+      fontWeight: "800",
+    },
+    pagesaNdihma: {
+      color: ngjyrat.tekstiZbehte,
+      fontSize: 13,
+      lineHeight: 18,
+    },
+    pagesaButonat: {
+      flexDirection: "row",
+      gap: hapesira.sm,
+    },
+    pagesaButoni: {
+      flex: 1,
     },
     boshIkona: {
       width: 64,

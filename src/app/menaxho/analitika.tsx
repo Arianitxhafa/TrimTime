@@ -94,6 +94,23 @@ function Permbajtja({ a, nga, deri }: { a: Analitika; nga: string; deri: string 
         <Karta vlera={`${a.klientet_e_rinj} / ${a.klientet_qe_kthehen}`} etiketa={`${t("analitika.klientetERinj")} / ${t("analitika.klientetQeKthehen")}`} />
       </View>
 
+      <Text style={styles.seksioni}>{t("analitika.pagesat")}</Text>
+      <View style={styles.kartat}>
+        <Karta vlera={formatoCmimin(a.paguar_kesh)} etiketa={t("analitika.kesh")} />
+        <Karta vlera={formatoCmimin(a.paguar_karte)} etiketa={t("analitika.karte")} />
+        <Karta vlera={formatoCmimin(a.pa_paguar)} etiketa={t("analitika.paPaguar")} />
+        <Karta
+          vlera={formatoCmimin(a.zbritjet)}
+          etiketa={a.shperblime > 0 ? `${t("analitika.zbritjet")} · ${a.shperblime} ${t("analitika.shperblime").toLowerCase()}` : t("analitika.zbritjet")}
+        />
+        {a.nr_vleresimeve > 0 && (
+          <Karta
+            vlera={`★ ${Number(a.vleresimi_mesatar ?? 0).toFixed(1)}`}
+            etiketa={`${t("analitika.vleresimi")} · ${a.nr_vleresimeve}`}
+          />
+        )}
+      </View>
+
       <Text style={styles.seksioni}>{t("analitika.sipasDites")}</Text>
       <View style={styles.grafiku}>
         {ditet.map((d) => (
