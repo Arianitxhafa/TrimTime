@@ -68,6 +68,24 @@ as $$
   limit 1;
 $$;
 
+-- Lista për zgjedhjen e qytetit me dorë, me numrin e lokaleve për meshkuj në secilin.
+create function public.qytetet_me_lokale()
+returns table (id integer, emri text, lat double precision, lng double precision, nr_lokaleve integer)
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select
+    q.id,
+    q.emri,
+    extensions.st_y(q.vendndodhja::extensions.geometry),
+    extensions.st_x(q.vendndodhja::extensions.geometry),
+    (select count(*)::integer from public.lokalet l where l.qyteti_id = q.id and l.i_publikuar and l.klientela <> 'femra')
+  from public.qytetet q
+  order by q.lloji, q.emri;
+$$;
+
 -- ─────────────────────────────────────────────────────────────
 -- lokalet_prane: me p_qyteti_id kthen vetëm lokalet e atij qyteti dhe ato brenda
 -- p_rrezja_km nga klienti; pa të (harta) sillet si më parë. Sallonet për femra nuk shfaqen.
@@ -419,6 +437,7 @@ revoke execute on function
 revoke execute on function
   public.qyteti_me_i_afert(extensions.geography),
   public.qyteti_prane(double precision, double precision),
+  public.qytetet_me_lokale(),
   public.lokalet_prane(double precision, double precision, double precision, text, boolean, integer, text, integer, integer),
   public.vendos_foton_e_stilit(uuid, text),
   public.bej_check_in(uuid),
@@ -427,6 +446,7 @@ revoke execute on function
 
 grant execute on function
   public.qyteti_prane(double precision, double precision),
+  public.qytetet_me_lokale(),
   public.lokalet_prane(double precision, double precision, double precision, text, boolean, integer, text, integer, integer)
   to anon, authenticated;
 

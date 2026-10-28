@@ -48,9 +48,25 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "TrimTime përdor fotot për logon dhe kopertinën e lokalit tënd.",
-          "cameraPermission": false,
+          "photosPermission": "TrimTime përdor fotot për lokalin, portofolin e qethjeve dhe stilin që dëshiron.",
+          "cameraPermission": "TrimTime përdor kamerën për të fotografuar qethjet dhe stilin që dëshiron.",
           "microphonePermission": false
+        }
+      ],
+      "expo-image",
+      "expo-web-browser",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "TrimTime përdor kamerën për të fotografuar qethjet dhe për të skanuar kodet QR.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "TrimTime përdor Face ID për të hapur aplikacionin në mënyrë të sigurt."
         }
       ]
     ],
