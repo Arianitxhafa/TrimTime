@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { klientiIQuery } from "../api/klienti";
+import KycjaBiometrike from "../components/KycjaBiometrike";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { PreferencatProvider, usePreferencat } from "../context/PreferencatContext";
 import { TemaProvider, useTema } from "../context/TemaContext";
@@ -56,7 +57,7 @@ function Navigimi() {
   // shkon te route-i i parë i lejuar, që për grupin (auth) do të ishte "/(auth)", pa ekran.
   const hyrjaPerTeLejuarit = !onboardingIPare ? "/onboarding" : !kaHyre ? "/roli" : "/lejet";
   return (
-    <>
+    <KycjaBiometrike aktive={kaHyre}>
       <StatusBar style={eshteErret ? "light" : "dark"} />
       <Stack
         screenOptions={{
@@ -123,6 +124,6 @@ function Navigimi() {
           <Stack.Screen name="cilesimet" options={{ title: t("cilesimet.titulli") }} />
         </Stack.Protected>
       </Stack>
-    </>
+    </KycjaBiometrike>
   );
 }

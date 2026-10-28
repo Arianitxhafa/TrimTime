@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 import Ikona, { ikonat, type EmriIkones } from "../components/Ikona";
+import { usePreferencat } from "../context/PreferencatContext";
 import { useStilet, useTema, type ZgjedhjaTemes } from "../context/TemaContext";
 import { gjuhaAktuale, gjuhet, ndryshoGjuhen, type Gjuha } from "../i18n";
+import { kaBiometri, verifiko } from "../lib/biometria";
+import { prekja } from "../lib/prekja";
 import { hapesira, rrezja, type Ngjyrat } from "../theme";
 
 const opsionetETemes = [
@@ -14,8 +17,27 @@ const opsionetETemes = [
 
 export default function Cilesimet() {
   const { t } = useTranslation();
-  const { zgjedhja, ndryshoZgjedhjen } = useTema();
+  const { zgjedhja, ndryshoZgjedhjen, ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
+  const { kycjaBiometrike, ndryshoKycjen } = usePreferencat();
+  const [gabimiBiometrise, setGabimiBiometrise] = useState<string | null>(null);
+
+  // Para aktivizimit, përdoruesi verifikohet një herë, që të mos kyçet jashtë aplikacionit.
+  async function ndryshoBiometrine(aktive: boolean) {
+    setGabimiBiometrise(null);
+    if (!aktive) {
+      ndryshoKycjen(false);
+      return;
+    }
+    if (!(await kaBiometri())) {
+      setGabimiBiometrise(t("biometria.paHardware"));
+      return;
+    }
+    if (await verifiko(t("biometria.titulli"))) {
+      prekja.sukses();
+      ndryshoKycjen(true);
+    }
+  }
   // Zgjedhja shfaqet menjëherë; përkthimi i gjithë aplikacionit nis pasi të vizatohet ajo,
   // që prekja të mos presë rivizatimin e të gjitha ekraneve.
   const [gjuha, setGjuha] = useState<Gjuha>(gjuhaAktuale);
@@ -42,6 +64,30 @@ export default function Cilesimet() {
           />
         ))}
       </View>
+
+      {Platform.OS !== "web" && (
+        <>
+          <Text style={[styles.seksioni, styles.seksioniTjeter]}>{t("biometria.titulli")}</Text>
+          <View style={styles.grupi}>
+            <View style={styles.rreshti}>
+              <View style={[styles.ikona, kycjaBiometrike && styles.ikonaAktive]}>
+                <Ikona emri={ikonat.biometria} madhesia={18} ngjyra={kycjaBiometrike ? ngjyrat.mbiAri : ngjyrat.tekstiDyte} />
+              </View>
+              <View style={styles.teksti}>
+                <Text style={styles.titulli}>{t("biometria.titulli")}</Text>
+                <Text style={styles.pershkrimi}>{gabimiBiometrise ?? t("biometria.teksti")}</Text>
+              </View>
+              <Switch
+                value={kycjaBiometrike}
+                onValueChange={ndryshoBiometrine}
+                trackColor={{ true: ngjyrat.ari, false: ngjyrat.kufiri }}
+                thumbColor="#FFFFFF"
+                accessibilityLabel={t("biometria.titulli")}
+              />
+            </View>
+          </View>
+        </>
+      )}
 
       <Text style={[styles.seksioni, styles.seksioniTjeter]}>{t("cilesimet.gjuha")}</Text>
       <View accessibilityRole="radiogroup" style={styles.grupi}>
