@@ -6,16 +6,23 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokali } from "../../api/lokalet";
 import { useOrari } from "../../api/orari";
 import { useSherbimet } from "../../api/sherbimet";
+import { useBesnikeria } from "../../api/besnikeria";
+import { usePromocionet } from "../../api/promocionet";
 import { useStafi } from "../../api/stafi";
 import { useVleresimetELokalit } from "../../api/vleresimet";
 import Avatar from "../../components/Avatar";
 import Butoni from "../../components/Butoni";
 import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
+import KartaEBesnikerise from "../../components/KartaEBesnikerise";
 import KartaEVleresimit from "../../components/KartaEVleresimit";
 import { celesiIDites, RENDI_I_DITEVE } from "../../components/RedaktoriIOrarit";
+import { useAuth } from "../../context/AuthContext";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { useModiAktiv } from "../../hooks/useModiAktiv";
+import { dataISO } from "../../lib/datat";
 import { formatoCmimin, formatoKohezgjatjen } from "../../lib/formatimi";
+import { pershkrimiIPromocionit, vlenSot } from "../../lib/promocionet";
+import type { Lokali, Sherbimi } from "../../lib/tipet";
 import { lidhjaEUdhezimeve } from "../../lib/vendndodhja";
 import { hapesira, rrezja, type Ngjyrat } from "../../theme";
 
@@ -169,6 +176,8 @@ export default function ProfiliILokalit() {
             </View>
           )}
 
+          {!ngaOsm && <Ofertat lokali={l} sherbimet={sherbimetAktive} kaKarte={modi === "klient"} />}
+
           {berberet.length > 0 && (
             <>
               <Text style={styles.seksioni}>{t("profiliLokalit.berberet")}</Text>
@@ -238,6 +247,64 @@ export default function ProfiliILokalit() {
         </View>
       )}
     </View>
+  );
+}
+
+// Promocionet që vlejnë sot dhe karta e besnikërisë (me progresin e klientit kur ka hyrë).
+function Ofertat({ lokali, sherbimet, kaKarte }: { lokali: Lokali; sherbimet: Sherbimi[]; kaKarte: boolean }) {
+  const { t } = useTranslation();
+  const { ngjyrat } = useTema();
+  const styles = useStilet(krijoStilet);
+  const { sesioni } = useAuth();
+  const promocionet = usePromocionet(lokali.id);
+  const sot = dataISO(new Date());
+  const teVlefshme = (promocionet.data ?? []).filter((p) => vlenSot(p, sot));
+  const besnikeria = useBesnikeria(
+    lokali.id,
+    sesioni ? `id:${sesioni.user.id}` : undefined,
+    lokali.besnikeria_aktive && kaKarte,
+  );
+
+  if (teVlefshme.length === 0 && !lokali.besnikeria_aktive) return null;
+
+  return (
+    <>
+      <Text style={styles.seksioni}>{t("promocionet.oferta")}</Text>
+      <View style={styles.ofertat}>
+        {teVlefshme.map((p) => (
+          <View key={p.id} style={styles.oferta}>
+            <View style={styles.ofertaPerqindja}>
+              <Text style={styles.ofertaPerqindjaTeksti}>{t("promocionet.etiketa", { perqindja: p.perqindja })}</Text>
+            </View>
+            <View style={styles.ofertaTeksti}>
+              <Text style={styles.ofertaTitulli}>{p.titulli}</Text>
+              <Text style={styles.ofertaPershkrimi}>{pershkrimiIPromocionit(p, t, sherbimet)}</Text>
+            </View>
+          </View>
+        ))}
+
+        {lokali.besnikeria_aktive && lokali.besnikeria_shperblimi ? (
+          <KartaEBesnikerise
+            besnikeria={
+              besnikeria.data ?? {
+                vizita: 0,
+                te_disponueshme: 0,
+                progresi: 0,
+                nevojiten: lokali.besnikeria_vizita,
+                shperblimi: lokali.besnikeria_shperblimi,
+              }
+            }
+            shenimi={t("besnikeria.tregoNeLokal")}
+          />
+        ) : null}
+      </View>
+      {teVlefshme.length > 0 && (
+        <View style={styles.ofertaShenim}>
+          <Ikona emri={ikonat.etiketa} madhesia={13} ngjyra={ngjyrat.tekstiZbehte} />
+          <Text style={styles.ofertaShenimTeksti}>{t("rezervimi.paguanNeLokal")}</Text>
+        </View>
+      )}
+    </>
   );
 }
 
@@ -421,6 +488,57 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     paTeDhena: {
       color: ngjyrat.tekstiZbehte,
       fontSize: 14,
+    },
+    ofertat: {
+      gap: hapesira.md,
+    },
+    oferta: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: hapesira.md,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderRadius: rrezja.lg,
+      borderWidth: 1,
+      borderColor: ngjyrat.ari,
+      padding: hapesira.lg,
+    },
+    ofertaPerqindja: {
+      minWidth: 58,
+      height: 36,
+      paddingHorizontal: 8,
+      borderRadius: rrezja.plote,
+      backgroundColor: ngjyrat.ari,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    ofertaPerqindjaTeksti: {
+      color: ngjyrat.mbiAri,
+      fontSize: 15,
+      fontWeight: "800",
+    },
+    ofertaTeksti: {
+      flex: 1,
+      gap: 2,
+    },
+    ofertaTitulli: {
+      color: ngjyrat.teksti,
+      fontSize: 15,
+      fontWeight: "800",
+    },
+    ofertaPershkrimi: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 13,
+      lineHeight: 18,
+    },
+    ofertaShenim: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      marginTop: hapesira.sm,
+    },
+    ofertaShenimTeksti: {
+      color: ngjyrat.tekstiZbehte,
+      fontSize: 12,
     },
     seksioniRreshti: {
       flexDirection: "row",

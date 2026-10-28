@@ -86,6 +86,7 @@ function Navigimi() {
             <Stack.Screen name="rezervo/[lokaliId]" options={{ title: t("rezervimi.titulli"), presentation: "modal" }} />
             <Stack.Screen name="riplanifiko/[id]" options={{ title: t("terminetEMia.ndryshoTitulli") }} />
             <Stack.Screen name="vlereso/[terminiId]" options={{ title: "", presentation: "modal" }} />
+            <Stack.Screen name="kartat" options={{ title: t("profili.kartat") }} />
           </Stack.Protected>
 
           <Stack.Protected guard={modi === "biznes"} redirectTo="/zbulo">
@@ -103,6 +104,9 @@ function Navigimi() {
             <Stack.Screen name="menaxho/sherbimet" options={{ title: t("sherbimet.titulli") }} />
             <Stack.Screen name="menaxho/sherbimi" options={{ title: "", presentation: "modal" }} />
             <Stack.Screen name="menaxho/stafi" options={{ title: t("stafi.titulli") }} />
+            <Stack.Screen name="menaxho/promocionet" options={{ title: t("promocionet.titulli") }} />
+            <Stack.Screen name="menaxho/promocioni" options={{ title: "", presentation: "modal" }} />
+            <Stack.Screen name="menaxho/besnikeria" options={{ title: t("besnikeria.titulli") }} />
           </Stack.Protected>
 
           <Stack.Screen name="lokali/[id]" options={{ title: "" }} />

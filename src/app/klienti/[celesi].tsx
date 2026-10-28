@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useBesnikeria } from "../../api/besnikeria";
 import { useHistorikuIKlientit, useKlientet, useRuajKlientin } from "../../api/biznesi";
 import { useLokaliIm } from "../../api/lokalet";
 import Avatar from "../../components/Avatar";
@@ -10,6 +11,7 @@ import BadgeStatusi from "../../components/BadgeStatusi";
 import Butoni from "../../components/Butoni";
 import FushaTekstit from "../../components/FushaTekstit";
 import Ikona, { ikonat } from "../../components/Ikona";
+import KartaEBesnikerise from "../../components/KartaEBesnikerise";
 import { GabimiIFormes } from "../../components/KornizaAuth";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { formatoDaten } from "../../lib/datat";
@@ -42,6 +44,7 @@ function Detajet({ lokaliId, klienti }: { lokaliId: string; klienti: KlientiILok
   const styles = useStilet(krijoStilet);
   const insets = useSafeAreaInsets();
   const historiku = useHistorikuIKlientit(lokaliId, klienti.celesi);
+  const besnikeria = useBesnikeria(lokaliId, klienti.celesi);
   const ruaj = useRuajKlientin(lokaliId);
   const [shenime, setShenime] = useState(klienti.shenime ?? "");
 
@@ -72,6 +75,12 @@ function Detajet({ lokaliId, klienti }: { lokaliId: string; klienti: KlientiILok
           <Statistika vlera={formatoCmimin(klienti.shpenzuar_centa)} etiketa={t("klientet.shpenzuar")} />
           <Statistika vlera={String(klienti.nuk_erdhi)} etiketa={t("klientet.nukErdhi")} />
         </View>
+
+        {besnikeria.data ? (
+          <View style={styles.besnikeria}>
+            <KartaEBesnikerise besnikeria={besnikeria.data} />
+          </View>
+        ) : null}
 
         <View style={styles.veprimet}>
           {klienti.telefoni && (
@@ -209,6 +218,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     statistikat: {
       flexDirection: "row",
       gap: hapesira.sm,
+      marginBottom: hapesira.lg,
+    },
+    besnikeria: {
       marginBottom: hapesira.lg,
     },
     statistika: {

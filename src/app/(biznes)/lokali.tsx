@@ -183,7 +183,17 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
             meKufi
           />
           {eshtePronar && (
-            <Rreshti ikona={ikonat.grafik} titulli={t("analitika.titulli")} href="/menaxho/analitika" meKufi />
+            <>
+              <Rreshti ikona={ikonat.etiketa} titulli={t("lokali.promocionet")} href="/menaxho/promocionet" meKufi />
+              <Rreshti
+                ikona={ikonat.dhurate}
+                titulli={t("lokali.besnikeria")}
+                vlera={lokali.besnikeria_aktive ? `${lokali.besnikeria_vizita}+1` : undefined}
+                href="/menaxho/besnikeria"
+                meKufi
+              />
+              <Rreshti ikona={ikonat.grafik} titulli={t("analitika.titulli")} href="/menaxho/analitika" meKufi />
+            </>
           )}
           <Rreshti
             ikona={ikonat.zbulo}
