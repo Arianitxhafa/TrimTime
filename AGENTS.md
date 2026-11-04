@@ -1,5 +1,27 @@
 This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
 
+## TrimTime
+
+TrimTime connects men's barbershops with their clients, starting in Kosovo. Built by Arianit and Albert.
+
+- **Client:** finds shops in the city they are in, books, cancels or reschedules, rates visits and earns loyalty rewards.
+- **Barber / shop:** manages the shop, services, hours, staff, calendar, clients (CRM), promotions and analytics.
+- **Payment happens at the shop;** staff record it as cash or card. Online payments come later, because Stripe doesn't support businesses in Kosovo.
+
+### Conventions
+
+- Code identifiers, file names and commit messages are in Albanian. Keep new code consistent with them.
+- All user-facing text goes in `src/i18n/sq.ts` (default) and `src/i18n/en.ts`, never hardcoded in a screen.
+- Styling uses `useStilet` and `useTema` with tokens from `src/theme`, so every screen works in dark and light mode.
+- Data access goes through the React Query hooks in `src/api/`.
+
+### Supabase
+
+- Copy `.env.example` to `.env`. It holds only the project URL and the publishable (anon) key. Never put a `service_role`/secret key or the database password in the app, in the repo or in chat.
+- Schema changes go in a **new** file in `supabase/migrations/`. Never edit a migration that has already been run. Migrations are run by hand, in filename order, in Supabase → SQL Editor. Every new table needs RLS and explicit grants.
+- After the last migration, run `supabase/seed/lokalet_osm_kosove.sql` (cities and shops from OpenStreetMap). `npm run importo:osm` regenerates it. Keep the "© OpenStreetMap contributors" attribution wherever these shops appear.
+- Prices, booking times and discounts are calculated on the server, not in the app.
+
 ## Expo has changed — do not trust your training data
 
 Expo ships breaking changes every SDK release. APIs you remember are likely renamed, moved, or removed. Before writing any code that touches an Expo, EAS, or React Native API:
