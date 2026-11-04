@@ -18,6 +18,28 @@ export default function MenaxhoSherbimet() {
   const lokaliIm = useLokaliIm();
   const sherbimet = useSherbimet(lokaliIm.data?.lokali.id);
 
+  // Pa lokal, query-t e shërbimeve nuk nis fare, ndaj kontrollohet edhe lokali.
+  const deshtoi = sherbimet.isError || (!lokaliIm.isPending && !lokaliIm.data);
+
+  if (deshtoi && !sherbimet.data) {
+    return (
+      <View style={[styles.container, styles.qendra, styles.gabimi]}>
+        <Ikona emri={ikonat.gabim} madhesia={32} ngjyra={ngjyrat.tekstiDyte} />
+        <Text style={styles.boshTeksti}>{t("pergjithshme.gabimPapritur")}</Text>
+        <Butoni
+          titulli={t("zbulo.provoPerseri")}
+          varianti="dytesor"
+          ikona={ikonat.kthe}
+          ngarkohet={lokaliIm.isFetching || sherbimet.isFetching}
+          onPress={() => {
+            lokaliIm.refetch();
+            if (lokaliIm.data) sherbimet.refetch();
+          }}
+        />
+      </View>
+    );
+  }
+
   if (!sherbimet.data) {
     return (
       <View style={[styles.container, styles.qendra]}>
@@ -73,6 +95,10 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     qendra: {
       alignItems: "center",
       justifyContent: "center",
+    },
+    gabimi: {
+      gap: hapesira.md,
+      padding: hapesira.xxl,
     },
     lista: {
       padding: hapesira.xl,
