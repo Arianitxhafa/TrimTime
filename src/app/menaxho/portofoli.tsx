@@ -19,6 +19,7 @@ import { useLokaliIm } from "../../api/lokalet";
 import { useFshiNgaPortofoli, usePortofoli, useShtoNePortofol } from "../../api/portofoli";
 import Butoni from "../../components/Butoni";
 import DialogKonfirmimi from "../../components/DialogKonfirmimi";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import FushaTekstit from "../../components/FushaTekstit";
 import GaleriaEPlote from "../../components/GaleriaEPlote";
 import Ikona, { ikonat } from "../../components/Ikona";
@@ -117,7 +118,9 @@ export default function Portofoli() {
           </Pressable>
         )}
         ListEmptyComponent={
-          portofoli.isPending ? (
+          portofoli.isError || lokaliIm.isError || lokaliIm.data === null ? (
+            <EkraniINgarkimit pyetjet={[lokaliIm, portofoli]} mungon={lokaliIm.data === null} />
+          ) : portofoli.isPending ? (
             <ActivityIndicator color={ngjyrat.ari} style={styles.ngarkimi} />
           ) : (
             <View style={styles.bosh}>

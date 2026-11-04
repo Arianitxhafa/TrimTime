@@ -3,7 +3,6 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -18,6 +17,7 @@ import { useLokaliIm } from "../../api/lokalet";
 import { useFshiSherbimin, useRuajSherbimin, useSherbimet } from "../../api/sherbimet";
 import Butoni from "../../components/Butoni";
 import DialogKonfirmimi from "../../components/DialogKonfirmimi";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import FushaTekstit from "../../components/FushaTekstit";
 import { GabimiIFormes } from "../../components/KornizaAuth";
 import { useStilet, useTema } from "../../context/TemaContext";
@@ -28,19 +28,13 @@ import { hapesira, rrezja, type Ngjyrat } from "../../theme";
 const KOHEZGJATJET = [10, 15, 20, 25, 30, 40, 45, 50, 60, 75, 90, 120];
 
 export default function FormaESherbimit() {
-  const { ngjyrat } = useTema();
-  const styles = useStilet(krijoStilet);
   const { id } = useLocalSearchParams<{ id?: string }>();
   const lokaliIm = useLokaliIm();
   const lokaliId = lokaliIm.data?.lokali.id;
   const sherbimet = useSherbimet(lokaliId);
 
   if (!lokaliId || !sherbimet.data) {
-    return (
-      <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
-    );
+    return <EkraniINgarkimit pyetjet={[lokaliIm, sherbimet]} mungon={lokaliIm.isSuccess && !lokaliId} />;
   }
 
   const ekzistues = id ? sherbimet.data.find((s) => s.id === id) : undefined;
@@ -194,10 +188,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
-    },
-    qendra: {
-      alignItems: "center",
-      justifyContent: "center",
     },
     permbajtja: {
       padding: hapesira.xl,

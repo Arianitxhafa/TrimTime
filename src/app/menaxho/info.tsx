@@ -17,6 +17,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ngarkoFoton, useLokaliIm, usePerditesoLokalin } from "../../api/lokalet";
 import Butoni from "../../components/Butoni";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import FushaTekstit from "../../components/FushaTekstit";
 import Ikona, { ikonat } from "../../components/Ikona";
 import { GabimiIFormes } from "../../components/KornizaAuth";
@@ -26,16 +27,10 @@ import type { Koordinata, Lokali } from "../../lib/tipet";
 import { hapesira, rrezja, type Ngjyrat } from "../../theme";
 
 export default function MenaxhoInfon() {
-  const { ngjyrat } = useTema();
-  const styles = useStilet(krijoStilet);
   const lokaliIm = useLokaliIm();
 
   if (!lokaliIm.data) {
-    return (
-      <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
-    );
+    return <EkraniINgarkimit pyetjet={[lokaliIm]} mungon={lokaliIm.isSuccess} />;
   }
   return <Forma lokali={lokaliIm.data.lokali} />;
 }
@@ -263,10 +258,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
-    },
-    qendra: {
-      alignItems: "center",
-      justifyContent: "center",
     },
     permbajtja: {
       padding: hapesira.xl,

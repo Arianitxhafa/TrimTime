@@ -1,7 +1,7 @@
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBesnikeria } from "../../api/besnikeria";
 import { useHistorikuIKlientit, useKlientet, useRuajKlientin } from "../../api/biznesi";
@@ -9,6 +9,7 @@ import { useLokaliIm } from "../../api/lokalet";
 import Avatar from "../../components/Avatar";
 import BadgeStatusi from "../../components/BadgeStatusi";
 import Butoni from "../../components/Butoni";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import FushaTekstit from "../../components/FushaTekstit";
 import Ikona, { ikonat } from "../../components/Ikona";
 import KartaEBesnikerise from "../../components/KartaEBesnikerise";
@@ -20,8 +21,6 @@ import type { KlientiILokalit } from "../../lib/tipet";
 import { hapesira, rrezja, type Ngjyrat } from "../../theme";
 
 export default function DetajetEKlientit() {
-  const { ngjyrat } = useTema();
-  const styles = useStilet(krijoStilet);
   const { celesi } = useLocalSearchParams<{ celesi: string }>();
   const lokaliIm = useLokaliIm();
   const lokaliId = lokaliIm.data?.lokali.id;
@@ -29,11 +28,7 @@ export default function DetajetEKlientit() {
   const klienti = klientet.data?.find((x) => x.celesi === celesi);
 
   if (!lokaliId || !klienti) {
-    return (
-      <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
-    );
+    return <EkraniINgarkimit pyetjet={[lokaliIm, klientet]} mungon={(lokaliIm.isSuccess && !lokaliId) || klientet.isSuccess} />;
   }
   return <Detajet lokaliId={lokaliId} klienti={klienti} />;
 }
@@ -125,8 +120,8 @@ function Detajet({ lokaliId, klienti }: { lokaliId: string; klienti: KlientiILok
         )}
 
         <Text style={styles.seksioni}>{t("klientet.historiku")}</Text>
-        {historiku.isPending ? (
-          <ActivityIndicator color={ngjyrat.ari} />
+        {historiku.isPending || historiku.isError ? (
+          <EkraniINgarkimit pyetjet={[historiku]} />
         ) : (historiku.data ?? []).length === 0 ? (
           <Text style={styles.paHistori}>{t("klientet.paHistori")}</Text>
         ) : (
@@ -169,10 +164,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
-    },
-    qendra: {
-      alignItems: "center",
-      justifyContent: "center",
     },
     permbajtja: {
       padding: hapesira.xl,

@@ -1,7 +1,7 @@
 import { Stack, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 import {
   useFshiPushim,
   useOrariIBerberit,
@@ -14,6 +14,7 @@ import { useLokaliIm } from "../../../api/lokalet";
 import { useOrari } from "../../../api/orari";
 import { useStafi } from "../../../api/stafi";
 import Butoni from "../../../components/Butoni";
+import EkraniINgarkimit from "../../../components/EkraniINgarkimit";
 import FushaTekstit from "../../../components/FushaTekstit";
 import Ikona, { ikonat } from "../../../components/Ikona";
 import { GabimiIFormes } from "../../../components/KornizaAuth";
@@ -30,7 +31,6 @@ const ORET_E_PUSHIMIT = Array.from({ length: 31 }, (_, i) => {
 });
 
 export default function EkraniIOraritTeBerberit() {
-  const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
   const { id } = useLocalSearchParams<{ id: string }>();
   const lokaliIm = useLokaliIm();
@@ -41,11 +41,7 @@ export default function EkraniIOraritTeBerberit() {
   const berberi = stafi.data?.find((a) => a.profili_id === id);
 
   if (!lokaliId || !orariIBerberit.data || !orariILokalit.data) {
-    return (
-      <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
-    );
+    return <EkraniINgarkimit pyetjet={[lokaliIm, orariIBerberit, orariILokalit]} mungon={lokaliIm.isSuccess && !lokaliId} />;
   }
 
   return (
@@ -279,10 +275,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
-    },
-    qendra: {
-      alignItems: "center",
-      justifyContent: "center",
     },
     permbajtja: {
       padding: hapesira.xl,

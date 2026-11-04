@@ -17,6 +17,7 @@ import Avatar from "../../components/Avatar";
 import BadgeStatusi from "../../components/BadgeStatusi";
 import Butoni from "../../components/Butoni";
 import DialogKonfirmimi from "../../components/DialogKonfirmimi";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import GaleriaEPlote from "../../components/GaleriaEPlote";
 import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
 import { GabimiIFormes } from "../../components/KornizaAuth";
@@ -44,21 +45,19 @@ export default function DetajetTerminit() {
 
   const termini = terminet.data?.find((x) => x.id === id);
 
+  if (!termini && !terminet.isSuccess) {
+    return <EkraniINgarkimit pyetjet={[lokaliIm, terminet]} mungon={lokaliIm.isSuccess && !lokaliIm.data} />;
+  }
+
   if (!termini) {
     return (
       <View style={[styles.container, styles.qendra]}>
-        {terminet.isPending || lokaliIm.isPending ? (
-          <ActivityIndicator color={ngjyrat.ari} />
-        ) : (
-          <>
-            <View style={styles.boshIkona}>
-              <Ikona emri={ikonat.anulo} madhesia={28} ngjyra={ngjyrat.tekstiDyte} />
-            </View>
-            <Text style={styles.boshTitulli}>{t("termini.nukUGjet")}</Text>
-            <Text style={styles.boshTeksti}>{t("termini.nukUGjetTeksti")}</Text>
-            <Butoni titulli={t("termini.kthehu")} ikona={ikonat.kthe} onPress={kthehu} />
-          </>
-        )}
+        <View style={styles.boshIkona}>
+          <Ikona emri={ikonat.anulo} madhesia={28} ngjyra={ngjyrat.tekstiDyte} />
+        </View>
+        <Text style={styles.boshTitulli}>{t("termini.nukUGjet")}</Text>
+        <Text style={styles.boshTeksti}>{t("termini.nukUGjetTeksti")}</Text>
+        <Butoni titulli={t("termini.kthehu")} ikona={ikonat.kthe} onPress={kthehu} />
       </View>
     );
   }

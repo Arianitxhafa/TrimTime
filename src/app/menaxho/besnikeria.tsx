@@ -2,7 +2,6 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -15,6 +14,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokaliIm, usePerditesoLokalin } from "../../api/lokalet";
 import Butoni from "../../components/Butoni";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import FushaTekstit from "../../components/FushaTekstit";
 import Ikona, { ikonat } from "../../components/Ikona";
 import { GabimiIFormes } from "../../components/KornizaAuth";
@@ -25,16 +25,11 @@ import { hapesira, rrezja, type Ngjyrat } from "../../theme";
 const VIZITAT = [5, 6, 8, 10, 12, 15];
 
 export default function Besnikeria() {
-  const { ngjyrat } = useTema();
-  const styles = useStilet(krijoStilet);
-  const lokali = useLokaliIm().data?.lokali;
+  const lokaliIm = useLokaliIm();
+  const lokali = lokaliIm.data?.lokali;
 
   if (!lokali) {
-    return (
-      <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
-    );
+    return <EkraniINgarkimit pyetjet={[lokaliIm]} mungon={lokaliIm.isSuccess} />;
   }
   return <Forma lokali={lokali} />;
 }
@@ -135,10 +130,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
-    },
-    qendra: {
-      alignItems: "center",
-      justifyContent: "center",
     },
     permbajtja: {
       padding: hapesira.xl,

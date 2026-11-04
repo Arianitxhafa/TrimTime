@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   mesazhiIGabimitTeRezervimit,
@@ -10,28 +10,23 @@ import {
   useTerminetEMia,
 } from "../../api/terminet";
 import Butoni from "../../components/Butoni";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import { GabimiIFormes } from "../../components/KornizaAuth";
 import RrjetaEOrareve from "../../components/RrjetaEOrareve";
 import ZgjedhesiIDites from "../../components/ZgjedhesiIDites";
-import { useStilet, useTema } from "../../context/TemaContext";
+import { useStilet } from "../../context/TemaContext";
 import { ditetEArdhshme, formatoDaten } from "../../lib/datat";
 import { planifikoKujtesat } from "../../lib/kujtesat";
 import type { OraELire, TerminiIKlientit } from "../../lib/tipet";
 import { hapesira, type Ngjyrat } from "../../theme";
 
 export default function Riplanifiko() {
-  const { ngjyrat } = useTema();
-  const styles = useStilet(krijoStilet);
   const { id } = useLocalSearchParams<{ id: string }>();
   const terminet = useTerminetEMia();
   const termini = terminet.data?.find((x) => x.id === id);
 
   if (!termini) {
-    return (
-      <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
-    );
+    return <EkraniINgarkimit pyetjet={[terminet]} mungon={terminet.isSuccess} />;
   }
   return <Zgjedhja termini={termini} />;
 }
@@ -118,10 +113,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
-    },
-    qendra: {
-      alignItems: "center",
-      justifyContent: "center",
     },
     permbajtja: {
       padding: hapesira.xl,

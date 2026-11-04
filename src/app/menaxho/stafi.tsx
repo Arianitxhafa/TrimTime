@@ -1,21 +1,21 @@
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { useLokaliIm } from "../../api/lokalet";
 import { useKrijoFtesen, useNdryshoAnetarin, useStafi } from "../../api/stafi";
 import Avatar from "../../components/Avatar";
 import Butoni from "../../components/Butoni";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import { ikonat } from "../../components/Ikona";
 import KartaQr from "../../components/KartaQr";
 import { GabimiIFormes } from "../../components/KornizaAuth";
 import { qrIFteses } from "../../lib/qr";
 import { useAuth } from "../../context/AuthContext";
-import { useStilet, useTema } from "../../context/TemaContext";
+import { useStilet } from "../../context/TemaContext";
 import { hapesira, rrezja, type Ngjyrat } from "../../theme";
 
 export default function MenaxhoStafin() {
   const { t } = useTranslation();
-  const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
   const { sesioni } = useAuth();
   const lokaliIm = useLokaliIm();
@@ -26,11 +26,7 @@ export default function MenaxhoStafin() {
   const ndrysho = useNdryshoAnetarin(lokali?.id ?? "");
 
   if (!lokali || !stafi.data) {
-    return (
-      <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
-    );
+    return <EkraniINgarkimit pyetjet={[lokaliIm, stafi]} mungon={lokaliIm.isSuccess && !lokali} />;
   }
 
   return (
@@ -106,10 +102,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
-    },
-    qendra: {
-      alignItems: "center",
-      justifyContent: "center",
     },
     permbajtja: {
       padding: hapesira.xl,

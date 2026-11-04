@@ -1,26 +1,23 @@
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Share, StyleSheet, Text } from "react-native";
 import { useLokaliIm } from "../../api/lokalet";
 import Butoni from "../../components/Butoni";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import { ikonat } from "../../components/Ikona";
 import KartaQr from "../../components/KartaQr";
-import { useStilet, useTema } from "../../context/TemaContext";
+import { useStilet } from "../../context/TemaContext";
 import { qrILokalit } from "../../lib/qr";
 import { hapesira, type Ngjyrat } from "../../theme";
 
 // QR-ja e lokalit për t'u printuar: klientët e skanojnë për profilin dhe për check-in.
 export default function QrILokalit() {
   const { t } = useTranslation();
-  const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
-  const lokali = useLokaliIm().data?.lokali;
+  const lokaliIm = useLokaliIm();
+  const lokali = lokaliIm.data?.lokali;
 
   if (!lokali) {
-    return (
-      <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
-    );
+    return <EkraniINgarkimit pyetjet={[lokaliIm]} mungon={lokaliIm.isSuccess} />;
   }
 
   const lidhja = qrILokalit(lokali.id);
@@ -43,10 +40,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
-    },
-    qendra: {
-      alignItems: "center",
-      justifyContent: "center",
     },
     permbajtja: {
       padding: hapesira.xl,

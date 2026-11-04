@@ -4,7 +4,7 @@ import * as LidhjetExpo from "expo-linking";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Linking, Platform, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { Linking, Platform, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokali } from "../../api/lokalet";
 import { useOrari } from "../../api/orari";
@@ -16,6 +16,7 @@ import { useStafi } from "../../api/stafi";
 import { useVleresimetELokalit } from "../../api/vleresimet";
 import Avatar from "../../components/Avatar";
 import Butoni from "../../components/Butoni";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
 import GaleriaEPlote from "../../components/GaleriaEPlote";
 import KartaEBesnikerise from "../../components/KartaEBesnikerise";
@@ -43,12 +44,12 @@ export default function ProfiliILokalit() {
   const stafi = useStafi(id);
   const modi = useModiAktiv();
 
-  if (lokali.isPending) {
+  if (!lokali.data && !lokali.isSuccess) {
     return (
-      <View style={[styles.container, styles.qendra]}>
+      <>
         <Stack.Screen options={{ title: "" }} />
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
+        <EkraniINgarkimit pyetjet={[lokali]} />
+      </>
     );
   }
 

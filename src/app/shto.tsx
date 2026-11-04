@@ -2,7 +2,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -17,12 +16,13 @@ import { useSherbimet } from "../api/sherbimet";
 import { useStafi } from "../api/stafi";
 import { mesazhiIGabimitTeRezervimit, useOraretELira, useShtoTerminNgaStafi } from "../api/terminet";
 import Butoni from "../components/Butoni";
+import EkraniINgarkimit from "../components/EkraniINgarkimit";
 import FushaTekstit from "../components/FushaTekstit";
 import { ikonat } from "../components/Ikona";
 import { GabimiIFormes } from "../components/KornizaAuth";
 import RrjetaEOrareve from "../components/RrjetaEOrareve";
 import ZgjedhesiIDites from "../components/ZgjedhesiIDites";
-import { useStilet, useTema } from "../context/TemaContext";
+import { useStilet } from "../context/TemaContext";
 import { ditetEArdhshme } from "../lib/datat";
 import { formatoCmimin, formatoKohezgjatjen } from "../lib/formatimi";
 import type { OraELire } from "../lib/tipet";
@@ -36,7 +36,6 @@ function kthehu() {
 // Termin i shtuar nga stafi: klient pa llogari (walk-in ose rezervim me telefon).
 export default function ShtoTermin() {
   const { t } = useTranslation();
-  const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
   const insets = useSafeAreaInsets();
   // Nga kalendari vjen data; nga profili i klientit vijnë emri dhe telefoni.
@@ -84,11 +83,7 @@ export default function ShtoTermin() {
   }
 
   if (!lokaliId || !sherbimet.data || !stafi.data) {
-    return (
-      <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
-    );
+    return <EkraniINgarkimit pyetjet={[lokaliIm, sherbimet, stafi]} mungon={lokaliIm.isSuccess && !lokaliId} />;
   }
 
   const berberet = stafi.data.filter((a) => a.aktiv);
@@ -223,10 +218,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
-    },
-    qendra: {
-      alignItems: "center",
-      justifyContent: "center",
     },
     permbajtja: {
       padding: hapesira.xl,

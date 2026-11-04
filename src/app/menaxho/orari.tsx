@@ -1,30 +1,25 @@
 import { router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokaliIm } from "../../api/lokalet";
 import { useOrari, useRuajOrarin } from "../../api/orari";
 import Butoni from "../../components/Butoni";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import { GabimiIFormes } from "../../components/KornizaAuth";
 import RedaktoriIOrarit, { orariEshteIVlefshem } from "../../components/RedaktoriIOrarit";
-import { useStilet, useTema } from "../../context/TemaContext";
+import { useStilet } from "../../context/TemaContext";
 import type { IntervaliIOrarit } from "../../lib/tipet";
 import { hapesira, type Ngjyrat } from "../../theme";
 
 export default function MenaxhoOrarin() {
-  const { ngjyrat } = useTema();
-  const styles = useStilet(krijoStilet);
   const lokaliIm = useLokaliIm();
   const lokaliId = lokaliIm.data?.lokali.id;
   const orari = useOrari(lokaliId);
 
   if (!lokaliId || !orari.data) {
-    return (
-      <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
-    );
+    return <EkraniINgarkimit pyetjet={[lokaliIm, orari]} mungon={lokaliIm.isSuccess && !lokaliId} />;
   }
 
   // Redaktori merr orarin vetëm pasi të jetë ngarkuar, si gjendje fillestare.
@@ -61,10 +56,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
-    },
-    qendra: {
-      alignItems: "center",
-      justifyContent: "center",
     },
     permbajtja: {
       padding: hapesira.xl,

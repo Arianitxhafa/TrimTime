@@ -1,24 +1,23 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useZhvendosTerminin } from "../../api/biznesi";
 import { useLokaliIm } from "../../api/lokalet";
 import { useStafi } from "../../api/stafi";
 import { mesazhiIGabimitTeRezervimit, useOraretELira, useTerminetELokalit } from "../../api/terminet";
 import Butoni from "../../components/Butoni";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import { GabimiIFormes } from "../../components/KornizaAuth";
 import RrjetaEOrareve from "../../components/RrjetaEOrareve";
 import ZgjedhesiIDites from "../../components/ZgjedhesiIDites";
-import { useStilet, useTema } from "../../context/TemaContext";
+import { useStilet } from "../../context/TemaContext";
 import { ditetEArdhshme } from "../../lib/datat";
 import type { AnetariIStafit, OraELire, TerminiILokalit } from "../../lib/tipet";
 import { hapesira, rrezja, type Ngjyrat } from "../../theme";
 
 export default function ZhvendosTerminin() {
-  const { ngjyrat } = useTema();
-  const styles = useStilet(krijoStilet);
   const { id, data } = useLocalSearchParams<{ id: string; data: string }>();
   const lokaliIm = useLokaliIm();
   const lokaliId = lokaliIm.data?.lokali.id;
@@ -27,11 +26,7 @@ export default function ZhvendosTerminin() {
   const termini = terminet.data?.find((x) => x.id === id);
 
   if (!lokaliId || !termini || !stafi.data) {
-    return (
-      <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
-    );
+    return <EkraniINgarkimit pyetjet={[lokaliIm, terminet, stafi]} mungon={(lokaliIm.isSuccess && !lokaliId) || (terminet.isSuccess && !termini)} />;
   }
   return <Zgjedhja lokaliId={lokaliId} termini={termini} berberet={stafi.data.filter((a) => a.aktiv)} dataEMeParshme={data} />;
 }
@@ -129,10 +124,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
-    },
-    qendra: {
-      alignItems: "center",
-      justifyContent: "center",
     },
     permbajtja: {
       padding: hapesira.xl,

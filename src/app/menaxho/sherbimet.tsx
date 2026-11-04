@@ -1,10 +1,11 @@
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokaliIm } from "../../api/lokalet";
 import { useSherbimet } from "../../api/sherbimet";
 import Butoni from "../../components/Butoni";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import Ikona, { ikonat } from "../../components/Ikona";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { formatoCmimin, formatoKohezgjatjen } from "../../lib/formatimi";
@@ -18,34 +19,8 @@ export default function MenaxhoSherbimet() {
   const lokaliIm = useLokaliIm();
   const sherbimet = useSherbimet(lokaliIm.data?.lokali.id);
 
-  // Pa lokal, query-t e shërbimeve nuk nis fare, ndaj kontrollohet edhe lokali.
-  const deshtoi = sherbimet.isError || (!lokaliIm.isPending && !lokaliIm.data);
-
-  if (deshtoi && !sherbimet.data) {
-    return (
-      <View style={[styles.container, styles.qendra, styles.gabimi]}>
-        <Ikona emri={ikonat.gabim} madhesia={32} ngjyra={ngjyrat.tekstiDyte} />
-        <Text style={styles.boshTeksti}>{t("pergjithshme.gabimPapritur")}</Text>
-        <Butoni
-          titulli={t("zbulo.provoPerseri")}
-          varianti="dytesor"
-          ikona={ikonat.kthe}
-          ngarkohet={lokaliIm.isFetching || sherbimet.isFetching}
-          onPress={() => {
-            lokaliIm.refetch();
-            if (lokaliIm.data) sherbimet.refetch();
-          }}
-        />
-      </View>
-    );
-  }
-
   if (!sherbimet.data) {
-    return (
-      <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
-    );
+    return <EkraniINgarkimit pyetjet={[lokaliIm, sherbimet]} mungon={lokaliIm.isSuccess && !lokaliIm.data} />;
   }
 
   return (
@@ -91,14 +66,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
-    },
-    qendra: {
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    gabimi: {
-      gap: hapesira.md,
-      padding: hapesira.xxl,
     },
     lista: {
       padding: hapesira.xl,

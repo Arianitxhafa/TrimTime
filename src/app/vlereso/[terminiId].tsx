@@ -1,11 +1,12 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { mesazhiIGabimitTeRezervimit, useTerminetEMia } from "../../api/terminet";
 import { useVleresoTerminin } from "../../api/vleresimet";
 import Butoni from "../../components/Butoni";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import FushaTekstit from "../../components/FushaTekstit";
 import Ikona, { ikonat } from "../../components/Ikona";
 import { GabimiIFormes } from "../../components/KornizaAuth";
@@ -16,18 +17,12 @@ import type { TerminiIKlientit } from "../../lib/tipet";
 import { hapesira, type Ngjyrat } from "../../theme";
 
 export default function Vlereso() {
-  const { ngjyrat } = useTema();
-  const styles = useStilet(krijoStilet);
   const { terminiId } = useLocalSearchParams<{ terminiId: string }>();
   const terminet = useTerminetEMia();
   const termini = terminet.data?.find((x) => x.id === terminiId);
 
   if (!termini) {
-    return (
-      <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
-    );
+    return <EkraniINgarkimit pyetjet={[terminet]} mungon={terminet.isSuccess} />;
   }
   return <Forma termini={termini} />;
 }

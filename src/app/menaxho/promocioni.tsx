@@ -2,7 +2,6 @@ import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -18,6 +17,7 @@ import { useFshiPromocionin, usePromocionet, useRuajPromocionin } from "../../ap
 import { useSherbimet } from "../../api/sherbimet";
 import Butoni from "../../components/Butoni";
 import DialogKonfirmimi from "../../components/DialogKonfirmimi";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import FushaTekstit from "../../components/FushaTekstit";
 import { GabimiIFormes } from "../../components/KornizaAuth";
 import { RENDI_I_DITEVE } from "../../components/RedaktoriIOrarit";
@@ -33,19 +33,14 @@ const DATA = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
 type CelesiIDites = `koha.d${0 | 1 | 2 | 3 | 4 | 5 | 6}`;
 
 export default function FormaEPromocionit() {
-  const { ngjyrat } = useTema();
-  const styles = useStilet(krijoStilet);
   const { id } = useLocalSearchParams<{ id?: string }>();
-  const lokaliId = useLokaliIm().data?.lokali.id;
+  const lokaliIm = useLokaliIm();
+  const lokaliId = lokaliIm.data?.lokali.id;
   const promocionet = usePromocionet(lokaliId);
   const sherbimet = useSherbimet(lokaliId);
 
   if (!lokaliId || !promocionet.data || !sherbimet.data) {
-    return (
-      <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
-    );
+    return <EkraniINgarkimit pyetjet={[lokaliIm, promocionet, sherbimet]} mungon={lokaliIm.isSuccess && !lokaliId} />;
   }
 
   const ekzistues = id ? promocionet.data.find((p) => p.id === id) : undefined;
@@ -275,10 +270,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
-    },
-    qendra: {
-      alignItems: "center",
-      justifyContent: "center",
     },
     permbajtja: {
       padding: hapesira.xl,

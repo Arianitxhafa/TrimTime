@@ -30,6 +30,7 @@ import {
 } from "../../api/terminet";
 import Avatar from "../../components/Avatar";
 import Butoni from "../../components/Butoni";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import FushaTekstit from "../../components/FushaTekstit";
 import Ikona, { ikonat } from "../../components/Ikona";
 import { GabimiIFormes } from "../../components/KornizaAuth";
@@ -154,10 +155,10 @@ export default function Rezervo() {
 
   if (!lokali.data || !sherbimet.data) {
     return (
-      <View style={[styles.container, styles.qendra]}>
+      <>
         <Stack.Screen options={{ title: t("rezervimi.titulli") }} />
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
+        <EkraniINgarkimit pyetjet={[lokali, sherbimet]} mungon={lokali.isSuccess && !lokali.data} />
+      </>
     );
   }
 

@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { FlatList, Modal, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQytetet } from "../api/lokalet";
 import { usePreferencat } from "../context/PreferencatContext";
 import { useStilet, useTema } from "../context/TemaContext";
 import { prekja } from "../lib/prekja";
 import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import EkraniINgarkimit from "./EkraniINgarkimit";
 import Ikona, { ikonat } from "./Ikona";
 
 type Props = {
@@ -103,7 +104,7 @@ export default function ZgjedhesiIQytetit({ iDukshem, qytetiAktual, onMbyll, onV
               </Pressable>
             );
           }}
-          ListEmptyComponent={qytetet.isPending ? <ActivityIndicator color={ngjyrat.ari} style={styles.ngarkimi} /> : undefined}
+          ListEmptyComponent={qytetet.data ? undefined : <EkraniINgarkimit pyetjet={[qytetet]} />}
         />
       </View>
     </Modal>
@@ -188,8 +189,5 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     numri: {
       color: ngjyrat.tekstiZbehte,
       fontSize: 13,
-    },
-    ngarkimi: {
-      marginTop: hapesira.xxl,
     },
   });

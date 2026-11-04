@@ -4,6 +4,7 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { useAnalitika } from "../../api/biznesi";
 import { useLokaliIm } from "../../api/lokalet";
 import Butoni from "../../components/Butoni";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import { ikonat } from "../../components/Ikona";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { dataISO, ngaISO, shtoDite } from "../../lib/datat";
@@ -48,7 +49,9 @@ export default function EkraniIAnalitikes() {
         ))}
       </View>
 
-      {analitika.isPending ? (
+      {lokaliIm.isError || lokaliIm.data === null ? (
+        <EkraniINgarkimit pyetjet={[lokaliIm]} mungon={lokaliIm.data === null} />
+      ) : analitika.isPending ? (
         <ActivityIndicator color={ngjyrat.ari} style={styles.ngarkimi} />
       ) : analitika.isError || !analitika.data ? (
         <View style={styles.bosh}>

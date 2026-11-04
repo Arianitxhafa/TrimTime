@@ -1,10 +1,11 @@
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useLokaliIm } from "../../api/lokalet";
 import { usePromocionet } from "../../api/promocionet";
 import { useSherbimet } from "../../api/sherbimet";
 import Butoni from "../../components/Butoni";
+import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import Ikona, { ikonat } from "../../components/Ikona";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { pershkrimiIPromocionit } from "../../lib/promocionet";
@@ -14,16 +15,13 @@ export default function Promocionet() {
   const { t } = useTranslation();
   const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
-  const lokaliId = useLokaliIm().data?.lokali.id;
+  const lokaliIm = useLokaliIm();
+  const lokaliId = lokaliIm.data?.lokali.id;
   const promocionet = usePromocionet(lokaliId);
   const sherbimet = useSherbimet(lokaliId);
 
   if (!promocionet.data) {
-    return (
-      <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.ari} />
-      </View>
-    );
+    return <EkraniINgarkimit pyetjet={[lokaliIm, promocionet]} mungon={lokaliIm.isSuccess && !lokaliId} />;
   }
 
   return (
@@ -73,10 +71,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
-    },
-    qendra: {
-      alignItems: "center",
-      justifyContent: "center",
     },
     permbajtja: {
       padding: hapesira.xl,
