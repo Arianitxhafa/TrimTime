@@ -17,6 +17,7 @@ import { AuthProvider, useAuth } from "../context/AuthContext";
 import { PreferencatProvider, usePreferencat } from "../context/PreferencatContext";
 import { TemaProvider, useTema } from "../context/TemaContext";
 import { useModiAktiv } from "../hooks/useModiAktiv";
+import { useNjoftimetEPrekura } from "../hooks/useNjoftimetEPrekura";
 import { shkronjat } from "../theme";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -57,6 +58,9 @@ function Navigimi() {
   useEffect(() => {
     if (!ngarkohet) SplashScreen.hideAsync().catch(() => {});
   }, [ngarkohet]);
+
+  // Njoftimet hapin ekranin e tyre vetëm pasi përdoruesi ka hyrë dhe ka kaluar lejet.
+  useNjoftimetEPrekura(!ngarkohet && sesioni !== null && lejetEPara);
 
   // Të dhënat e një llogarie nuk duhet t'i shohë llogaria tjetër. Cache-i pastrohet vetëm kur
   // largohet një përdorues që ishte brenda; pas hyrjes do të fshiheshin query-t që sapo kanë nisur.
@@ -142,7 +146,11 @@ function Navigimi() {
           <Stack.Screen name="skano" options={{ headerShown: false, presentation: "fullScreenModal", animation: "fade" }} />
 
           <Stack.Screen name="cilesimet" options={{ title: t("cilesimet.titulli") }} />
+          <Stack.Screen name="profili-im" options={{ title: t("profili.teDhenat") }} />
         </Stack.Protected>
+
+        {/* Lidhja e rivendosjes së fjalëkalimit hapet nga email-i, me ose pa sesion. */}
+        <Stack.Screen name="fjalekalimi-i-ri" options={{ headerShown: false, animation: "fade" }} />
       </Stack>
     </KycjaBiometrike>
   );

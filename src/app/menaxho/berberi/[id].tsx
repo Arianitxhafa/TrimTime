@@ -148,6 +148,7 @@ function SeksioniIPushimeve({ lokaliId, profiliId }: { lokaliId: string; profili
     <View style={styles.seksioni}>
       <Text style={styles.titulli}>{t("berberi.pushimet")}</Text>
 
+      <GabimiIFormes mesazhi={fshi.isError ? t("pergjithshme.gabimPapritur") : null} />
       {(pushimet.data ?? []).length === 0 && !pushimet.isPending ? (
         <Text style={styles.paPushime}>{t("berberi.paPushime")}</Text>
       ) : (

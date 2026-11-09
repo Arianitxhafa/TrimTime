@@ -8,6 +8,7 @@ import { useOrari } from "../../api/orari";
 import { useSherbimet } from "../../api/sherbimet";
 import Butoni from "../../components/Butoni";
 import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
+import { GabimiIFormes } from "../../components/KornizaAuth";
 import { useAuth } from "../../context/AuthContext";
 import { useStilet, useTema } from "../../context/TemaContext";
 import type { Lokali } from "../../lib/tipet";
@@ -131,6 +132,7 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
                 accessibilityLabel={t("lokali.publikuar")}
               />
             </View>
+            <GabimiIFormes mesazhi={perditeso.isError ? t("pergjithshme.gabimPapritur") : null} />
             {!lokali.i_publikuar && (
               <View style={styles.kushtet}>
                 <Text style={styles.kushtetTitulli}>{t("lokali.kushtet")}</Text>

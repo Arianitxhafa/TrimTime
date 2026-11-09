@@ -26,6 +26,8 @@ type VleraKontekstit = {
   roli: Modi | null;
   ngarkohet: boolean;
   dil: () => Promise<void>;
+  // Ruan emrin dhe telefonin; profili në aplikacion përditësohet menjëherë.
+  ruajProfilin: (ndryshimet: { emri: string; telefoni: string | null }) => Promise<void>;
 };
 
 const AuthContext = createContext<VleraKontekstit | null>(null);
@@ -84,6 +86,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ngarkohet,
       dil: async () => {
         await supabase.auth.signOut();
+      },
+      ruajProfilin: async ({ emri, telefoni }) => {
+        if (!sesioni) throw new Error("Pa sesion");
+        const { data, error } = await supabase
+          .from("profilet")
+          .update({ emri, telefoni })
+          .eq("id", sesioni.user.id)
+          .select("id, emri, telefoni, foto_url")
+          .single<Profili>();
+        if (error) throw error;
+        setProfili(data);
       },
     };
   }, [sesioni, profiliAktual, ngarkohet]);

@@ -93,6 +93,9 @@ export default function Hyrja() {
         onSubmitEditing={hyr}
         gabimi={provuar ? gabimet.fjalekalimi : null}
       />
+      <Link href={{ pathname: "/rivendos", params: { email: email.trim() } }} style={styles.harrove}>
+        {t("auth.harrove")}
+      </Link>
       <Butoni titulli={t("auth.hyr")} onPress={hyr} ngarkohet={ngarkohet} style={styles.butoni} />
     </KornizaAuth>
   );
@@ -102,6 +105,14 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
   StyleSheet.create({
     butoni: {
       marginTop: 8,
+    },
+    harrove: {
+      alignSelf: "flex-end",
+      color: ngjyrat.teksti,
+      fontSize: 14,
+      textDecorationLine: "underline",
+      marginTop: -6,
+      marginBottom: 16,
     },
     tekstiFundit: {
       color: ngjyrat.tekstiDyte,

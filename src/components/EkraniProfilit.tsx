@@ -41,13 +41,14 @@ export default function EkraniProfilit() {
 
         <Text style={styles.seksioni}>{t("profili.llogaria")}</Text>
         <View style={styles.grupi}>
+          <Rreshti ikona={ikonat.personi} titulli={t("profili.teDhenat")} onPress={() => router.push("/profili-im")} />
           {modi === "klient" && (
-            <Rreshti ikona={ikonat.dhurate} titulli={t("profili.kartat")} onPress={() => router.push("/kartat")} />
+            <Rreshti ikona={ikonat.dhurate} titulli={t("profili.kartat")} meKufi onPress={() => router.push("/kartat")} />
           )}
           <Rreshti
             ikona={ikonat.cilesimet}
             titulli={t("profili.cilesimet")}
-            meKufi={modi === "klient"}
+            meKufi
             onPress={() => router.push("/cilesimet")}
           />
           <Rreshti ikona={ikonat.dil} titulli={t("profili.dil")} rrezik meKufi onPress={() => setDialogu(true)} />

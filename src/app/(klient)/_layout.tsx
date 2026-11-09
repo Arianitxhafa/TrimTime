@@ -20,11 +20,14 @@ export default function KlientLayout() {
       const lista = klienti
         .getQueriesData<NeListenEPritjes[]>({ queryKey: ["lista-e-pritjes"] })
         .flatMap(([, te]) => te ?? []);
-      const lokali = lista.find((h) => h.id === hyrja.id)?.lokali_emri ?? "TrimTime";
+      const ePritur = lista.find((h) => h.id === hyrja.id);
       njoftoOrenELire(
         t("listaEPritjes.njoftimiTitulli"),
-        t("listaEPritjes.njoftimiTeksti", { lokali, data: formatoDaten(hyrja.data, t).toLowerCase() }),
-        { lokaliId: hyrja.lokali_id, data: hyrja.data },
+        t("listaEPritjes.njoftimiTeksti", {
+          lokali: ePritur?.lokali_emri ?? "TrimTime",
+          data: formatoDaten(hyrja.data, t).toLowerCase(),
+        }),
+        { lokaliId: hyrja.lokali_id, data: hyrja.data, sherbimiId: ePritur?.sherbimi_id },
       );
     },
     [klienti, t],

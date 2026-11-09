@@ -168,6 +168,7 @@ function ListaEPritjes() {
   return (
     <View style={styles.pritja}>
       <Text style={styles.pritjaTitulli}>{t("listaEPritjes.titulli")}</Text>
+      <GabimiIFormes mesazhi={largohu.isError ? t("pergjithshme.gabimPapritur") : null} />
       {lista.data.map((h) => {
         const uLirua = h.njoftuar_me !== null;
         return (

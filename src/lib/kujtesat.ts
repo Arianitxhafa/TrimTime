@@ -66,7 +66,8 @@ async function planifiko(termini: TerminiPerKujtese, t: TFunction) {
             sherbimi: termini.sherbimi_emri,
           }),
           body: t("kujtesat.teksti", { ora: termini.ora_lokale, lokali: termini.lokali_emri }),
-          data: { terminiId: termini.id },
+          // `url` hapet kur përdoruesi prek njoftimin (shih useNjoftimetEPrekura).
+          data: { terminiId: termini.id, url: "/terminet-e-mia" },
         },
         trigger: { type: Notifications.SchedulableTriggerInputTypes.DATE, date: new Date(kur), channelId: KANALI },
       }),
@@ -104,7 +105,14 @@ export async function kerkoLejenENjoftimeve(): Promise<GjendjaELejes> {
 
 // Njoftim i menjëhershëm kur lirohet një orë në listën e pritjes. Pa server push, vjen vetëm
 // kur aplikacioni është i hapur ose në sfond; push nga serveri shtohet me development build.
-export async function njoftoOrenELire(titulli: string, teksti: string, te: { lokaliId: string; data: string }) {
+export async function njoftoOrenELire(
+  titulli: string,
+  teksti: string,
+  te: { lokaliId: string; data: string; sherbimiId?: string },
+) {
+  // Prekja e njoftimit hap rezervimin direkt te dita dhe shërbimi që klienti priste.
+  const parametrat = new URLSearchParams({ data: te.data, ...(te.sherbimiId ? { sherbimiId: te.sherbimiId } : {}) });
+  const url = `/rezervo/${te.lokaliId}?${parametrat.toString()}`;
   try {
     if (!(await kaLeje(false))) return;
     await Notifications.setNotificationChannelAsync(KANALI, {
@@ -114,7 +122,7 @@ export async function njoftoOrenELire(titulli: string, teksti: string, te: { lok
       importance: Notifications.AndroidImportance.HIGH,
     });
     await Notifications.scheduleNotificationAsync({
-      content: { title: titulli, body: teksti, data: te },
+      content: { title: titulli, body: teksti, data: { ...te, url } },
       trigger: null,
     });
   } catch {
