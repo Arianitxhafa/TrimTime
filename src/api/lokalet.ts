@@ -80,6 +80,12 @@ export type ParametratEKerkimit = {
   limit?: number;
   // Lista e Zbulo: lokalet e këtij qyteti + ato brenda rrezes. Harta nuk e përdor.
   qytetiId?: number | null;
+  // Filtrat e Zbulo; harta nuk i përdor.
+  sherbimi?: string | null;
+  vleresimiMin?: number | null;
+  distancaMaxKm?: number | null;
+  vetemOnline?: boolean;
+  vetemOferta?: boolean;
 };
 
 export type Qyteti = { id: number; emri: string; lat: number; lng: number; nr_lokaleve: number };
@@ -130,6 +136,11 @@ export function useLokaletPrane(p: ParametratEKerkimit, aktiv = true) {
         p_renditja: p.renditja,
         p_limit: p.limit ?? 50,
         p_qyteti_id: p.qytetiId ?? null,
+        p_sherbimi: p.sherbimi ?? null,
+        p_vleresimi_min: p.vleresimiMin ?? null,
+        p_distanca_max_km: p.distancaMaxKm ?? null,
+        p_vetem_online: p.vetemOnline ?? false,
+        p_vetem_oferta: p.vetemOferta ?? false,
       });
       if (error) throw error;
       return (data ?? []) as LokaliPrane[];

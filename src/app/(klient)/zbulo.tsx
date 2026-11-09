@@ -5,6 +5,12 @@ import { FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, Text, Text
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokaletPrane } from "../../api/lokalet";
 import Butoni from "../../components/Butoni";
+import FiltratEKerkimit, {
+  FILTRAT_FILLESTARE,
+  KATEGORITE,
+  numeroFiltrat,
+  type Filtrat,
+} from "../../components/FiltratEKerkimit";
 import Ikona, { ikonat } from "../../components/Ikona";
 import KartaELokalit from "../../components/KartaELokalit";
 import Marka from "../../components/Marka";
@@ -14,11 +20,9 @@ import { useAuth } from "../../context/AuthContext";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { useVonesa } from "../../hooks/useVonesa";
 import { useZonaIme } from "../../hooks/useZonaIme";
-import { formatoCmimin } from "../../lib/formatimi";
 import { prekja } from "../../lib/prekja";
 import { hapesira, shkronjat, type Ngjyrat } from "../../theme";
 
-const CMIMI_MAX_FILTRI = 1000;
 // Përveç qytetit, shfaqen edhe lokalet brenda kësaj rrezeje nga klienti (lagjet në periferi).
 const RREZJA_KM = 10;
 
@@ -49,35 +53,39 @@ export default function Zbulo() {
   const [zgjedhesi, setZgjedhesi] = useState(false);
 
   const [kerkimi, setKerkimi] = useState("");
-  const [vetemHapur, setVetemHapur] = useState(false);
-  const [renditja, setRenditja] = useState<"distanca" | "cmimi" | "vleresimi">("distanca");
-  const [deri10, setDeri10] = useState(false);
+  const [filtrat, setFiltrat] = useState<Filtrat>(FILTRAT_FILLESTARE);
+  const [fleta, setFleta] = useState(false);
   const kerkimiIVonuar = useVonesa(kerkimi);
+  const nrFiltrave = numeroFiltrat(filtrat);
+  const ndrysho = <K extends keyof Filtrat>(celesi: K, vlera: Filtrat[K]) => setFiltrat((f) => ({ ...f, [celesi]: vlera }));
 
   const lokalet = useLokaletPrane(
     {
       pika,
       rrezjaKm: RREZJA_KM,
       kerkimi: kerkimiIVonuar,
-      vetemHapur,
-      cmimiMax: deri10 ? CMIMI_MAX_FILTRI : null,
-      renditja,
+      vetemHapur: filtrat.vetemHapur,
+      cmimiMax: filtrat.cmimiMax,
+      renditja: filtrat.renditja,
       qytetiId: zona.qyteti?.id ?? null,
+      sherbimi: filtrat.sherbimi,
+      vleresimiMin: filtrat.vleresimiMin,
+      distancaMaxKm: filtrat.distancaKm,
+      vetemOnline: filtrat.vetemOnline,
+      vetemOferta: filtrat.vetemOferta,
     },
     // Pret derisa të dihet qyteti, që të mos ngarkohen lokalet e një qyteti tjetër.
     zona.gati,
   );
 
-  const kaFiltra = vetemHapur || deri10 || kerkimi.trim() !== "";
+  const kaFiltra = nrFiltrave > 0 || kerkimi.trim() !== "";
   const emriIPare = emriIShfaqur.includes("@") ? "" : emriIShfaqur.split(" ")[0];
   const sot = new Date();
   const botimi = `No.${javaEVitit(sot)} · ${t(`koha.m${sot.getMonth()}` as CelesiIMuajit)} ${sot.getFullYear()}`;
 
   function pastroFiltrat() {
     setKerkimi("");
-    setVetemHapur(false);
-    setDeri10(false);
-    setRenditja("distanca");
+    setFiltrat(FILTRAT_FILLESTARE);
   }
 
   const koka = (
@@ -150,6 +158,21 @@ export default function Zbulo() {
             <Ikona emri={ikonat.pastro} madhesia={18} ngjyra={ngjyrat.tekstiDyte} />
           </Pressable>
         )}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={nrFiltrave > 0 ? `${t("zbulo.filtrat")} (${nrFiltrave})` : t("zbulo.filtrat")}
+          onPress={() => {
+            prekja.lehte();
+            setFleta(true);
+          }}
+          hitSlop={6}
+          style={({ pressed }) => [styles.filtratButoni, nrFiltrave > 0 && styles.filtratButoniAktiv, pressed && styles.shtypur]}
+        >
+          <Ikona emri={ikonat.filtrat} madhesia={16} ngjyra={nrFiltrave > 0 ? ngjyrat.mbiAri : ngjyrat.teksti} />
+          <Text style={[styles.filtratTeksti, nrFiltrave > 0 && styles.filtratTekstiAktiv]}>
+            {nrFiltrave > 0 ? `${t("zbulo.filtrat")} · ${nrFiltrave}` : t("zbulo.filtrat")}
+          </Text>
+        </Pressable>
       </View>
 
       <ScrollView
@@ -158,19 +181,17 @@ export default function Zbulo() {
         style={styles.filtratScroll}
         contentContainerStyle={styles.filtrat}
       >
-        <Chip teksti={t("zbulo.hapurTani")} aktiv={vetemHapur} onPress={() => setVetemHapur(!vetemHapur)} />
-        <Chip
-          teksti={t("zbulo.deriNe", { cmimi: formatoCmimin(CMIMI_MAX_FILTRI) })}
-          aktiv={deri10}
-          onPress={() => setDeri10(!deri10)}
-        />
-        <Chip teksti={t("zbulo.meAfer")} aktiv={renditja === "distanca"} onPress={() => setRenditja("distanca")} />
-        <Chip teksti={t("zbulo.meLire")} aktiv={renditja === "cmimi"} onPress={() => setRenditja("cmimi")} />
-        <Chip
-          teksti={t("zbulo.meTeVleresuar")}
-          aktiv={renditja === "vleresimi"}
-          onPress={() => setRenditja("vleresimi")}
-        />
+        <Chip teksti={t("zbulo.hapurTani")} aktiv={filtrat.vetemHapur} onPress={() => ndrysho("vetemHapur", !filtrat.vetemHapur)} />
+        <Chip teksti={t("zbulo.online")} aktiv={filtrat.vetemOnline} onPress={() => ndrysho("vetemOnline", !filtrat.vetemOnline)} />
+        <Chip teksti={t("zbulo.meOferte")} aktiv={filtrat.vetemOferta} onPress={() => ndrysho("vetemOferta", !filtrat.vetemOferta)} />
+        {KATEGORITE.map((k) => (
+          <Chip
+            key={k}
+            teksti={t(`zbulo.k_${k}`)}
+            aktiv={filtrat.sherbimi === k}
+            onPress={() => ndrysho("sherbimi", filtrat.sherbimi === k ? null : k)}
+          />
+        ))}
       </ScrollView>
 
       {kaLeje === false && !zona.qyteti && (
@@ -193,6 +214,13 @@ export default function Zbulo() {
 
   return (
     <View style={styles.container}>
+      <FiltratEKerkimit
+        iDukshem={fleta}
+        filtrat={filtrat}
+        ndrysho={setFiltrat}
+        numri={lokalet.data && !lokalet.isPlaceholderData ? lokalet.data.length : null}
+        onMbyll={() => setFleta(false)}
+      />
       <ZgjedhesiIQytetit
         iDukshem={zgjedhesi}
         qytetiAktual={zona.qyteti?.id ?? null}
@@ -372,6 +400,28 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       color: ngjyrat.teksti,
       fontSize: 16,
       height: "100%",
+    },
+    filtratButoni: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      paddingHorizontal: 10,
+      height: 34,
+      borderWidth: 1.5,
+      borderColor: ngjyrat.vija,
+    },
+    filtratButoniAktiv: {
+      backgroundColor: ngjyrat.ari,
+    },
+    filtratTeksti: {
+      fontFamily: shkronjat.monoBold,
+      color: ngjyrat.teksti,
+      fontSize: 11,
+      letterSpacing: 1,
+      textTransform: "uppercase",
+    },
+    filtratTekstiAktiv: {
+      color: ngjyrat.mbiAri,
     },
     filtratScroll: {
       marginHorizontal: -hapesira.xl,

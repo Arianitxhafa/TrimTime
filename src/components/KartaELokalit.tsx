@@ -29,17 +29,20 @@ export default function KartaELokalit({ lokali, kompakte = false, indeksi }: Pro
   const styles = useStilet(krijoStilet);
   const shtypja = useShtypja(0.985);
   const kaVleresim = lokali.vleresimi_mesatar != null && lokali.nr_vleresimeve > 0;
-  const ngjyraEStatusit = lokali.i_hapur_tani ? statusetMeta.konfirmuar.ngjyra : ngjyrat.tekstiZbehte;
+  const ngjyraEStatusit =
+    lokali.ka_orar && lokali.i_hapur_tani ? statusetMeta.konfirmuar.ngjyra : ngjyrat.tekstiZbehte;
 
   function hap() {
     prekja.lehte();
     router.push({ pathname: "/lokali/[id]", params: { id: lokali.id } });
   }
 
+  // Orari i panjohur (shumica e lokaleve nga OpenStreetMap): nuk shkruajmë "Mbyllur".
   const detajet = [
-    lokali.i_hapur_tani ? t("lokali.hapur") : t("lokali.mbyllur"),
+    lokali.ka_orar ? (lokali.i_hapur_tani ? t("lokali.hapur") : t("lokali.mbyllur")) : null,
     formatoDistancen(lokali.distanca_m),
     lokali.cmimi_min !== null ? t("lokali.ngaCmimi", { cmimi: formatoCmimin(lokali.cmimi_min) }) : null,
+    lokali.rezervim_online ? null : lokali.telefoni ? t("lokali.meTelefon") : t("lokali.paTermin"),
   ].filter(Boolean);
 
   if (kompakte) {

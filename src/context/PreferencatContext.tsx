@@ -17,7 +17,8 @@ export type QytetiIZgjedhur = { id: number; emri: string; lat: number; lng: numb
 
 const CELESI_MODIT = "trimtime.modi";
 const CELESI_ONBOARDING = "trimtime.onboarding";
-const CELESI_LEJET = "trimtime.lejet";
+// v2: ekrani i lejeve me vendndodhjen e detyrueshme u shfaqet një herë edhe përdoruesve ekzistues.
+const CELESI_LEJET = "trimtime.lejet.v2";
 const CELESI_QYTETI = "trimtime.qyteti";
 const CELESI_KYCJA = "trimtime.kycja";
 

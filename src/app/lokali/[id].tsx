@@ -71,8 +71,14 @@ export default function ProfiliILokalit() {
   const sot = new Date().getDay();
   const ngaOsm = l.burimi === "osm";
   const kaFoto = Boolean(l.kopertina_url);
+  // Pa orar në TrimTime (shumica e lokaleve nga OpenStreetMap) nuk themi "Mbyllur": orari nuk dihet.
+  const kaOrar = (orari.data ?? []).length > 0;
   // Vetëm klientët rezervojnë; pronari e sheh profilin si parapamje.
   const mundTeRezervoje = !ngaOsm && modi === "klient" && sherbimetAktive.length > 0;
+  // Lokalet pa rezervim online: shiriti poshtë thërret lokalin ose hap udhëzimet.
+  const meTelefon = !mundTeRezervoje && modi === "klient";
+  const thirr = () => Linking.openURL(`tel:${l.telefoni?.replace(/\s/g, "")}`);
+  const udhezimet = () => Linking.openURL(lidhjaEUdhezimeve(l, Platform.OS));
 
   function hapRezervimin(sherbimiId?: string) {
     router.push({ pathname: "/rezervo/[lokaliId]", params: { lokaliId: l.id, ...(sherbimiId ? { sherbimiId } : {}) } });
@@ -83,7 +89,7 @@ export default function ProfiliILokalit() {
       <Stack.Screen
         options={{ title: "", headerTransparent: true, headerTintColor: kaFoto ? "#FFFFFF" : ngjyrat.teksti }}
       />
-      <ScrollView contentContainerStyle={{ paddingBottom: (mundTeRezervoje ? 120 : hapesira.xxl) + insets.bottom }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: (mundTeRezervoje || meTelefon ? 120 : hapesira.xxl) + insets.bottom }}>
         {kaFoto ? (
           // Me foto: emri i bardhë mbi foton e errësuar poshtë.
           <View style={[styles.kopertina, { height: 320 + insets.top }]}>
@@ -93,7 +99,7 @@ export default function ProfiliILokalit() {
             <View style={styles.koka}>
               <Text style={[styles.rubrika, styles.mbiFoto]}>{l.qyteti}</Text>
               <Text style={[styles.emri, styles.mbiFoto]}>{l.emri}</Text>
-              <Statusi lokali={l} mbiFoto />
+              <Statusi lokali={l} kaOrar={kaOrar} mbiFoto />
             </View>
           </View>
         ) : (
@@ -102,7 +108,7 @@ export default function ProfiliILokalit() {
             <View style={styles.vijaETrashe} />
             <Text style={styles.rubrika}>{l.qyteti}</Text>
             <Text style={styles.emri}>{l.emri}</Text>
-            <Statusi lokali={l} />
+            <Statusi lokali={l} kaOrar={kaOrar} />
             <View style={styles.vijaEHolle} />
           </View>
         )}
@@ -120,13 +126,13 @@ export default function ProfiliILokalit() {
               <Veprimi
                 ikona={ikonat.telefoni}
                 teksti={t("profiliLokalit.thirr")}
-                onPress={() => Linking.openURL(`tel:${l.telefoni?.replace(/\s/g, "")}`)}
+                onPress={thirr}
               />
             ) : null}
             <Veprimi
               ikona={ikonat.harta}
               teksti={t("profiliLokalit.udhezimet")}
-              onPress={() => Linking.openURL(lidhjaEUdhezimeve(l, Platform.OS))}
+              onPress={udhezimet}
             />
             <Veprimi
               ikona={ikonat.ndaj}
@@ -134,17 +140,6 @@ export default function ProfiliILokalit() {
               onPress={() => Share.share({ message: `${l.emri} · ${l.adresa}, ${l.qyteti}\n${LidhjetExpo.createURL(`/lokali/${l.id}`)}` })}
             />
           </View>
-
-          {ngaOsm && (
-            <View style={styles.osm}>
-              <Ikona emri={ikonat.zbulo} madhesia={18} ngjyra={ngjyrat.ari} />
-              <View style={styles.osmTeksti}>
-                <Text style={styles.osmTitulli}>{t("profiliLokalit.osmTitulli")}</Text>
-                <Text style={styles.osmPershkrimi}>{t("profiliLokalit.osmTeksti")}</Text>
-                <Text style={styles.osmAtribuimi}>{t("pergjithshme.atribuimiOsm")}</Text>
-              </View>
-            </View>
-          )}
 
           {!ngaOsm && <Text style={styles.seksioni}>{t("profiliLokalit.sherbimet")}</Text>}
           {ngaOsm ? null : sherbimetAktive.length === 0 ? (
@@ -197,6 +192,9 @@ export default function ProfiliILokalit() {
           )}
 
           <Text style={styles.seksioni}>{t("profiliLokalit.orari")}</Text>
+          {!kaOrar && orari.isSuccess ? (
+            <Text style={styles.paTeDhena}>{t("profiliLokalit.orariINjohur")}</Text>
+          ) : (
           <View style={styles.grupi}>
             {RENDI_I_DITEVE.map((dita, i) => {
               const intervalet = (orari.data ?? []).filter((o) => o.dita === dita);
@@ -216,6 +214,7 @@ export default function ProfiliILokalit() {
               );
             })}
           </View>
+          )}
 
           {!ngaOsm && <VleresimetEFundit lokaliId={l.id} numri={l.nr_vleresimeve} />}
 
@@ -225,6 +224,8 @@ export default function ProfiliILokalit() {
               <Text style={styles.pershkrimi}>{l.pershkrimi}</Text>
             </>
           ) : null}
+
+          {ngaOsm && <Text style={styles.atribuimi}>{t("pergjithshme.atribuimiOsm")}</Text>}
         </View>
       </ScrollView>
 
@@ -243,12 +244,28 @@ export default function ProfiliILokalit() {
           <Butoni titulli={t("profiliLokalit.rezervo")} ikona={ikonat.kalendar} onPress={() => hapRezervimin()} style={styles.rezervo} />
         </View>
       )}
+
+      {meTelefon && (
+        <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>
+          <View style={styles.fundiTeksti}>
+            <Text style={styles.fundiCmimi}>{l.telefoni ? t("lokali.meTelefon") : t("lokali.paTermin")}</Text>
+            <Text style={styles.fundiShenim}>
+              {l.telefoni ? t("profiliLokalit.meTelefonTeksti") : t("profiliLokalit.paTerminTeksti")}
+            </Text>
+          </View>
+          {l.telefoni ? (
+            <Butoni titulli={t("profiliLokalit.thirr")} ikona={ikonat.telefoni} onPress={thirr} style={styles.rezervo} />
+          ) : (
+            <Butoni titulli={t("profiliLokalit.udhezimet")} ikona={ikonat.harta} onPress={udhezimet} style={styles.rezervo} />
+          )}
+        </View>
+      )}
     </View>
   );
 }
 
-// "Hapur · ★ 4.9 (23)" me mono; vlerësimi hap të gjitha vlerësimet.
-function Statusi({ lokali: l, mbiFoto = false }: { lokali: Lokali; mbiFoto?: boolean }) {
+// "Hapur · ★ 4.9 (23)" me mono; vlerësimi hap të gjitha vlerësimet. Pa orar, statusi nuk shfaqet.
+function Statusi({ lokali: l, kaOrar, mbiFoto = false }: { lokali: Lokali; kaOrar: boolean; mbiFoto?: boolean }) {
   const { t } = useTranslation();
   const { ngjyrat, statusetMeta } = useTema();
   const styles = useStilet(krijoStilet);
@@ -256,8 +273,12 @@ function Statusi({ lokali: l, mbiFoto = false }: { lokali: Lokali; mbiFoto?: boo
 
   return (
     <View style={styles.statusiRreshti}>
-      <View style={[styles.pika, { backgroundColor: ngjyra }]} />
-      <Text style={[styles.statusi, { color: ngjyra }]}>{l.i_hapur_tani ? t("lokali.hapur") : t("lokali.mbyllur")}</Text>
+      {kaOrar && (
+        <>
+          <View style={[styles.pika, { backgroundColor: ngjyra }]} />
+          <Text style={[styles.statusi, { color: ngjyra }]}>{l.i_hapur_tani ? t("lokali.hapur") : t("lokali.mbyllur")}</Text>
+        </>
+      )}
       {l.vleresimi_mesatar != null && l.nr_vleresimeve > 0 && (
         <Pressable
           accessibilityRole="link"
@@ -745,32 +766,12 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontSize: 15,
       lineHeight: 22,
     },
-    osm: {
-      flexDirection: "row",
-      gap: hapesira.md,
-      backgroundColor: ngjyrat.ariIErret,
-      borderRadius: rrezja.lg,
-      padding: hapesira.lg,
-      marginBottom: hapesira.sm,
-    },
-    osmTeksti: {
-      flex: 1,
-      gap: 4,
-    },
-    osmTitulli: {
-      color: ngjyrat.teksti,
-      fontSize: 15,
-      fontWeight: "800",
-    },
-    osmPershkrimi: {
-      color: ngjyrat.tekstiDyte,
-      fontSize: 13,
-      lineHeight: 19,
-    },
-    osmAtribuimi: {
+    atribuimi: {
+      fontFamily: shkronjat.mono,
       color: ngjyrat.tekstiZbehte,
-      fontSize: 11,
-      marginTop: 4,
+      fontSize: 10,
+      letterSpacing: 0.5,
+      marginTop: hapesira.xxl,
     },
     fundi: {
       position: "absolute",

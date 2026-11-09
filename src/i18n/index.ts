@@ -1,5 +1,4 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getLocales } from "expo-localization";
 import i18n, { changeLanguage } from "i18next";
 import { initReactI18next } from "react-i18next";
 import { en } from "./en";
@@ -21,15 +20,11 @@ function eshteGjuhe(vlera: string | null | undefined): vlera is Gjuha {
   return vlera === "sq" || vlera === "en";
 }
 
-// Shqipja është e parazgjedhur; anglishtja vetëm kur telefoni është në anglisht.
-function gjuhaEPajisjes(): Gjuha {
-  return getLocales()[0]?.languageCode === "en" ? "en" : "sq";
-}
-
 // eslint-disable-next-line import/no-named-as-default-member -- `use` me emër do ngatërrohej me hook-un use() të React-it.
 i18n.use(initReactI18next).init({
   resources: { sq: { translation: sq }, en: { translation: en } },
-  lng: gjuhaEPajisjes(),
+  // Aplikacioni nis gjithmonë në shqip, pavarësisht gjuhës së telefonit; anglishtja zgjidhet te Cilësimet.
+  lng: "sq",
   fallbackLng: "sq",
   interpolation: { escapeValue: false },
 });
@@ -39,7 +34,7 @@ export async function ngarkoGjuhenERuajtur(): Promise<void> {
     const vlera = await AsyncStorage.getItem(CELESI_RUAJTJES);
     if (eshteGjuhe(vlera)) await changeLanguage(vlera);
   } catch {
-    // Mbetet gjuha e pajisjes.
+    // Mbetet shqipja.
   }
 }
 

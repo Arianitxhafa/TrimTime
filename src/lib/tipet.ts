@@ -39,15 +39,20 @@ export type LokaliPrane = {
   emri: string;
   adresa: string;
   qyteti: string;
+  telefoni: string | null;
   logo_url: string | null;
   kopertina_url: string | null;
   lat: number;
   lng: number;
   distanca_m: number;
   i_hapur_tani: boolean;
+  // false: lokali nuk e ka orarin në TrimTime, ndaj i_hapur_tani nuk tregon asgjë.
+  ka_orar: boolean;
   cmimi_min: number | null;
   nr_sherbimeve: number;
   burimi: BurimiILokalit;
+  // Lokal i TrimTime me shërbime: rezervohet në aplikacion.
+  rezervim_online: boolean;
   vleresimi_mesatar: number | null;
   nr_vleresimeve: number;
   promocioni_max: number | null;

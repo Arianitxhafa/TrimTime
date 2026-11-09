@@ -26,6 +26,7 @@ export const ikonat = {
   gershere: { ios: "scissors", android: "content_cut" },
   ora: { ios: "clock", android: "schedule" },
   kerko: { ios: "magnifyingglass", android: "search" },
+  filtrat: { ios: "slider.horizontal.3", android: "tune" },
   shto: { ios: "plus", android: "add" },
   fshi: { ios: "trash", android: "delete" },
   djathtas: { ios: "chevron.right", android: "chevron_right" },
