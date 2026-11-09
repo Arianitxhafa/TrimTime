@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStilet, useTema } from "../context/TemaContext";
-import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Ikona, { ikonat } from "./Ikona";
 import Marka, { Drita } from "./Marka";
 
@@ -84,15 +84,15 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       justifyContent: "center",
     },
     emriMarkes: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 20,
-      fontWeight: "800",
       letterSpacing: -0.3,
     },
     titulli: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 32,
-      fontWeight: "800",
       letterSpacing: -0.6,
     },
     nentitulli: {

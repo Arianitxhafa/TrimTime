@@ -23,7 +23,7 @@ import { useStilet, useTema } from "../../context/TemaContext";
 import { dataISO, formatoDaten } from "../../lib/datat";
 import { formatoCmimin } from "../../lib/formatimi";
 import type { KlientiILokalit } from "../../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 type Filtri = "teGjithe" | "vip" | "meMosardhje";
 
@@ -168,9 +168,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       backgroundColor: ngjyrat.sfondi,
     },
     titulli: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 30,
-      fontWeight: "800",
       letterSpacing: -0.6,
       paddingHorizontal: hapesira.xl,
       marginBottom: hapesira.lg,
@@ -291,9 +291,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     boshTitulli: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 17,
-      fontWeight: "800",
     },
     boshTeksti: {
       color: ngjyrat.tekstiDyte,

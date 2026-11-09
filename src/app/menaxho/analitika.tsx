@@ -10,7 +10,7 @@ import { useStilet, useTema } from "../../context/TemaContext";
 import { dataISO, ngaISO, shtoDite } from "../../lib/datat";
 import { formatoCmimin } from "../../lib/formatimi";
 import type { Analitika } from "../../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 type Periudha = "d7" | "d30" | "muaji";
 
@@ -279,9 +279,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       borderColor: ngjyrat.ari,
     },
     kartaVlera: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.teksti,
       fontSize: 24,
-      fontWeight: "800",
       fontVariant: ["tabular-nums"],
     },
     kartaVleraETheksuar: {
@@ -293,9 +293,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontWeight: "600",
     },
     seksioni: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
-      fontWeight: "700",
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginTop: hapesira.xxl,

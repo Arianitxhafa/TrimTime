@@ -9,7 +9,7 @@ import Ikona, { ikonat } from "../../components/Ikona";
 import KartaEVleresimit from "../../components/KartaEVleresimit";
 import Yjet from "../../components/Yjet";
 import { useStilet, useTema } from "../../context/TemaContext";
-import { hapesira, type Ngjyrat } from "../../theme";
+import { hapesira, shkronjat, type Ngjyrat } from "../../theme";
 
 // E përbashkët për klientin dhe stafin; pronari i lokalit mund të përgjigjet.
 export default function Vleresimet() {
@@ -99,9 +99,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingBottom: hapesira.xl,
     },
     mesatarja: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 48,
-      fontWeight: "800",
       letterSpacing: -1,
     },
     numri: {
@@ -126,9 +126,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     boshTitulli: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 17,
-      fontWeight: "800",
     },
     boshTeksti: {
       color: ngjyrat.tekstiDyte,

@@ -24,7 +24,7 @@ import { GabimiIFormes } from "../../components/KornizaAuth";
 import ZgjedhesiVendndodhjes from "../../components/ZgjedhesiVendndodhjes";
 import { useStilet, useTema } from "../../context/TemaContext";
 import type { Koordinata, Lokali } from "../../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 export default function MenaxhoInfon() {
   const lokaliIm = useLokaliIm();
@@ -315,9 +315,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       overflow: "hidden",
     },
     logoShkronja: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.mbiAri,
       fontSize: 30,
-      fontWeight: "800",
     },
     logoTeksti: {
       gap: 4,

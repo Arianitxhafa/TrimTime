@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStilet, useTema } from "../context/TemaContext";
-import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Ikona, { type EmriIkones } from "./Ikona";
 
 type Props = {
@@ -82,9 +82,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       letterSpacing: 0.4,
     },
     titulli: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 24,
-      fontWeight: "800",
       letterSpacing: -0.3,
       textAlign: "center",
       marginBottom: hapesira.sm,

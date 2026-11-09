@@ -14,7 +14,7 @@ import Yjet from "../../components/Yjet";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { formatoDaten } from "../../lib/datat";
 import type { TerminiIKlientit } from "../../lib/tipet";
-import { hapesira, type Ngjyrat } from "../../theme";
+import { hapesira, shkronjat, type Ngjyrat } from "../../theme";
 
 export default function Vlereso() {
   const { terminiId } = useLocalSearchParams<{ terminiId: string }>();
@@ -109,9 +109,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.lg,
     },
     titulli: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 26,
-      fontWeight: "800",
       letterSpacing: -0.4,
       textAlign: "center",
     },

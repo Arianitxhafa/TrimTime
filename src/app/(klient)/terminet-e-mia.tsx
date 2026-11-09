@@ -29,7 +29,7 @@ import { formatoCmimin } from "../../lib/formatimi";
 import { anuloKujtesat, sinkronizoKujtesat } from "../../lib/kujtesat";
 import type { TerminiIKlientit } from "../../lib/tipet";
 import { lidhjaEUdhezimeve } from "../../lib/vendndodhja";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 type Skeda = "teArdhshme" | "teKaluara";
 
@@ -344,9 +344,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       backgroundColor: ngjyrat.sfondi,
     },
     titulli: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 30,
-      fontWeight: "800",
       letterSpacing: -0.6,
       paddingHorizontal: hapesira.xl,
       marginBottom: hapesira.lg,
@@ -412,9 +412,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       overflow: "hidden",
     },
     logoShkronja: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.mbiAri,
       fontSize: 20,
-      fontWeight: "800",
     },
     kokaTeksti: {
       flex: 1,
@@ -469,9 +469,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.lg,
     },
     pritjaTitulli: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
-      fontWeight: "700",
       textTransform: "uppercase",
       letterSpacing: 0.8,
     },
@@ -554,9 +554,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     boshTitulli: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 18,
-      fontWeight: "800",
     },
     boshTeksti: {
       color: ngjyrat.tekstiDyte,

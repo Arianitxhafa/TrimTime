@@ -23,7 +23,7 @@ import ZgjedhesiIDites from "../../../components/ZgjedhesiIDites";
 import { useStilet, useTema } from "../../../context/TemaContext";
 import { dataISO, ditetEArdhshme, formatoDaten, ngaISO, shtoDite } from "../../../lib/datat";
 import type { IntervaliIOrarit, Pushimi } from "../../../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../../theme";
 
 const ORET_E_PUSHIMIT = Array.from({ length: 31 }, (_, i) => {
   const minutat = 7 * 60 + i * 30; // 07:00 … 22:00
@@ -285,9 +285,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.md,
     },
     titulli: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
-      fontWeight: "700",
       textTransform: "uppercase",
       letterSpacing: 0.8,
     },
@@ -376,9 +376,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       borderColor: ngjyrat.ari,
     },
     oraTeksti: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.teksti,
       fontSize: 14,
-      fontWeight: "700",
       fontVariant: ["tabular-nums"],
     },
     oraTekstiAktiv: {

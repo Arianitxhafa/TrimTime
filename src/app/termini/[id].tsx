@@ -25,7 +25,7 @@ import { useStilet, useTema } from "../../context/TemaContext";
 import { dataISO, formatoDaten } from "../../lib/datat";
 import { formatoCmimin, formatoKohezgjatjen } from "../../lib/formatimi";
 import type { StatusiTerminit, TerminiILokalit } from "../../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 function kthehu() {
   if (router.canGoBack()) router.back();
@@ -395,9 +395,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingVertical: hapesira.xl,
     },
     emri: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 26,
-      fontWeight: "800",
       letterSpacing: -0.3,
       textAlign: "center",
     },
@@ -464,9 +464,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       lineHeight: 22,
     },
     seksioni: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
-      fontWeight: "700",
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginTop: hapesira.sm,
@@ -532,9 +532,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontWeight: "700",
     },
     pagesaTotali: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 20,
-      fontWeight: "800",
     },
     pagesaNdihma: {
       color: ngjyrat.tekstiZbehte,
@@ -558,9 +558,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     boshTitulli: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 18,
-      fontWeight: "700",
     },
     boshTeksti: {
       color: ngjyrat.tekstiDyte,

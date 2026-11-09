@@ -9,7 +9,7 @@ import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import Ikona, { ikonat } from "../../components/Ikona";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { pershkrimiIPromocionit } from "../../lib/promocionet";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 export default function Promocionet() {
   const { t } = useTranslation();
@@ -145,9 +145,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     boshTitulli: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 17,
-      fontWeight: "800",
     },
     boshTeksti: {
       color: ngjyrat.tekstiDyte,

@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useStilet, useTema } from "../context/TemaContext";
 import { formatoCmimin, formatoKohezgjatjen } from "../lib/formatimi";
 import type { TerminiILokalit } from "../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Avatar from "./Avatar";
 import BadgeStatusi from "./BadgeStatusi";
 import Ikona, { ikonat } from "./Ikona";
@@ -102,9 +102,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       width: 48,
     },
     ora: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.teksti,
       fontSize: 15,
-      fontWeight: "800",
       fontVariant: ["tabular-nums"],
     },
     vija: {

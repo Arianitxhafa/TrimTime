@@ -41,7 +41,7 @@ import { ditetEArdhshme, formatoDaten } from "../../lib/datat";
 import { formatoCmimin, formatoKohezgjatjen } from "../../lib/formatimi";
 import { planifikoKujtesat } from "../../lib/kujtesat";
 import type { OraELire } from "../../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 const DITET_PERPARA = 14;
 
@@ -449,9 +449,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingBottom: hapesira.xxl,
     },
     seksioni: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
-      fontWeight: "700",
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginTop: hapesira.lg,
@@ -583,9 +583,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontWeight: "600",
     },
     fundiCmimi: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 20,
-      fontWeight: "800",
     },
     stili: {
       marginTop: hapesira.lg,
@@ -713,9 +713,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.sm,
     },
     suksesiTitulli: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 28,
-      fontWeight: "800",
       letterSpacing: -0.5,
       textAlign: "center",
     },

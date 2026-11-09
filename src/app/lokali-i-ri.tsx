@@ -15,7 +15,7 @@ import { useStilet, useTema } from "../context/TemaContext";
 import { formatoCmimin, formatoKohezgjatjen } from "../lib/formatimi";
 import type { IntervaliIOrarit, Koordinata } from "../lib/tipet";
 import { PRISHTINA } from "../lib/vendndodhja";
-import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 
 const SHEMBUJT = [
   { celesi: "sherbimet.shembullKlasike", cmimi_centa: 800, kohezgjatja_min: 30 },
@@ -269,16 +269,16 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingBottom: hapesira.xxl,
     },
     hapi: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.ari,
       fontSize: 13,
-      fontWeight: "800",
       letterSpacing: 0.6,
       textTransform: "uppercase",
     },
     titulli: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 28,
-      fontWeight: "800",
       letterSpacing: -0.5,
       marginTop: 6,
     },

@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { useTema } from "../context/TemaContext";
-import { hapesira, hijet, rrezja } from "../theme";
+import { hapesira, hijet, rrezja, shkronjat } from "../theme";
 
 type Props = {
   vlera: string;
@@ -41,9 +41,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   titulli: {
+    fontFamily: shkronjat.titullBold,
     color: "#0B0B0F",
     fontSize: 20,
-    fontWeight: "800",
     textAlign: "center",
     maxWidth: 260,
   },

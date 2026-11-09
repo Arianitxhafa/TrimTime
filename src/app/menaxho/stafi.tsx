@@ -12,7 +12,7 @@ import { GabimiIFormes } from "../../components/KornizaAuth";
 import { qrIFteses } from "../../lib/qr";
 import { useAuth } from "../../context/AuthContext";
 import { useStilet } from "../../context/TemaContext";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 export default function MenaxhoStafin() {
   const { t } = useTranslation();
@@ -166,9 +166,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.md,
     },
     kodi: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.ari,
       fontSize: 34,
-      fontWeight: "800",
       letterSpacing: 6,
       textAlign: "center",
       fontVariant: ["tabular-nums"],

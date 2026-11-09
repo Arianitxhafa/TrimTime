@@ -11,7 +11,7 @@ import { usePreferencat } from "../context/PreferencatContext";
 import { useStilet, useTema } from "../context/TemaContext";
 import { gjendjaENjoftimeve, kerkoLejenENjoftimeve, type GjendjaELejes } from "../lib/kujtesat";
 import { prekja } from "../lib/prekja";
-import { hapesira, hijet, rrezja, type Ngjyrat } from "../theme";
+import { hapesira, hijet, rrezja, shkronjat, type Ngjyrat } from "../theme";
 
 async function gjendjaEVendndodhjes(): Promise<GjendjaELejes> {
   const leja = await Location.getForegroundPermissionsAsync();
@@ -166,9 +166,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     titulli: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 32,
-      fontWeight: "800",
       letterSpacing: -0.8,
       textAlign: "center",
     },

@@ -7,7 +7,7 @@ import Marka, { Drita } from "../../components/Marka";
 import { usePreferencat, type Modi } from "../../context/PreferencatContext";
 import { prekja } from "../../lib/prekja";
 import { useStilet, useTema } from "../../context/TemaContext";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 const rolet = [
   { vlera: "klient", titulli: "roli.klient", teksti: "roli.klientTeksti", ikona: ikonat.gershere },
@@ -96,15 +96,15 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       justifyContent: "center",
     },
     emriMarkes: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 20,
-      fontWeight: "800",
       letterSpacing: -0.3,
     },
     titulli: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 32,
-      fontWeight: "800",
       letterSpacing: -0.6,
     },
     nentitulli: {
@@ -144,9 +144,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: 4,
     },
     kartaTitulli: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 17,
-      fontWeight: "800",
     },
     kartaTeksti: {
       color: ngjyrat.tekstiDyte,

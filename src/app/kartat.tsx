@@ -6,7 +6,7 @@ import Butoni from "../components/Butoni";
 import Ikona, { ikonat } from "../components/Ikona";
 import KartaEBesnikerise from "../components/KartaEBesnikerise";
 import { useStilet, useTema } from "../context/TemaContext";
-import { hapesira, type Ngjyrat } from "../theme";
+import { hapesira, shkronjat, type Ngjyrat } from "../theme";
 
 // Kartat e besnikërisë së klientit në lokalet ku ka qenë.
 export default function KartatEMia() {
@@ -86,9 +86,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     boshTitulli: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 17,
-      fontWeight: "800",
     },
     boshTeksti: {
       color: ngjyrat.tekstiDyte,

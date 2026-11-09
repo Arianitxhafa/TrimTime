@@ -23,7 +23,7 @@ import { useStilet, useTema } from "../../context/TemaContext";
 import { dataISO, ditetEArdhshme, formatoDaten } from "../../lib/datat";
 import { formatoCmimin } from "../../lib/formatimi";
 import { STATUSET, type StatusiTerminit } from "../../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 type Filtri = "te_gjitha" | StatusiTerminit;
 
@@ -330,9 +330,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontWeight: "600",
     },
     titulli: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 28,
-      fontWeight: "800",
       letterSpacing: -0.5,
     },
     kokaButonat: {
@@ -380,16 +380,16 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       opacity: 0.7,
     },
     iRadhesOra: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.mbiAri,
       fontSize: 36,
-      fontWeight: "800",
       letterSpacing: -1,
       fontVariant: ["tabular-nums"],
     },
     iRadhesKlienti: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.mbiAri,
       fontSize: 18,
-      fontWeight: "700",
       marginTop: 2,
     },
     iRadhesSherbimi: {
@@ -428,9 +428,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     statistikaVlera: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.teksti,
       fontSize: 22,
-      fontWeight: "800",
       fontVariant: ["tabular-nums"],
     },
     statistikaEtiketa: {
@@ -494,9 +494,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       color: ngjyrat.sfondi,
     },
     seksioni: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
-      fontWeight: "700",
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginBottom: hapesira.md,
@@ -519,9 +519,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     boshTitulli: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 17,
-      fontWeight: "700",
     },
     boshTeksti: {
       color: ngjyrat.tekstiDyte,

@@ -16,7 +16,7 @@ import Butoni from "../components/Butoni";
 import Ikona, { ikonat, type EmriIkones } from "../components/Ikona";
 import { usePreferencat } from "../context/PreferencatContext";
 import { useStilet, useTema } from "../context/TemaContext";
-import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 
 const faqet = [
   { ikona: ikonat.harta, titulli: "onboarding.titulli1", teksti: "onboarding.teksti1" },
@@ -222,9 +222,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       justifyContent: "center",
     },
     titulli: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 30,
-      fontWeight: "800",
       letterSpacing: -0.6,
       textAlign: "center",
       marginBottom: hapesira.md,

@@ -15,7 +15,7 @@ import ZgjedhesiIDites from "../../components/ZgjedhesiIDites";
 import { useStilet } from "../../context/TemaContext";
 import { ditetEArdhshme } from "../../lib/datat";
 import type { AnetariIStafit, OraELire, TerminiILokalit } from "../../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 export default function ZhvendosTerminin() {
   const { id, data } = useLocalSearchParams<{ id: string; data: string }>();
@@ -134,9 +134,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       lineHeight: 22,
     },
     etiketa: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
-      fontWeight: "700",
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginTop: hapesira.xl,

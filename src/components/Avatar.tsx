@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
-
-const paleta = ["#E8B04B", "#7C9CFF", "#3DD68C", "#F5A524", "#C084FC", "#38BDF8"];
+import { useTema } from "../context/TemaContext";
+import { shkronjat } from "../theme";
 
 function inicialet(emri: string): string {
   return emri
@@ -11,10 +11,9 @@ function inicialet(emri: string): string {
     .join("");
 }
 
+// Inicialet me serif brenda një rrethi me kornizë boje, si monogram.
 export default function Avatar({ emri, madhesia = 44 }: { emri: string; madhesia?: number }) {
-  const indeksi = [...emri].reduce((shuma, c) => shuma + c.charCodeAt(0), 0) % paleta.length;
-  const ngjyra = paleta[indeksi];
-
+  const { ngjyrat } = useTema();
   return (
     <View
       style={[
@@ -23,14 +22,12 @@ export default function Avatar({ emri, madhesia = 44 }: { emri: string; madhesia
           width: madhesia,
           height: madhesia,
           borderRadius: madhesia / 2,
-          backgroundColor: ngjyra + "22",
-          borderColor: ngjyra + "55",
+          backgroundColor: ngjyrat.siperfaqja2,
+          borderColor: ngjyrat.vija,
         },
       ]}
     >
-      <Text style={[styles.teksti, { color: ngjyra, fontSize: madhesia * 0.38 }]}>
-        {inicialet(emri)}
-      </Text>
+      <Text style={[styles.teksti, { color: ngjyrat.teksti, fontSize: madhesia * 0.4 }]}>{inicialet(emri)}</Text>
     </View>
   );
 }
@@ -42,7 +39,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   teksti: {
-    fontWeight: "700",
-    letterSpacing: 0.5,
+    fontFamily: shkronjat.titullBold,
   },
 });

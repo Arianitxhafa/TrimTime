@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
 import { useStilet } from "../context/TemaContext";
 import { emriShkurterIDites, ngaISO } from "../lib/datat";
-import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 
 type Props = {
   ditet: string[];
@@ -73,9 +73,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontWeight: "700",
     },
     numri: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.teksti,
       fontSize: 20,
-      fontWeight: "800",
       fontVariant: ["tabular-nums"],
     },
     tekstiAktiv: {

@@ -9,7 +9,7 @@ import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import Ikona, { ikonat } from "../../components/Ikona";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { formatoCmimin, formatoKohezgjatjen } from "../../lib/formatimi";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 export default function MenaxhoSherbimet() {
   const { t } = useTranslation();
@@ -111,9 +111,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingVertical: hapesira.xxl * 2,
     },
     boshTitulli: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 18,
-      fontWeight: "800",
     },
     boshTeksti: {
       color: ngjyrat.tekstiDyte,

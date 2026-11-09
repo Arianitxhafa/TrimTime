@@ -18,7 +18,7 @@ import { useStilet, useTema } from "../../context/TemaContext";
 import { formatoDaten } from "../../lib/datat";
 import { formatoCmimin } from "../../lib/formatimi";
 import type { KlientiILokalit } from "../../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 export default function DetajetEKlientit() {
   const { celesi } = useLocalSearchParams<{ celesi: string }>();
@@ -174,9 +174,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.xl,
     },
     emri: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 24,
-      fontWeight: "800",
       marginTop: hapesira.sm,
       textAlign: "center",
     },
@@ -225,9 +225,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: 2,
     },
     statistikaVlera: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 20,
-      fontWeight: "800",
     },
     statistikaEtiketa: {
       color: ngjyrat.tekstiDyte,
@@ -243,9 +243,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       flex: 1,
     },
     seksioni: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
-      fontWeight: "700",
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginTop: hapesira.xl,

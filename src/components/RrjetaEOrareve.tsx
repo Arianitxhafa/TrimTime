@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 import { useStilet, useTema } from "../context/TemaContext";
 import type { OraELire } from "../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Ikona, { ikonat } from "./Ikona";
 
 type Props = {
@@ -81,9 +81,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       opacity: 0.8,
     },
     oraTeksti: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.teksti,
       fontSize: 15,
-      fontWeight: "700",
       fontVariant: ["tabular-nums"],
     },
     oraTekstiAktiv: {

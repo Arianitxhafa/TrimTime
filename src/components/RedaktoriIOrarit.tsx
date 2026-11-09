@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { FlatList, Modal, Pressable, StyleSheet, Switch, Text, View } from "react-native";
 import { useStilet, useTema } from "../context/TemaContext";
 import type { IntervaliIOrarit } from "../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Ikona, { ikonat } from "./Ikona";
 
 // Java fillon të hënën.
@@ -210,9 +210,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       justifyContent: "center",
     },
     butoniIOresTeksti: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.teksti,
       fontSize: 15,
-      fontWeight: "700",
       fontVariant: ["tabular-nums"],
     },
     shtypur: {
@@ -250,9 +250,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       alignSelf: "center",
     },
     dritarjaTitulli: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 18,
-      fontWeight: "800",
       marginBottom: hapesira.md,
     },
     rreshtiOreve: {
@@ -271,9 +271,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       backgroundColor: ngjyrat.ari,
     },
     oraTeksti: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.teksti,
       fontSize: 14,
-      fontWeight: "700",
       fontVariant: ["tabular-nums"],
     },
     oraTekstiAktual: {

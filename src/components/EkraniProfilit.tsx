@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useAuth } from "../context/AuthContext";
 import { useStilet, useTema } from "../context/TemaContext";
 import { useModiAktiv } from "../hooks/useModiAktiv";
-import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Avatar from "./Avatar";
 import DialogKonfirmimi from "./DialogKonfirmimi";
 import { Drita } from "./Marka";
@@ -112,9 +112,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.xxl,
     },
     emri: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 24,
-      fontWeight: "800",
       letterSpacing: -0.3,
       marginTop: hapesira.xs,
       textAlign: "center",
@@ -124,9 +124,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontSize: 14,
     },
     seksioni: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
-      fontWeight: "700",
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginBottom: hapesira.md,

@@ -1,4 +1,11 @@
+import { IBMPlexMono_500Medium } from "@expo-google-fonts/ibm-plex-mono/500Medium";
+import { IBMPlexMono_600SemiBold } from "@expo-google-fonts/ibm-plex-mono/600SemiBold";
+import { PlayfairDisplay_400Regular_Italic } from "@expo-google-fonts/playfair-display/400Regular_Italic";
+import { PlayfairDisplay_700Bold } from "@expo-google-fonts/playfair-display/700Bold";
+import { PlayfairDisplay_700Bold_Italic } from "@expo-google-fonts/playfair-display/700Bold_Italic";
+import { PlayfairDisplay_900Black } from "@expo-google-fonts/playfair-display/900Black";
 import { QueryClientProvider } from "@tanstack/react-query";
+import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -10,10 +17,23 @@ import { AuthProvider, useAuth } from "../context/AuthContext";
 import { PreferencatProvider, usePreferencat } from "../context/PreferencatContext";
 import { TemaProvider, useTema } from "../context/TemaContext";
 import { useModiAktiv } from "../hooks/useModiAktiv";
+import { shkronjat } from "../theme";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
+  // Shkronjat e revistës; splash screen-i mbetet derisa të ngarkohen (ose të dështojnë: atëherë
+  // përdoren shkronjat e sistemit, që aplikacioni të mos ngecë).
+  const [shkronjatGati, gabimiShkronjave] = useFonts({
+    PlayfairDisplay_900Black,
+    PlayfairDisplay_700Bold,
+    PlayfairDisplay_400Regular_Italic,
+    PlayfairDisplay_700Bold_Italic,
+    IBMPlexMono_500Medium,
+    IBMPlexMono_600SemiBold,
+  });
+  if (!shkronjatGati && !gabimiShkronjave) return null;
+
   return (
     <TemaProvider>
       <PreferencatProvider>
@@ -63,7 +83,7 @@ function Navigimi() {
         screenOptions={{
           headerStyle: { backgroundColor: ngjyrat.sfondi },
           headerTintColor: ngjyrat.ari,
-          headerTitleStyle: { color: ngjyrat.teksti, fontWeight: "700" },
+          headerTitleStyle: { color: ngjyrat.teksti, fontFamily: shkronjat.titullBold, fontSize: 19 },
           headerShadowVisible: false,
           // Në iOS 26+ SDK 58 i bën header-at transparentë dhe përmbajtja hyn poshtë tyre.
           headerTransparent: false,

@@ -20,7 +20,7 @@ import Ikona, { ikonat } from "../../components/Ikona";
 import { GabimiIFormes } from "../../components/KornizaAuth";
 import { useStilet, useTema } from "../../context/TemaContext";
 import type { Lokali } from "../../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 const VIZITAT = [5, 6, 8, 10, 12, 15];
 
@@ -154,9 +154,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       justifyContent: "center",
     },
     parapamjaTitulli: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 18,
-      fontWeight: "800",
     },
     parapamjaRregulli: {
       color: ngjyrat.tekstiDyte,

@@ -7,7 +7,7 @@ import { useStilet, useTema, type ZgjedhjaTemes } from "../context/TemaContext";
 import { gjuhaAktuale, gjuhet, ndryshoGjuhen, type Gjuha } from "../i18n";
 import { kaBiometri, verifiko } from "../lib/biometria";
 import { prekja } from "../lib/prekja";
-import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 
 const opsionetETemes = [
   { vlera: "sistemi", titulli: "cilesimet.temaSistemi", pershkrimi: "cilesimet.temaSistemiPershkrimi", ikona: ikonat.pajisja },
@@ -150,9 +150,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       padding: hapesira.xl,
     },
     seksioni: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
-      fontWeight: "700",
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginBottom: hapesira.md,

@@ -20,7 +20,7 @@ import Ikona, { ikonat } from "../../components/Ikona";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { dataISO, emriShkurterIDites, formatoDaten, ngaISO, shtoDite } from "../../lib/datat";
 import type { Pushimi, TerminiIKalendarit } from "../../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 type Pamja = "dita" | "java";
 
@@ -379,9 +379,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       justifyContent: "center",
     },
     periudha: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 17,
-      fontWeight: "800",
     },
     filtratScroll: {
       flexGrow: 0,
@@ -420,11 +420,11 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingRight: hapesira.lg,
     },
     ora: {
+      fontFamily: shkronjat.monoBold,
       position: "absolute",
       right: 6,
       color: ngjyrat.tekstiZbehte,
       fontSize: 11,
-      fontWeight: "600",
       fontVariant: ["tabular-nums"],
     },
     kolonaTitulli: {
@@ -480,8 +480,8 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       opacity: 0.45,
     },
     bllokuOra: {
+      fontFamily: shkronjat.monoBold,
       fontSize: 11,
-      fontWeight: "800",
       fontVariant: ["tabular-nums"],
     },
     bllokuKlienti: {

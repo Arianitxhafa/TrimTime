@@ -7,7 +7,7 @@ import Butoni from "../components/Butoni";
 import FushaTekstit from "../components/FushaTekstit";
 import { ikonat } from "../components/Ikona";
 import { useStilet } from "../context/TemaContext";
-import { hapesira, type Ngjyrat } from "../theme";
+import { hapesira, shkronjat, type Ngjyrat } from "../theme";
 
 export default function Bashkohu() {
   const { t } = useTranslation();
@@ -58,9 +58,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       padding: hapesira.xl,
     },
     titulli: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 28,
-      fontWeight: "800",
       letterSpacing: -0.5,
     },
     teksti: {

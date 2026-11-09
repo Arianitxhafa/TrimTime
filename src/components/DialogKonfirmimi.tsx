@@ -1,6 +1,6 @@
 import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
 import { useStilet } from "../context/TemaContext";
-import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Butoni from "./Butoni";
 
 type Props = {
@@ -65,9 +65,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     alignSelf: "center",
   },
   titulli: {
+    fontFamily: shkronjat.titullBold,
     color: ngjyrat.teksti,
     fontSize: 19,
-    fontWeight: "800",
     marginBottom: hapesira.sm,
   },
   mesazhi: {

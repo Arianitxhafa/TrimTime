@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, Text, TextInput, View, type TextInputProps } from "react-native";
 import { useStilet, useTema } from "../context/TemaContext";
-import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Ikona, { ikonat, type EmriIkones } from "./Ikona";
 
 type Props = Omit<TextInputProps, "style" | "secureTextEntry"> & {
@@ -81,27 +81,32 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     fusha: {
       marginBottom: hapesira.lg,
     },
+    // Etiketë mono e vogël mbi një fushë me vetëm vijë poshtë, si formular në letër.
     etiketa: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.tekstiDyte,
-      fontSize: 13,
-      fontWeight: "700",
-      marginBottom: hapesira.sm,
+      fontSize: 11,
+      letterSpacing: 1.2,
+      textTransform: "uppercase",
+      marginBottom: 2,
     },
     kutia: {
       flexDirection: "row",
       alignItems: "center",
       gap: hapesira.sm,
-      backgroundColor: ngjyrat.siperfaqja,
-      borderRadius: rrezja.md,
-      borderWidth: 1.5,
+      backgroundColor: "transparent",
+      borderRadius: 0,
+      borderBottomWidth: 1.5,
       borderColor: ngjyrat.kufiri,
-      paddingHorizontal: hapesira.lg,
-      height: 54,
+      height: 50,
     },
     kutiaShumeRreshta: {
       height: 112,
       alignItems: "flex-start",
       paddingVertical: hapesira.md,
+      borderWidth: 1.5,
+      borderRadius: rrezja.sm,
+      paddingHorizontal: hapesira.md,
     },
     kutiaFokus: {
       borderColor: ngjyrat.ari,

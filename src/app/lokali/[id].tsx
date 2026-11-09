@@ -30,7 +30,7 @@ import { formatoCmimin, formatoKohezgjatjen } from "../../lib/formatimi";
 import { pershkrimiIPromocionit, vlenSot } from "../../lib/promocionet";
 import type { Lokali, Sherbimi } from "../../lib/tipet";
 import { lidhjaEUdhezimeve } from "../../lib/vendndodhja";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 export default function ProfiliILokalit() {
   const { t } = useTranslation();
@@ -70,6 +70,7 @@ export default function ProfiliILokalit() {
   const berberet = (stafi.data ?? []).filter((a) => a.aktiv);
   const sot = new Date().getDay();
   const ngaOsm = l.burimi === "osm";
+  const kaFoto = Boolean(l.kopertina_url);
   // Vetëm klientët rezervojnë; pronari e sheh profilin si parapamje.
   const mundTeRezervoje = !ngaOsm && modi === "klient" && sherbimetAktive.length > 0;
 
@@ -79,58 +80,32 @@ export default function ProfiliILokalit() {
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: "", headerTransparent: true, headerTintColor: "#FFFFFF" }} />
+      <Stack.Screen
+        options={{ title: "", headerTransparent: true, headerTintColor: kaFoto ? "#FFFFFF" : ngjyrat.teksti }}
+      />
       <ScrollView contentContainerStyle={{ paddingBottom: (mundTeRezervoje ? 120 : hapesira.xxl) + insets.bottom }}>
-        <View style={[styles.kopertina, { height: 300 + insets.top }]}>
-          {l.kopertina_url ? (
-            <Image source={{ uri: l.kopertina_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={250} />
-          ) : (
-            <LinearGradient
-              colors={[ngjyrat.siperfaqja2, ngjyrat.ariIErret]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={[StyleSheet.absoluteFill, styles.kopertinaBosh]}
-            >
-              <Ikona emri={ikonat.gershere} madhesia={56} ngjyra={ngjyrat.ari} />
-            </LinearGradient>
-          )}
-          <LinearGradient colors={["rgba(11,11,15,0.55)", "rgba(11,11,15,0)"]} style={styles.hijaLart} />
-          <LinearGradient colors={ngjyrat.hijaEFotos} style={styles.hijaPoshte} />
-
-          <View style={styles.koka}>
-            <View style={styles.logo}>
-              {l.logo_url ? (
-                <Image source={{ uri: l.logo_url }} style={StyleSheet.absoluteFill} contentFit="cover" />
-              ) : (
-                <LinearGradient colors={ngjyrat.gradientiAri} style={[StyleSheet.absoluteFill, styles.logoBosh]}>
-                  <Text style={styles.logoShkronja}>{l.emri.charAt(0).toUpperCase()}</Text>
-                </LinearGradient>
-              )}
-            </View>
-            <View style={styles.kokaTeksti}>
-              <Text style={styles.emri}>{l.emri}</Text>
-              <View style={styles.statusiRreshti}>
-                <View style={[styles.pika, { backgroundColor: l.i_hapur_tani ? "#3DD68C" : "#A1A1AE" }]} />
-                <Text style={[styles.statusi, { color: l.i_hapur_tani ? "#3DD68C" : "rgba(255,255,255,0.75)" }]}>
-                  {l.i_hapur_tani ? t("lokali.hapur") : t("lokali.mbyllur")}
-                </Text>
-                {l.vleresimi_mesatar != null && l.nr_vleresimeve > 0 && (
-                  <Pressable
-                    accessibilityRole="link"
-                    onPress={() => router.push({ pathname: "/vleresimet/[lokaliId]", params: { lokaliId: l.id } })}
-                    style={styles.vleresimi}
-                    hitSlop={8}
-                  >
-                    <Ikona emri={ikonat.yll} madhesia={13} ngjyra={ngjyrat.ari} />
-                    <Text style={styles.vleresimiTeksti}>
-                      {Number(l.vleresimi_mesatar).toFixed(1)} ({l.nr_vleresimeve})
-                    </Text>
-                  </Pressable>
-                )}
-              </View>
+        {kaFoto ? (
+          // Me foto: emri i bardhë mbi foton e errësuar poshtë.
+          <View style={[styles.kopertina, { height: 320 + insets.top }]}>
+            <Image source={{ uri: l.kopertina_url! }} style={StyleSheet.absoluteFill} contentFit="cover" transition={250} />
+            <LinearGradient colors={["rgba(17,16,14,0.55)", "rgba(17,16,14,0)"]} style={styles.hijaLart} />
+            <LinearGradient colors={ngjyrat.hijaEFotos} style={styles.hijaPoshte} />
+            <View style={styles.koka}>
+              <Text style={[styles.rubrika, styles.mbiFoto]}>{l.qyteti}</Text>
+              <Text style={[styles.emri, styles.mbiFoto]}>{l.emri}</Text>
+              <Statusi lokali={l} mbiFoto />
             </View>
           </View>
-        </View>
+        ) : (
+          // Pa foto: faqe reviste me emrin me bojë të zezë mbi letër.
+          <View style={[styles.kokaELetres, { paddingTop: insets.top + 64 }]}>
+            <View style={styles.vijaETrashe} />
+            <Text style={styles.rubrika}>{l.qyteti}</Text>
+            <Text style={styles.emri}>{l.emri}</Text>
+            <Statusi lokali={l} />
+            <View style={styles.vijaEHolle} />
+          </View>
+        )}
 
         <View style={styles.permbajtja}>
           <View style={styles.adresaRreshti}>
@@ -267,6 +242,32 @@ export default function ProfiliILokalit() {
           </View>
           <Butoni titulli={t("profiliLokalit.rezervo")} ikona={ikonat.kalendar} onPress={() => hapRezervimin()} style={styles.rezervo} />
         </View>
+      )}
+    </View>
+  );
+}
+
+// "Hapur · ★ 4.9 (23)" me mono; vlerësimi hap të gjitha vlerësimet.
+function Statusi({ lokali: l, mbiFoto = false }: { lokali: Lokali; mbiFoto?: boolean }) {
+  const { t } = useTranslation();
+  const { ngjyrat, statusetMeta } = useTema();
+  const styles = useStilet(krijoStilet);
+  const ngjyra = l.i_hapur_tani ? (mbiFoto ? "#9FD3A9" : statusetMeta.konfirmuar.ngjyra) : mbiFoto ? "rgba(255,255,255,0.75)" : ngjyrat.tekstiDyte;
+
+  return (
+    <View style={styles.statusiRreshti}>
+      <View style={[styles.pika, { backgroundColor: ngjyra }]} />
+      <Text style={[styles.statusi, { color: ngjyra }]}>{l.i_hapur_tani ? t("lokali.hapur") : t("lokali.mbyllur")}</Text>
+      {l.vleresimi_mesatar != null && l.nr_vleresimeve > 0 && (
+        <Pressable
+          accessibilityRole="link"
+          onPress={() => router.push({ pathname: "/vleresimet/[lokaliId]", params: { lokaliId: l.id } })}
+          hitSlop={8}
+        >
+          <Text style={[styles.statusi, { color: mbiFoto ? "#FFFFFF" : ngjyrat.teksti }]}>
+            ★ {Number(l.vleresimi_mesatar).toFixed(1)} ({l.nr_vleresimeve}) →
+          </Text>
+        </Pressable>
       )}
     </View>
   );
@@ -427,9 +428,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       padding: hapesira.xxl,
     },
     boshTitulli: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 18,
-      fontWeight: "800",
     },
     boshTeksti: {
       color: ngjyrat.tekstiDyte,
@@ -464,54 +465,58 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingTop: hapesira.lg,
     },
     koka: {
-      flexDirection: "row",
-      alignItems: "flex-end",
-      gap: hapesira.md,
+      gap: 6,
       paddingHorizontal: hapesira.xl,
-      paddingBottom: hapesira.lg,
+      paddingBottom: hapesira.xl,
     },
-    logo: {
-      width: 72,
-      height: 72,
-      borderRadius: 22,
-      backgroundColor: ngjyrat.ari,
-      borderWidth: 2,
-      borderColor: "rgba(255,255,255,0.85)",
-      overflow: "hidden",
+    kokaELetres: {
+      paddingHorizontal: hapesira.xl,
+      gap: 6,
     },
-    logoBosh: {
-      alignItems: "center",
-      justifyContent: "center",
+    vijaETrashe: {
+      height: 4,
+      backgroundColor: ngjyrat.vija,
+      marginBottom: hapesira.md,
     },
-    logoShkronja: {
-      color: ngjyrat.mbiAri,
-      fontSize: 30,
-      fontWeight: "900",
+    vijaEHolle: {
+      height: 1,
+      backgroundColor: ngjyrat.vija,
+      marginTop: hapesira.lg,
     },
-    kokaTeksti: {
-      flex: 1,
-      paddingBottom: 2,
-      gap: 4,
+    rubrika: {
+      fontFamily: shkronjat.monoBold,
+      color: ngjyrat.theksi,
+      fontSize: 11,
+      letterSpacing: 1.5,
+      textTransform: "uppercase",
+    },
+    mbiFoto: {
+      color: "#FFFFFF",
     },
     emri: {
-      color: "#FFFFFF",
-      fontSize: 28,
-      fontWeight: "800",
-      letterSpacing: -0.6,
+      fontFamily: shkronjat.titull,
+      color: ngjyrat.teksti,
+      fontSize: 44,
+      lineHeight: 48,
+      letterSpacing: -1.2,
     },
     statusiRreshti: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
+      flexWrap: "wrap",
+      gap: hapesira.sm,
+      marginTop: 4,
     },
     pika: {
-      width: 8,
-      height: 8,
+      width: 7,
+      height: 7,
       borderRadius: 4,
     },
     statusi: {
-      fontSize: 14,
-      fontWeight: "700",
+      fontFamily: shkronjat.monoBold,
+      fontSize: 11,
+      letterSpacing: 1,
+      textTransform: "uppercase",
     },
     adresaRreshti: {
       flexDirection: "row",
@@ -535,23 +540,23 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       justifyContent: "center",
       gap: 6,
       height: 68,
-      borderRadius: rrezja.lg,
-      backgroundColor: ngjyrat.siperfaqja,
-      borderWidth: 1,
-      borderColor: ngjyrat.kufiri,
+      borderWidth: 1.5,
+      borderColor: ngjyrat.vija,
     },
     veprimiTeksti: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.teksti,
-      fontSize: 13,
-      fontWeight: "700",
+      fontSize: 11,
+      letterSpacing: 1,
+      textTransform: "uppercase",
     },
     shtypur: {
       opacity: 0.8,
     },
     seksioni: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
-      fontWeight: "700",
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginTop: hapesira.lg,
@@ -724,6 +729,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontSize: 14,
     },
     orariOret: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.teksti,
       fontSize: 14,
       fontVariant: ["tabular-nums"],
@@ -785,9 +791,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: 2,
     },
     fundiCmimi: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 17,
-      fontWeight: "800",
     },
     fundiShenim: {
       color: ngjyrat.tekstiZbehte,

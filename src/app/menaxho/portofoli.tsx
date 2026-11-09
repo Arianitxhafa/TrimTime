@@ -29,7 +29,7 @@ import { useStilet, useTema } from "../../context/TemaContext";
 import { zgjidhFoton, type BurimiIFotos, type Fotoja } from "../../lib/fotot";
 import { prekja } from "../../lib/prekja";
 import type { FotoEPortofolit } from "../../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 const KOLONAT = 3;
 
@@ -236,9 +236,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     boshTitulli: {
+      fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 17,
-      fontWeight: "800",
     },
     boshTeksti: {
       color: ngjyrat.tekstiDyte,

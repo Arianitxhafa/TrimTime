@@ -6,7 +6,7 @@ import { useQytetet } from "../api/lokalet";
 import { usePreferencat } from "../context/PreferencatContext";
 import { useStilet, useTema } from "../context/TemaContext";
 import { prekja } from "../lib/prekja";
-import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import EkraniINgarkimit from "./EkraniINgarkimit";
 import Ikona, { ikonat } from "./Ikona";
 
@@ -124,9 +124,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       padding: hapesira.xl,
     },
     titulli: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 24,
-      fontWeight: "800",
       letterSpacing: -0.4,
     },
     kerkimi: {

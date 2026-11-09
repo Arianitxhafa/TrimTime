@@ -11,7 +11,7 @@ import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
 import { useAuth } from "../../context/AuthContext";
 import { useStilet, useTema } from "../../context/TemaContext";
 import type { Lokali } from "../../lib/tipet";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 export default function TabiLokali() {
   const { ngjyrat } = useTema();
@@ -280,9 +280,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       justifyContent: "center",
     },
     boshTitulli: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 24,
-      fontWeight: "800",
       textAlign: "center",
       marginBottom: hapesira.sm,
     },
@@ -334,14 +334,14 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       overflow: "hidden",
     },
     logoShkronja: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.mbiAri,
       fontSize: 36,
-      fontWeight: "800",
     },
     emri: {
+      fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 24,
-      fontWeight: "800",
       letterSpacing: -0.3,
       marginTop: hapesira.md,
       textAlign: "center",
@@ -393,9 +393,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.sm,
     },
     kushtetTitulli: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 12,
-      fontWeight: "700",
       textTransform: "uppercase",
       letterSpacing: 0.6,
     },
@@ -412,9 +412,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       color: ngjyrat.teksti,
     },
     seksioni: {
+      fontFamily: shkronjat.monoBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
-      fontWeight: "700",
       textTransform: "uppercase",
       letterSpacing: 0.8,
       marginBottom: hapesira.md,
