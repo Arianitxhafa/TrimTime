@@ -1,42 +1,27 @@
-import type { Tabs } from "expo-router";
+import type { Stack } from "expo-router";
 import type { ComponentProps } from "react";
 import { useTema } from "../context/TemaContext";
-import type { ColorValue } from "react-native";
-import { prekja } from "../lib/prekja";
 import { shkronjat } from "../theme";
-import Ikona, { type EmriIkones } from "./Ikona";
 
-type OpsionetETabeve = Exclude<
-  NonNullable<ComponentProps<typeof Tabs>["screenOptions"]>,
+type OpsionetEStackut = Exclude<
+  NonNullable<ComponentProps<typeof Stack>["screenOptions"]>,
   (...args: never[]) => unknown
 >;
 
-// Shiriti i poshtëm: sipërfaqja e kartave, vijë e hollë sipër dhe etiketa që lexohen mirë.
-export function useOpsionetETabeve(): OpsionetETabeve {
+// Stack-u brenda çdo tab-i: titull i madh që tkurret kur lëviz, si te aplikacionet e Apple.
+// Lista e ekranit duhet të ketë contentInsetAdjustmentBehavior="automatic".
+export function useOpsionetEStackut(): OpsionetEStackut {
   const { ngjyrat } = useTema();
   return {
-    headerShown: false,
-    tabBarActiveTintColor: ngjyrat.ari,
-    tabBarInactiveTintColor: ngjyrat.tekstiZbehte,
-    tabBarStyle: {
-      backgroundColor: ngjyrat.siperfaqja,
-      borderTopColor: ngjyrat.kufiri,
-      borderTopWidth: 1,
-      paddingTop: 6,
-    },
-    tabBarLabelStyle: {
-      fontFamily: shkronjat.etikete,
-      fontSize: 12,
-    },
-    sceneStyle: { backgroundColor: ngjyrat.sfondi },
-  };
-}
-
-// Dridhje e lehtë kur ndërrohet tab-i.
-export const degjuesitETabeve = { tabPress: () => prekja.zgjedhje() };
-
-export function ikonaETabit(emri: EmriIkones) {
-  return function IkonaETabit({ color }: { color: ColorValue }) {
-    return <Ikona emri={emri} madhesia={22} ngjyra={color} />;
+    headerLargeTitleEnabled: true,
+    headerLargeTitleShadowVisible: false,
+    headerShadowVisible: false,
+    headerTransparent: false,
+    headerStyle: { backgroundColor: ngjyrat.sfondi },
+    headerTintColor: ngjyrat.ari,
+    headerTitleStyle: { color: ngjyrat.teksti, ...shkronjat.titullBold, fontSize: 17 },
+    headerLargeTitleStyle: { color: ngjyrat.teksti },
+    headerBackButtonDisplayMode: "minimal",
+    contentStyle: { backgroundColor: ngjyrat.sfondi },
   };
 }

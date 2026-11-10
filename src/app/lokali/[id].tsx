@@ -437,7 +437,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       padding: hapesira.xxl,
     },
     boshTitulli: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 18,
     },
@@ -479,7 +479,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingBottom: hapesira.xl,
     },
     rubrika: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: "#E3C690",
       fontSize: 12,
       letterSpacing: 0.6,
@@ -489,7 +489,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       color: "#FFFFFF",
     },
     emri: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 38,
       lineHeight: 44,
@@ -508,7 +508,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       borderRadius: 4,
     },
     statusi: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       fontSize: 12,
       letterSpacing: 0.6,
       textTransform: "uppercase",
@@ -541,7 +541,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       borderColor: ngjyrat.kufiri,
     },
     veprimiTeksti: {
-      fontFamily: shkronjat.etikete,
+      ...shkronjat.etikete,
       color: ngjyrat.teksti,
       fontSize: 13,
     },
@@ -549,7 +549,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       opacity: 0.8,
     },
     seksioni: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 22,
       marginTop: hapesira.xl,
@@ -722,7 +722,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontSize: 14,
     },
     orariOret: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 14,
       fontVariant: ["tabular-nums"],
@@ -739,7 +739,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       lineHeight: 22,
     },
     atribuimi: {
-      fontFamily: shkronjat.etikete,
+      ...shkronjat.etikete,
       color: ngjyrat.tekstiZbehte,
       fontSize: 12,
       letterSpacing: 0.5,
@@ -764,7 +764,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: 2,
     },
     fundiCmimi: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 17,
     },

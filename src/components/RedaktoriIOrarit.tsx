@@ -210,7 +210,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       justifyContent: "center",
     },
     butoniIOresTeksti: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 15,
       fontVariant: ["tabular-nums"],
@@ -250,7 +250,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       alignSelf: "center",
     },
     dritarjaTitulli: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 18,
       marginBottom: hapesira.md,
@@ -271,7 +271,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       backgroundColor: ngjyrat.ari,
     },
     oraTeksti: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 14,
       fontVariant: ["tabular-nums"],

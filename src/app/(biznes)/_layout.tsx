@@ -1,16 +1,16 @@
-import { Tabs } from "expo-router";
+import { NativeTabs } from "expo-router/native-tabs";
+import { Platform } from "react-native";
+import TabetWeb from "../../components/TabetWeb";
 import { useTranslation } from "react-i18next";
 import { useLokaliIm } from "../../api/lokalet";
 import { useTerminetELokalit, useTerminetLiveILokalit } from "../../api/terminet";
 import { ikonat } from "../../components/Ikona";
-import { degjuesitETabeve, ikonaETabit, useOpsionetETabeve } from "../../components/opsionetETabeve";
 import { useTema } from "../../context/TemaContext";
 import { dataISO } from "../../lib/datat";
 
 export default function BiznesLayout() {
   const { t } = useTranslation();
   const { ngjyrat } = useTema();
-  const opsionet = useOpsionetETabeve();
 
   // Rezervimet e sotme që presin konfirmim shfaqen si numër mbi tab-in Sot, në kohë reale.
   const lokaliId = useLokaliIm().data?.lokali.id;
@@ -18,30 +18,43 @@ export default function BiznesLayout() {
   useTerminetLiveILokalit(lokaliId);
   const nePritje = (terminetESotme.data ?? []).filter((x) => x.statusi === "ne_pritje").length;
 
+  if (Platform.OS === "web") {
+    return (
+      <TabetWeb
+        tabet={[
+          { emri: "sot", titulli: t("tabs.sot"), ikona: ikonat.sot, numri: nePritje },
+          { emri: "kalendari", titulli: t("tabs.kalendari"), ikona: ikonat.kalendar },
+          { emri: "klientet", titulli: t("tabs.klientet"), ikona: ikonat.klientet },
+          { emri: "lokali", titulli: t("tabs.lokali"), ikona: ikonat.lokali },
+          { emri: "llogaria", titulli: t("tabs.profili"), ikona: ikonat.personi },
+        ]}
+      />
+    );
+  }
+
   return (
-    <Tabs screenOptions={opsionet} screenListeners={degjuesitETabeve}>
-      <Tabs.Screen
-        name="sot"
-        options={{
-          title: t("tabs.sot"),
-          tabBarIcon: ikonaETabit(ikonat.sot),
-          tabBarBadge: nePritje > 0 ? nePritje : undefined,
-          tabBarBadgeStyle: { backgroundColor: ngjyrat.ari, color: ngjyrat.mbiAri, fontWeight: "800" },
-        }}
-      />
-      <Tabs.Screen
-        name="kalendari"
-        options={{ title: t("tabs.kalendari"), tabBarIcon: ikonaETabit(ikonat.kalendar) }}
-      />
-      <Tabs.Screen
-        name="klientet"
-        options={{ title: t("tabs.klientet"), tabBarIcon: ikonaETabit(ikonat.klientet) }}
-      />
-      <Tabs.Screen name="lokali" options={{ title: t("tabs.lokali"), tabBarIcon: ikonaETabit(ikonat.lokali) }} />
-      <Tabs.Screen
-        name="llogaria"
-        options={{ title: t("tabs.profili"), tabBarIcon: ikonaETabit(ikonat.personi) }}
-      />
-    </Tabs>
+    <NativeTabs tintColor={ngjyrat.ari} backgroundColor={ngjyrat.siperfaqja} badgeBackgroundColor={ngjyrat.ari}>
+      <NativeTabs.Trigger name="sot">
+        <NativeTabs.Trigger.Icon sf={{ default: "sun.max", selected: "sun.max.fill" }} md={ikonat.sot.android} />
+        <NativeTabs.Trigger.Label>{t("tabs.sot")}</NativeTabs.Trigger.Label>
+        {nePritje > 0 ? <NativeTabs.Trigger.Badge>{String(nePritje)}</NativeTabs.Trigger.Badge> : null}
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="kalendari">
+        <NativeTabs.Trigger.Icon sf="calendar" md={ikonat.kalendar.android} />
+        <NativeTabs.Trigger.Label>{t("tabs.kalendari")}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="klientet">
+        <NativeTabs.Trigger.Icon sf={{ default: "person.2", selected: "person.2.fill" }} md={ikonat.klientet.android} />
+        <NativeTabs.Trigger.Label>{t("tabs.klientet")}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="lokali">
+        <NativeTabs.Trigger.Icon sf={{ default: "storefront", selected: "storefront.fill" }} md={ikonat.lokali.android} />
+        <NativeTabs.Trigger.Label>{t("tabs.lokali")}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="llogaria">
+        <NativeTabs.Trigger.Icon sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }} md={ikonat.personi.android} />
+        <NativeTabs.Trigger.Label>{t("tabs.profili")}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }

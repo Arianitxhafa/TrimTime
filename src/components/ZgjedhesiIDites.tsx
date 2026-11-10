@@ -73,7 +73,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontWeight: "700",
     },
     numri: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 20,
       fontVariant: ["tabular-nums"],

@@ -111,7 +111,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingVertical: hapesira.xxl * 2,
     },
     boshTitulli: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 18,
     },

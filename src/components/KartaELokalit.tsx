@@ -1,57 +1,66 @@
-import { router } from "expo-router";
+import * as LidhjetExpo from "expo-linking";
+import { Link, router } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Linking, Platform, Pressable, Share, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useStilet, useTema } from "../context/TemaContext";
 import { useShtypja } from "../hooks/useShtypja";
 import { formatoCmimin, formatoDistancen } from "../lib/formatimi";
 import { prekja } from "../lib/prekja";
 import type { LokaliPrane } from "../lib/tipet";
-import { hapesira, hijet, rrezja, shkronjat, type Ngjyrat } from "../theme";
+import { lidhjaEUdhezimeve } from "../lib/vendndodhja";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Ikona, { ikonat } from "./Ikona";
 import KopertinaELokalit from "./KopertinaELokalit";
 
 type Props = {
   lokali: LokaliPrane;
-  // Në hartë karta është më e ngushtë dhe pa kopertinë.
+  // Në hartë karta është më e ngushtë dhe pa kopertinë të madhe.
   kompakte?: boolean;
   // Pozicioni në listë: kartat e para hyjnë njëra pas tjetrës.
   indeksi?: number;
 };
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-// Lokali si kartë berberie: kopertina (foto ose tabelë e gjeneruar), vlerësimi dhe oferta mbi të,
-// pastaj emri me serif dhe detajet.
+// Lokali si kartë iOS. Prekja e shkurtër hap profilin; prekja e gjatë (iPhone) tregon parapamjen e
+// profilit dhe menunë me Rezervo, Thirr, Udhëzimet dhe Ndaj.
 export default function KartaELokalit({ lokali, kompakte = false, indeksi }: Props) {
   const { t } = useTranslation();
   const { ngjyrat, statusetMeta } = useTema();
   const styles = useStilet(krijoStilet);
-  const shtypja = useShtypja(0.98);
+  const shtypja = useShtypja(0.97);
   const kaVleresim = lokali.vleresimi_mesatar != null && lokali.nr_vleresimeve > 0;
-  const ngjyraEStatusit =
-    lokali.ka_orar && lokali.i_hapur_tani ? statusetMeta.konfirmuar.ngjyra : ngjyrat.tekstiZbehte;
-
-  function hap() {
-    prekja.lehte();
-    router.push({ pathname: "/lokali/[id]", params: { id: lokali.id } });
-  }
+  const vleresimi = kaVleresim ? Number(lokali.vleresimi_mesatar).toFixed(1).replace(".", ",") : null;
 
   // Orari i panjohur (shumica e lokaleve nga OpenStreetMap): nuk shkruajmë "Mbyllur".
   const statusi = lokali.ka_orar ? (lokali.i_hapur_tani ? t("lokali.hapur") : t("lokali.mbyllur")) : null;
+  const ngjyraEStatusit = lokali.i_hapur_tani ? statusetMeta.konfirmuar.ngjyra : ngjyrat.tekstiZbehte;
   const detajet = [
-    statusi,
     formatoDistancen(lokali.distanca_m),
     lokali.cmimi_min !== null ? t("lokali.ngaCmimi", { cmimi: formatoCmimin(lokali.cmimi_min) }) : null,
   ].filter(Boolean);
-  const rezervimi = lokali.rezervim_online ? null : lokali.telefoni ? t("lokali.meTelefon") : t("lokali.paTermin");
+  const rezervimi = lokali.rezervim_online
+    ? t("zbulo.online")
+    : lokali.telefoni
+      ? t("lokali.meTelefon")
+      : t("lokali.paTermin");
+
+  const href = { pathname: "/lokali/[id]", params: { id: lokali.id } } as const;
+  const thirr = () => Linking.openURL(`tel:${lokali.telefoni?.replace(/\s/g, "")}`);
+  const udhezimet = () => Linking.openURL(lidhjaEUdhezimeve(lokali, Platform.OS));
+  const ndaj = () =>
+    Share.share({
+      message: `${lokali.emri} · ${lokali.adresa}, ${lokali.qyteti}\n${LidhjetExpo.createURL(`/lokali/${lokali.id}`)}`,
+    });
 
   if (kompakte) {
     return (
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={lokali.emri}
-        onPress={hap}
+        onPress={() => {
+          prekja.lehte();
+          router.push(href);
+        }}
         style={({ pressed }) => [styles.kompakte, pressed && styles.shtypur]}
       >
         <KopertinaELokalit emri={lokali.emri} fotoUrl={lokali.kopertina_url} style={styles.kopertinaKompakte} />
@@ -60,71 +69,98 @@ export default function KartaELokalit({ lokali, kompakte = false, indeksi }: Pro
             {lokali.emri}
           </Text>
           <Text style={styles.meta} numberOfLines={1}>
-            {kaVleresim ? `★ ${Number(lokali.vleresimi_mesatar).toFixed(1)} · ` : ""}
-            {detajet.join(" · ")}
+            {vleresimi ? `★ ${vleresimi} · ` : ""}
+            {[statusi, ...detajet].filter(Boolean).join(" · ")}
           </Text>
         </View>
         {lokali.promocioni_max ? (
           <Text style={styles.promo}>{t("promocionet.etiketa", { perqindja: lokali.promocioni_max })}</Text>
         ) : null}
-        <Ikona emri={ikonat.djathtas} madhesia={16} ngjyra={ngjyrat.tekstiZbehte} />
+        <Ikona emri={ikonat.djathtas} madhesia={14} ngjyra={ngjyrat.tekstiZbehte} />
       </Pressable>
     );
   }
 
   return (
-    <Animated.View entering={indeksi !== undefined && indeksi < 8 ? FadeInDown.delay(indeksi * 70).duration(420) : undefined}>
-      <AnimatedPressable
-        accessibilityRole="button"
-        accessibilityLabel={lokali.emri}
-        onPressIn={shtypja.onPressIn}
-        onPressOut={shtypja.onPressOut}
-        onPress={hap}
-        style={[styles.karta, hijet.karte, shtypja.stili]}
-      >
-        <View>
-          <KopertinaELokalit emri={lokali.emri} fotoUrl={lokali.kopertina_url} style={styles.kopertina} />
-          {kaVleresim ? (
-            <View style={styles.vleresimi}>
-              <Text style={styles.vleresimiTeksti}>★ {Number(lokali.vleresimi_mesatar).toFixed(1)}</Text>
-              <Text style={styles.vleresimiNumri}>({lokali.nr_vleresimeve})</Text>
+    <Animated.View entering={indeksi !== undefined && indeksi < 8 ? FadeInDown.delay(indeksi * 60).duration(380) : undefined}>
+      <Link href={href} asChild>
+        <Link.Trigger>
+          {/* Link-u (asChild) nuk pranon stile në listë: animacioni i shtypjes është te View-ja brenda. */}
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={lokali.emri}
+            onPressIn={() => {
+              prekja.lehte();
+              shtypja.onPressIn();
+            }}
+            onPressOut={shtypja.onPressOut}
+          >
+            <Animated.View style={[styles.karta, shtypja.stili]}>
+            <View>
+              <KopertinaELokalit emri={lokali.emri} fotoUrl={lokali.kopertina_url} style={styles.kopertina} />
+              {vleresimi ? (
+                <View style={styles.vleresimi}>
+                  <Text style={styles.vleresimiTeksti}>★ {vleresimi}</Text>
+                  <Text style={styles.vleresimiNumri}>({lokali.nr_vleresimeve})</Text>
+                </View>
+              ) : null}
+              {lokali.promocioni_max ? (
+                <View style={styles.promoEtiketa}>
+                  <Text style={styles.promoEtiketaTeksti}>
+                    {t("promocionet.etiketa", { perqindja: lokali.promocioni_max })}
+                  </Text>
+                </View>
+              ) : null}
             </View>
-          ) : null}
-          {lokali.promocioni_max ? (
-            <View style={styles.promoEtiketa}>
-              <Text style={styles.promoEtiketaTeksti}>
-                {t("promocionet.etiketa", { perqindja: lokali.promocioni_max })}
-              </Text>
-            </View>
-          ) : null}
-        </View>
 
-        <View style={styles.trupi}>
-          <Text style={styles.emri} numberOfLines={2}>
-            {lokali.emri}
-          </Text>
-          <Text style={styles.adresa} numberOfLines={1}>
-            {lokali.adresa}, {lokali.qyteti}
-          </Text>
-          <View style={styles.detajet}>
-            {statusi ? <View style={[styles.pika, { backgroundColor: ngjyraEStatusit }]} /> : null}
-            <Text style={styles.meta} numberOfLines={1}>
-              {detajet.join("  ·  ")}
-            </Text>
-          </View>
-          {rezervimi ? (
-            <View style={styles.etiketa}>
-              <Ikona emri={lokali.telefoni ? ikonat.telefoni : ikonat.harta} madhesia={13} ngjyra={ngjyrat.bronzi} />
-              <Text style={styles.etiketaTeksti}>{rezervimi}</Text>
+            <View style={styles.trupi}>
+              <View style={styles.rreshtiEmrit}>
+                <Text style={styles.emri} numberOfLines={1}>
+                  {lokali.emri}
+                </Text>
+                <Ikona emri={ikonat.djathtas} madhesia={14} ngjyra={ngjyrat.tekstiZbehte} />
+              </View>
+              <Text style={styles.adresa} numberOfLines={1}>
+                {lokali.adresa}, {lokali.qyteti}
+              </Text>
+              <View style={styles.detajet}>
+                {statusi ? (
+                  <>
+                    <View style={[styles.pika, { backgroundColor: ngjyraEStatusit }]} />
+                    <Text style={[styles.meta, { color: ngjyraEStatusit }]}>{statusi}</Text>
+                    <Text style={styles.meta}>·</Text>
+                  </>
+                ) : null}
+                <Text style={styles.meta} numberOfLines={1}>
+                  {detajet.join(" · ")}
+                </Text>
+              </View>
+              <View style={styles.fundi}>
+                <Ikona
+                  emri={lokali.rezervim_online ? ikonat.kalendar : lokali.telefoni ? ikonat.telefoni : ikonat.harta}
+                  madhesia={13}
+                  ngjyra={ngjyrat.bronzi}
+                />
+                <Text style={styles.rezervimi}>{rezervimi}</Text>
+              </View>
             </View>
-          ) : (
-            <View style={styles.etiketa}>
-              <Ikona emri={ikonat.kalendar} madhesia={13} ngjyra={ngjyrat.bronzi} />
-              <Text style={styles.etiketaTeksti}>{t("zbulo.online")}</Text>
-            </View>
-          )}
-        </View>
-      </AnimatedPressable>
+            </Animated.View>
+          </Pressable>
+        </Link.Trigger>
+        <Link.Preview />
+        <Link.Menu>
+          {lokali.rezervim_online ? (
+            <Link.MenuAction
+              title={t("profiliLokalit.rezervo")}
+              icon="calendar.badge.plus"
+              onPress={() => router.push({ pathname: "/rezervo/[lokaliId]", params: { lokaliId: lokali.id } })}
+            />
+          ) : null}
+          {lokali.telefoni ? <Link.MenuAction title={t("profiliLokalit.thirr")} icon="phone" onPress={thirr} /> : null}
+          <Link.MenuAction title={t("profiliLokalit.udhezimet")} icon="map" onPress={udhezimet} />
+          <Link.MenuAction title={t("profiliLokalit.ndaj")} icon="square.and.arrow.up" onPress={() => void ndaj()} />
+        </Link.Menu>
+      </Link>
     </Animated.View>
   );
 }
@@ -134,17 +170,16 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     karta: {
       backgroundColor: ngjyrat.siperfaqja,
       borderRadius: rrezja.lg,
-      borderWidth: 1,
-      borderColor: ngjyrat.kufiri,
+      borderCurve: "continuous",
       overflow: "hidden",
     },
     kopertina: {
-      height: 140,
+      height: 150,
     },
     vleresimi: {
       position: "absolute",
-      top: 20,
       left: hapesira.md,
+      bottom: hapesira.md,
       flexDirection: "row",
       alignItems: "center",
       gap: 4,
@@ -154,18 +189,18 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingVertical: 5,
     },
     vleresimiTeksti: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 13,
     },
     vleresimiNumri: {
-      fontFamily: shkronjat.etikete,
+      ...shkronjat.etikete,
       color: ngjyrat.tekstiDyte,
       fontSize: 12,
     },
     promoEtiketa: {
       position: "absolute",
-      top: 20,
+      top: hapesira.md,
       right: hapesira.md,
       backgroundColor: ngjyrat.theksi,
       borderRadius: rrezja.plote,
@@ -173,19 +208,26 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingVertical: 5,
     },
     promoEtiketaTeksti: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: "#FFFFFF",
       fontSize: 12,
     },
     trupi: {
-      padding: hapesira.lg,
-      gap: 4,
+      paddingHorizontal: hapesira.lg,
+      paddingTop: hapesira.md,
+      paddingBottom: hapesira.lg,
+      gap: 3,
+    },
+    rreshtiEmrit: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: hapesira.sm,
     },
     emri: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titullBold,
+      flex: 1,
       color: ngjyrat.teksti,
-      fontSize: 23,
-      lineHeight: 28,
+      fontSize: 19,
       letterSpacing: -0.3,
     },
     adresa: {
@@ -195,36 +237,33 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     detajet: {
       flexDirection: "row",
       alignItems: "center",
-      gap: hapesira.sm,
-      marginTop: 6,
+      gap: 6,
+      marginTop: 4,
     },
     pika: {
-      width: 8,
-      height: 8,
+      width: 7,
+      height: 7,
       borderRadius: 4,
     },
     meta: {
       flexShrink: 1,
-      fontFamily: shkronjat.etikete,
+      ...shkronjat.etikete,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
     },
-    etiketa: {
+    fundi: {
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
-      alignSelf: "flex-start",
       marginTop: hapesira.sm,
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-      borderRadius: rrezja.plote,
-      borderWidth: 1,
-      borderColor: ngjyrat.vija,
+      paddingTop: hapesira.sm,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: ngjyrat.kufiri,
     },
-    etiketaTeksti: {
-      fontFamily: shkronjat.etikete,
+    rezervimi: {
+      ...shkronjat.etikete,
       color: ngjyrat.bronzi,
-      fontSize: 12,
+      fontSize: 13,
     },
     kompakte: {
       flexDirection: "row",
@@ -233,28 +272,28 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       padding: hapesira.md,
       backgroundColor: ngjyrat.siperfaqja,
       borderRadius: rrezja.lg,
-      borderWidth: 1,
-      borderColor: ngjyrat.kufiri,
+      borderCurve: "continuous",
     },
     kopertinaKompakte: {
       width: 56,
       height: 56,
-      borderRadius: rrezja.md,
+      borderRadius: rrezja.sm + 4,
+      borderCurve: "continuous",
     },
     shtypur: {
       opacity: 0.85,
     },
     teksti: {
       flex: 1,
-      gap: 4,
+      gap: 3,
     },
     emriKompakt: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.teksti,
-      fontSize: 18,
+      fontSize: 17,
     },
     promo: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.theksi,
       fontSize: 12,
     },

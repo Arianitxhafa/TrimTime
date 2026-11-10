@@ -26,16 +26,16 @@ function ngjyratEVariantit(
     case "kryesor":
       return { sfondi: ngjyrat.ari, teksti: ngjyrat.mbiAri, kufiri: ngjyrat.ari };
     case "dytesor":
-      return { sfondi: "transparent", teksti: ngjyrat.teksti, kufiri: ngjyrat.vija };
+      return { sfondi: ngjyrat.siperfaqja2, teksti: ngjyrat.teksti, kufiri: ngjyrat.siperfaqja2 };
     case "rrezik":
-      return { sfondi: "transparent", teksti: ngjyrat.rrezik, kufiri: ngjyrat.rrezik };
+      return { sfondi: ngjyrat.siperfaqja2, teksti: ngjyrat.rrezik, kufiri: ngjyrat.siperfaqja2 };
   }
 }
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-// Butoni i berberisë: e gjelbër e thellë (bronz natën) me shkronja të trasha, ose vetëm kornizë
-// prej bronzi. Shtypet me animacion dhe dridhje.
+// Butoni në stilin e Apple: ar shampanjë (i zi në dritë) ose gri e sistemit për veprimet dytësore,
+// me kënde të vazhdueshme si në iOS. Shtypet me animacion dhe dridhje.
 export default function Butoni({
   titulli,
   onPress,
@@ -86,8 +86,9 @@ export default function Butoni({
 const styles = StyleSheet.create({
   butoni: {
     minHeight: 54,
-    paddingHorizontal: 20,
+    paddingHorizontal: 22,
     borderRadius: rrezja.md,
+    borderCurve: "continuous",
     borderWidth: 1,
     flexDirection: "row",
     alignItems: "center",
@@ -98,8 +99,8 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   teksti: {
-    fontFamily: shkronjat.etiketeBold,
-    fontSize: 15,
-    letterSpacing: 0.3,
+    ...shkronjat.etiketeBold,
+    fontSize: 17,
+    letterSpacing: -0.2,
   },
 });

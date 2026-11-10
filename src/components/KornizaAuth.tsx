@@ -84,13 +84,13 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       justifyContent: "center",
     },
     emriMarkes: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 20,
       letterSpacing: -0.3,
     },
     titulli: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 32,
       letterSpacing: -0.6,

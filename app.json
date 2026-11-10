@@ -13,7 +13,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#0B0B0F",
+        "backgroundColor": "#000000",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -30,11 +30,11 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#F7F5F0",
+          "backgroundColor": "#F2F2F7",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76,
           "dark": {
-            "backgroundColor": "#0B0B0F"
+            "backgroundColor": "#000000"
           }
         }
       ],
@@ -67,6 +67,13 @@
         "expo-local-authentication",
         {
           "faceIDPermission": "TrimTime përdor Face ID për të hapur aplikacionin në mënyrë të sigurt."
+        }
+      ],
+      [
+        "expo-calendar",
+        {
+          "writeOnlyAccess": true,
+          "writeOnlyCalendarPermission": "TrimTime shton terminet e tua në kalendar, me kujtesë para orës."
         }
       ]
     ],

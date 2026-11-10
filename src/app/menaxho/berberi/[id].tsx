@@ -286,7 +286,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.md,
     },
     titulli: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       textTransform: "uppercase",
@@ -377,7 +377,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       borderColor: ngjyrat.ari,
     },
     oraTeksti: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 14,
       fontVariant: ["tabular-nums"],

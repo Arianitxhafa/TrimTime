@@ -379,7 +379,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       justifyContent: "center",
     },
     periudha: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 17,
     },
@@ -420,7 +420,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingRight: hapesira.lg,
     },
     ora: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       position: "absolute",
       right: 6,
       color: ngjyrat.tekstiZbehte,
@@ -480,7 +480,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       opacity: 0.45,
     },
     bllokuOra: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       fontSize: 12,
       fontVariant: ["tabular-nums"],
     },

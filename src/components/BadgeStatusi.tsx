@@ -36,7 +36,7 @@ const krijoStilet = (_ngjyrat: Ngjyrat) =>
     borderRadius: 3,
   },
   teksti: {
-    fontFamily: shkronjat.etiketeBold,
+    ...shkronjat.etiketeBold,
     fontSize: 12,
   },
 });

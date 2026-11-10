@@ -87,14 +87,14 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       padding: hapesira.xl,
     },
     email: {
-      fontFamily: shkronjat.etikete,
+      ...shkronjat.etikete,
       color: ngjyrat.tekstiDyte,
       fontSize: 12,
       letterSpacing: 0.5,
       marginBottom: hapesira.xl,
     },
     shenim: {
-      fontFamily: shkronjat.kursive,
+      ...shkronjat.kursive,
       color: ngjyrat.tekstiDyte,
       fontSize: 15,
       lineHeight: 21,

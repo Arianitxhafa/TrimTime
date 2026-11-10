@@ -73,7 +73,7 @@ export default function Rivendos() {
 const krijoStilet = (ngjyrat: Ngjyrat) =>
   StyleSheet.create({
     uDergua: {
-      fontFamily: shkronjat.kursive,
+      ...shkronjat.kursive,
       color: ngjyrat.teksti,
       fontSize: 18,
       lineHeight: 26,

@@ -168,7 +168,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       backgroundColor: ngjyrat.sfondi,
     },
     titulli: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 30,
       letterSpacing: -0.6,
@@ -291,7 +291,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     boshTitulli: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 17,
     },

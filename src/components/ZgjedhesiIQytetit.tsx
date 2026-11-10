@@ -124,7 +124,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       padding: hapesira.xl,
     },
     titulli: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 24,
       letterSpacing: -0.4,

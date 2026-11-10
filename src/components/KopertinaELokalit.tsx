@@ -3,7 +3,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
 import { useTema } from "../context/TemaContext";
 import { shkronjat } from "../theme";
-import { ShiritiBerberit } from "./Marka";
+import Ikona, { ikonat } from "./Ikona";
 
 type Props = {
   emri: string;
@@ -26,15 +26,17 @@ function inicialet(emri: string): string {
   return shkronjat.toLocaleUpperCase("sq");
 }
 
-// I njëjti lokal merr gjithmonë të njëjtën ngjyrë tabele.
+// I njëjti lokal merr gjithmonë të njëjtën ngjyrë.
 function indeksiINgjyres(emri: string, numri: number): number {
   let h = 0;
   for (const c of emri) h = (h * 31 + c.charCodeAt(0)) | 0;
   return Math.abs(h) % numri;
 }
 
-// Kopertina e lokalit: fotoja kur ka, përndryshe një tabelë berberie e gjeneruar me inicialet e
-// lokalit në një medaljon prej bronzi dhe shiritin e berberit sipër.
+const ARI = "#D4B483";
+
+// Kopertina e lokalit: fotoja kur ka, përndryshe një kopertinë e errët me gradient të butë,
+// monogram ari dhe gërshërë, si kartat e një aplikacioni luksoz.
 export default function KopertinaELokalit({ emri, fotoUrl, style, meHije = false }: Props) {
   const { ngjyrat } = useTema();
 
@@ -47,18 +49,21 @@ export default function KopertinaELokalit({ emri, fotoUrl, style, meHije = false
     );
   }
 
-  const sfondi = ngjyrat.tabelat[indeksiINgjyres(emri, ngjyrat.tabelat.length)];
-  const bronzi = "#D5B47A";
+  const ngjyra = ngjyrat.tabelat[indeksiINgjyres(emri, ngjyrat.tabelat.length)];
   return (
-    <View style={[styles.baza, { backgroundColor: sfondi }, style]} accessible={false}>
-      <ShiritiBerberit lartesia={10} gjeresiaEVijes={8} />
-      <View style={[styles.korniza, { borderColor: "rgba(213,180,122,0.45)" }]} />
+    <View style={[styles.baza, style]} accessible={false}>
+      <LinearGradient
+        colors={[ngjyra, "#0A0A0B"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
       <View style={styles.qendra}>
-        <View style={[styles.medaljoni, { borderColor: bronzi }]}>
-          <Text style={[styles.inicialet, { color: bronzi }]} numberOfLines={1} adjustsFontSizeToFit>
-            {inicialet(emri)}
-          </Text>
-        </View>
+        <Text style={styles.inicialet} numberOfLines={1} adjustsFontSizeToFit>
+          {inicialet(emri)}
+        </Text>
+        <View style={styles.vija} />
+        <Ikona emri={ikonat.gershere} madhesia={14} ngjyra={ARI} />
       </View>
       {meHije && <LinearGradient colors={ngjyrat.hijaEFotos} style={styles.hija} />}
     </View>
@@ -68,34 +73,25 @@ export default function KopertinaELokalit({ emri, fotoUrl, style, meHije = false
 const styles = StyleSheet.create({
   baza: {
     overflow: "hidden",
-  },
-  korniza: {
-    position: "absolute",
-    top: 18,
-    left: 8,
-    right: 8,
-    bottom: 8,
-    borderWidth: 1,
-    borderRadius: 8,
+    backgroundColor: "#0A0A0B",
   },
   qendra: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-  },
-  medaljoni: {
-    width: 74,
-    height: 74,
-    borderRadius: 37,
-    borderWidth: 2,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 8,
+    gap: 8,
   },
   inicialet: {
-    fontFamily: shkronjat.kursiveBold,
-    fontSize: 30,
-    letterSpacing: 0.5,
+    ...shkronjat.etikete,
+    color: ARI,
+    fontSize: 38,
+    letterSpacing: 6,
+    paddingLeft: 6,
+  },
+  vija: {
+    width: 28,
+    height: StyleSheet.hairlineWidth * 2,
+    backgroundColor: "rgba(212,180,131,0.6)",
   },
   hija: {
     position: "absolute",

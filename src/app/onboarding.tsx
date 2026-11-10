@@ -222,7 +222,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       justifyContent: "center",
     },
     titulli: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 30,
       letterSpacing: -0.6,

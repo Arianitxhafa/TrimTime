@@ -83,7 +83,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     // Etiketa sipër dhe kutia e plotë me kënde të buta.
     etiketa: {
-      fontFamily: shkronjat.etikete,
+      ...shkronjat.etikete,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       marginBottom: 6,

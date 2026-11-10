@@ -1,11 +1,4 @@
-import { Fraunces_400Regular_Italic } from "@expo-google-fonts/fraunces/400Regular_Italic";
-import { Fraunces_600SemiBold } from "@expo-google-fonts/fraunces/600SemiBold";
-import { Fraunces_600SemiBold_Italic } from "@expo-google-fonts/fraunces/600SemiBold_Italic";
-import { Fraunces_700Bold } from "@expo-google-fonts/fraunces/700Bold";
-import { Inter_600SemiBold } from "@expo-google-fonts/inter/600SemiBold";
-import { Inter_700Bold } from "@expo-google-fonts/inter/700Bold";
 import { QueryClientProvider } from "@tanstack/react-query";
-import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -23,18 +16,7 @@ import { shkronjat } from "../theme";
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
-  // Shkronjat e berberisë klasike; splash screen-i mbetet derisa të ngarkohen (ose të dështojnë:
-  // atëherë përdoren shkronjat e sistemit, që aplikacioni të mos ngecë).
-  const [shkronjatGati, gabimiShkronjave] = useFonts({
-    Fraunces_700Bold,
-    Fraunces_600SemiBold,
-    Fraunces_400Regular_Italic,
-    Fraunces_600SemiBold_Italic,
-    Inter_600SemiBold,
-    Inter_700Bold,
-  });
-  if (!shkronjatGati && !gabimiShkronjave) return null;
-
+  // Shkronjat janë ato të sistemit (SF Pro në iPhone), si në aplikacionet e Apple: s'ka çfarë të ngarkohet.
   return (
     <TemaProvider>
       <PreferencatProvider>
@@ -87,7 +69,7 @@ function Navigimi() {
         screenOptions={{
           headerStyle: { backgroundColor: ngjyrat.sfondi },
           headerTintColor: ngjyrat.ari,
-          headerTitleStyle: { color: ngjyrat.teksti, fontFamily: shkronjat.titullBold, fontSize: 19 },
+          headerTitleStyle: { color: ngjyrat.teksti, ...shkronjat.titullBold, fontSize: 19 },
           headerShadowVisible: false,
           // Në iOS 26+ SDK 58 i bën header-at transparentë dhe përmbajtja hyn poshtë tyre.
           headerTransparent: false,

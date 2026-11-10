@@ -399,6 +399,7 @@ export const en: Perkthimet = {
     gabimLokali: "This shop isn't taking online bookings right now.",
   },
   terminetEMia: {
+    shtoNeKalendar: "Add to Calendar",
     teArdhshme: "Upcoming",
     teKaluara: "Past",
     boshTitulli: "No bookings yet",

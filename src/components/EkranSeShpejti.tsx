@@ -82,7 +82,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       letterSpacing: 0.4,
     },
     titulli: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 24,
       letterSpacing: -0.3,

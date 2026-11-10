@@ -109,7 +109,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.lg,
     },
     titulli: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 26,
       letterSpacing: -0.4,

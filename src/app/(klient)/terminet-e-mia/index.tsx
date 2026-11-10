@@ -13,23 +13,22 @@ import {
   Text,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useLargohuNgaLista, useListaImeEPritjes } from "../../api/listaEPritjes";
-import { mesazhiIGabimitTeRezervimit, useAnuloTerminin, useTerminetEMia } from "../../api/terminet";
-import BadgeStatusi from "../../components/BadgeStatusi";
-import Butoni from "../../components/Butoni";
-import DialogKonfirmimi from "../../components/DialogKonfirmimi";
-import { Drita } from "../../components/Marka";
-import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
-import { GabimiIFormes } from "../../components/KornizaAuth";
-import Yjet from "../../components/Yjet";
-import { useStilet, useTema } from "../../context/TemaContext";
-import { formatoDaten } from "../../lib/datat";
-import { formatoCmimin } from "../../lib/formatimi";
-import { anuloKujtesat, sinkronizoKujtesat } from "../../lib/kujtesat";
-import type { TerminiIKlientit } from "../../lib/tipet";
-import { lidhjaEUdhezimeve } from "../../lib/vendndodhja";
-import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
+import { useLargohuNgaLista, useListaImeEPritjes } from "../../../api/listaEPritjes";
+import { mesazhiIGabimitTeRezervimit, useAnuloTerminin, useTerminetEMia } from "../../../api/terminet";
+import BadgeStatusi from "../../../components/BadgeStatusi";
+import Butoni from "../../../components/Butoni";
+import DialogKonfirmimi from "../../../components/DialogKonfirmimi";
+import Ikona, { ikonat, type EmriIkones } from "../../../components/Ikona";
+import { GabimiIFormes } from "../../../components/KornizaAuth";
+import Yjet from "../../../components/Yjet";
+import { useStilet, useTema } from "../../../context/TemaContext";
+import { formatoDaten } from "../../../lib/datat";
+import { formatoCmimin } from "../../../lib/formatimi";
+import { shtoNeKalendar } from "../../../lib/kalendari";
+import { anuloKujtesat, sinkronizoKujtesat } from "../../../lib/kujtesat";
+import type { TerminiIKlientit } from "../../../lib/tipet";
+import { lidhjaEUdhezimeve } from "../../../lib/vendndodhja";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../../theme";
 
 type Skeda = "teArdhshme" | "teKaluara";
 
@@ -37,7 +36,6 @@ export default function TerminetEMia() {
   const { t } = useTranslation();
   const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
-  const insets = useSafeAreaInsets();
   const terminet = useTerminetEMia();
   const anulo = useAnuloTerminin();
   const [skeda, setSkeda] = useState<Skeda>("teArdhshme");
@@ -65,10 +63,18 @@ export default function TerminetEMia() {
   const lista = skeda === "teArdhshme" ? teArdhshme : teKaluara;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + hapesira.lg }]}>
-      <Drita lartesia={260} />
-      <Text style={styles.titulli}>{t("tabs.terminet")}</Text>
-
+    <View style={styles.container}>
+      <FlatList
+        data={lista}
+        keyExtractor={(x) => x.id}
+        contentInsetAdjustmentBehavior="automatic"
+        contentContainerStyle={styles.lista}
+        ItemSeparatorComponent={() => <View style={{ height: hapesira.md }} />}
+        refreshControl={
+          <RefreshControl refreshing={terminet.isRefetching} onRefresh={() => void terminet.refetch()} tintColor={ngjyrat.ari} />
+        }
+        ListHeaderComponent={
+          <>
       <View style={styles.skedat}>
         {(["teArdhshme", "teKaluara"] as const).map((s) => (
           <Pressable
@@ -91,16 +97,9 @@ export default function TerminetEMia() {
           <GabimiIFormes mesazhi={mesazhiIGabimitTeRezervimit(anulo.error, t)} />
         </View>
       )}
-
-      <FlatList
-        data={lista}
-        keyExtractor={(x) => x.id}
-        contentContainerStyle={styles.lista}
-        ItemSeparatorComponent={() => <View style={{ height: hapesira.md }} />}
-        refreshControl={
-          <RefreshControl refreshing={terminet.isRefetching} onRefresh={() => void terminet.refetch()} tintColor={ngjyrat.ari} />
+            {skeda === "teArdhshme" ? <ListaEPritjes /> : null}
+          </>
         }
-        ListHeaderComponent={skeda === "teArdhshme" ? <ListaEPritjes /> : undefined}
         renderItem={({ item }) => (
           <KartaETerminit termini={item} iArdhshem={skeda === "teArdhshme"} onAnulo={() => setPerTeAnuluar(item)} />
         )}
@@ -290,6 +289,25 @@ function KartaETerminit({ termini, iArdhshem, onAnulo }: KartaProps) {
             />
           </View>
         )
+      ) : null}
+      {iArdhshem ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => {
+            const fillon = new Date(termini.fillon_me);
+            void shtoNeKalendar({
+              titulli: `${termini.sherbimi_emri} · ${termini.lokali_emri}`,
+              fillon,
+              mbaron: new Date(fillon.getTime() + termini.kohezgjatja_min * 60_000),
+              vendi: `${termini.lokali_emri}, ${termini.lokali_adresa}, ${termini.lokali_qyteti}`,
+              shenime: t("terminetEMia.me", { berberi: termini.berberi_emri }),
+            });
+          }}
+          style={({ pressed }) => [styles.kalendari, pressed && { opacity: 0.6 }]}
+        >
+          <Ikona emri={ikonat.kalendar} madhesia={16} ngjyra={ngjyrat.ari} />
+          <Text style={styles.kalendariTeksti}>{t("terminetEMia.shtoNeKalendar")}</Text>
+        </Pressable>
       ) : (
         <View style={styles.veprimet}>
           {termini.vleresimi_yjet ? (
@@ -340,12 +358,27 @@ function Veprimi({ ikona, teksti, rrezik = false, theksuar = false, onPress }: V
 
 const krijoStilet = (ngjyrat: Ngjyrat) =>
   StyleSheet.create({
+    kalendari: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      marginTop: hapesira.md,
+      paddingTop: hapesira.md,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: ngjyrat.kufiri,
+    },
+    kalendariTeksti: {
+      ...shkronjat.etiketeBold,
+      color: ngjyrat.ari,
+      fontSize: 15,
+    },
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
     },
     titulli: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 30,
       letterSpacing: -0.6,
@@ -413,7 +446,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       overflow: "hidden",
     },
     logoShkronja: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.mbiAri,
       fontSize: 20,
     },
@@ -470,7 +503,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.lg,
     },
     pritjaTitulli: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       textTransform: "uppercase",
@@ -555,7 +588,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     boshTitulli: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 18,
     },

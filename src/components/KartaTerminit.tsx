@@ -102,7 +102,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       width: 48,
     },
     ora: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 15,
       fontVariant: ["tabular-nums"],

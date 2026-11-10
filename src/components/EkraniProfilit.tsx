@@ -9,10 +9,9 @@ import { useModiAktiv } from "../hooks/useModiAktiv";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Avatar from "./Avatar";
 import DialogKonfirmimi from "./DialogKonfirmimi";
-import { Drita } from "./Marka";
 import Ikona, { ikonat, type EmriIkones } from "./Ikona";
 
-export default function EkraniProfilit() {
+export default function EkraniProfilit({ meTitullNative = false }: { meTitullNative?: boolean }) {
   const { t } = useTranslation();
   const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
@@ -23,9 +22,9 @@ export default function EkraniProfilit() {
 
   return (
     <View style={styles.container}>
-      <Drita lartesia={300} />
       <ScrollView
-        contentContainerStyle={[styles.permbajtja, { paddingTop: insets.top + hapesira.xl }]}
+        contentInsetAdjustmentBehavior={meTitullNative ? "automatic" : undefined}
+        contentContainerStyle={[styles.permbajtja, { paddingTop: meTitullNative ? hapesira.md : insets.top + hapesira.xl }]}
       >
         <View style={styles.koka}>
           <Avatar emri={emriIShfaqur || t("profili.perdorues")} madhesia={84} />
@@ -113,7 +112,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.xxl,
     },
     emri: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 24,
       letterSpacing: -0.3,
@@ -125,7 +124,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontSize: 14,
     },
     seksioni: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       textTransform: "uppercase",

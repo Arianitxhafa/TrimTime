@@ -6,7 +6,7 @@ export type Ngjyrat = {
   siperfaqja: string;
   siperfaqja2: string;
   kufiri: string;
-  // Ngjyra kryesore e veprimeve (butonat, ikonat aktive): e gjelbër berberie në dritë, bronz në errësirë.
+  // Ngjyra kryesore e veprimeve (butonat, ikonat aktive): ar shampanjë në errësirë, e zezë në dritë.
   ari: string;
   ariIErret: string;
   teksti: string;
@@ -27,95 +27,83 @@ export type Ngjyrat = {
   theksi: string;
   // Vijat e holla prej bronzi që ndajnë seksionet.
   vija: string;
-  // Bronzi i tabelave të berberisë, i errësuar sa duhet që teksti të lexohet.
+  // Ari i theksimeve (oraret e lira, etiketat), i errësuar në dritë që të lexohet.
   bronzi: string;
   // Ngjyrat e shiritit të berberit: e kuqe, krem, blu.
   shiriti: readonly [string, string, string];
-  // Sfondi i tabelave të lokaleve pa foto (zgjidhet sipas emrit).
+  // Sfondi i kopertinave të lokaleve pa foto (zgjidhet sipas emrit).
   tabelat: readonly string[];
 };
 
-// "Barbershop klasik" i ditës: letër krem, bojë e gjelbër e thellë dhe bronz.
+// Pamja e ndritshme në stilin e Apple: gri e sistemit, karta të bardha, butona të zinj dhe ar
+// i errësuar vetëm për theksim.
 export const ngjyratCelta: Ngjyrat = {
-  sfondi: "#F4ECDD",
-  siperfaqja: "#FBF7EE",
-  siperfaqja2: "#ECE2CF",
-  kufiri: "#DDCFB4",
-  ari: "#1F3A2E",
-  ariIErret: "#E2E6D6",
-  teksti: "#1B2620",
-  tekstiDyte: "#4D5A51",
-  tekstiZbehte: "#7A8378",
-  rrezik: "#A3221D",
-  rrezikSfond: "#F6E0DA",
-  rrezikKufiri: "#E8BDB4",
-  mbiAri: "#F7F0E2",
-  mbulesa: "rgba(19,38,29,0.5)",
-  gradientiAri: ["#2A4B3C", "#1F3A2E", "#16291F"],
-  xham: "rgba(251,247,238,0.94)",
-  kufiriXham: "rgba(31,58,46,0.16)",
-  hijaEFotos: ["rgba(16,30,23,0)", "rgba(16,30,23,0.85)"],
-  theksi: "#B3261E",
-  vija: "#C9AE7E",
-  bronzi: "#80612F",
-  shiriti: ["#B3261E", "#F7F0E2", "#1F4E8C"],
-  tabelat: ["#1F3A2E", "#3A2A1E", "#1D2E44", "#4A1F24"],
+  sfondi: "#F2F2F7",
+  siperfaqja: "#FFFFFF",
+  siperfaqja2: "#E9E9EE",
+  kufiri: "#E3E3E8",
+  ari: "#111111",
+  ariIErret: "#F1ECE2",
+  teksti: "#000000",
+  tekstiDyte: "#5E5E63",
+  tekstiZbehte: "#8E8E93",
+  rrezik: "#FF3B30",
+  rrezikSfond: "#FFE9E7",
+  rrezikKufiri: "#FFC9C4",
+  mbiAri: "#FFFFFF",
+  mbulesa: "rgba(0,0,0,0.4)",
+  gradientiAri: ["#2A2A2A", "#111111", "#000000"],
+  xham: "rgba(255,255,255,0.86)",
+  kufiriXham: "rgba(0,0,0,0.06)",
+  hijaEFotos: ["rgba(0,0,0,0)", "rgba(0,0,0,0.78)"],
+  theksi: "#FF3B30",
+  vija: "#E3E3E8",
+  bronzi: "#9A7B45",
+  shiriti: ["#FF3B30", "#FFFFFF", "#0A84FF"],
+  tabelat: ["#2C2C2E", "#2B241A", "#1E2633", "#2E1F22"],
 };
 
-// "Barbershop klasik" i natës: e gjelbër e thellë, krem dhe bronz i ndritshëm.
+// Pamja kryesore: e zezë OLED, karta gri të errëta dhe ar shampanjë vetëm te veprimet.
 export const ngjyratErrta: Ngjyrat = {
-  sfondi: "#12241B",
-  siperfaqja: "#183026",
-  siperfaqja2: "#203C30",
-  kufiri: "#2E4C3E",
-  ari: "#CDAA6D",
-  ariIErret: "#24392C",
-  teksti: "#F3E9D6",
-  tekstiDyte: "#C5BCA8",
-  tekstiZbehte: "#8F9C90",
-  rrezik: "#F2786C",
-  rrezikSfond: "#3A1E1A",
-  rrezikKufiri: "#5A2A24",
-  mbiAri: "#12241B",
-  mbulesa: "rgba(0,0,0,0.65)",
-  gradientiAri: ["#DCBD84", "#CDAA6D", "#B8935A"],
-  xham: "rgba(18,36,27,0.92)",
-  kufiriXham: "rgba(205,170,109,0.3)",
-  hijaEFotos: ["rgba(10,22,16,0)", "rgba(10,22,16,0.88)"],
-  theksi: "#E5574D",
-  vija: "#4C6A55",
-  bronzi: "#CDAA6D",
-  shiriti: ["#C7302A", "#F3E9D6", "#2D63A8"],
-  tabelat: ["#1C3A2C", "#3B2B1F", "#1E3048", "#4B2126"],
+  sfondi: "#000000",
+  siperfaqja: "#1C1C1E",
+  siperfaqja2: "#2C2C2E",
+  kufiri: "#2A2A2D",
+  ari: "#D4B483",
+  ariIErret: "#2A2418",
+  teksti: "#FFFFFF",
+  tekstiDyte: "#AEAEB2",
+  tekstiZbehte: "#8E8E93",
+  rrezik: "#FF453A",
+  rrezikSfond: "#3A1513",
+  rrezikKufiri: "#5C211D",
+  mbiAri: "#000000",
+  mbulesa: "rgba(0,0,0,0.6)",
+  gradientiAri: ["#E6CC9E", "#D4B483", "#B8955F"],
+  xham: "rgba(44,44,46,0.82)",
+  kufiriXham: "rgba(255,255,255,0.08)",
+  hijaEFotos: ["rgba(0,0,0,0)", "rgba(0,0,0,0.85)"],
+  theksi: "#FF453A",
+  vija: "#2A2A2D",
+  bronzi: "#D4B483",
+  shiriti: ["#FF453A", "#FFFFFF", "#0A84FF"],
+  tabelat: ["#1C1C1E", "#2A2418", "#1A2230", "#2A1C1F"],
 };
 
-// Hije e butë, si një tabelë e varur në mur.
+// Si Apple: pa hije në errësirë; vetëm një hije shumë e lehtë te kartat në dritë.
 export const hijet = {
-  karte: {
-    shadowColor: "#0B1A12",
-    shadowOpacity: 0.12,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 3,
-  },
-  ari: {
-    shadowColor: "#0B1A12",
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
-  },
+  karte: {},
+  ari: {},
 } as const;
 
-// Titujt me Fraunces (serif klasik i tabelave) dhe etiketat me Inter, që lexohet mirë edhe e vogël.
-// Ngarkohen te _layout.tsx; teksti i zakonshëm mbetet me shkronjat e sistemit.
+// SF Pro (shkronjat e sistemit) me peshat e Apple. Përdoren me "...shkronjat.titull" brenda stileve.
 export const shkronjat = {
-  titull: "Fraunces_700Bold",
-  titullBold: "Fraunces_600SemiBold",
-  kursive: "Fraunces_400Regular_Italic",
-  kursiveBold: "Fraunces_600SemiBold_Italic",
-  etikete: "Inter_600SemiBold",
-  etiketeBold: "Inter_700Bold",
+  titull: { fontFamily: "System", fontWeight: "700" },
+  titullBold: { fontFamily: "System", fontWeight: "600" },
+  kursive: { fontFamily: "System", fontWeight: "400" },
+  kursiveBold: { fontFamily: "System", fontWeight: "600" },
+  etikete: { fontFamily: "System", fontWeight: "500" },
+  etiketeBold: { fontFamily: "System", fontWeight: "600" },
 } as const;
 
 export const hapesira = {
@@ -127,11 +115,11 @@ export const hapesira = {
   xxl: 28,
 } as const;
 
-// Kënde të buta, si buzët e një tabele druri.
+// Kënde të buta si te iOS (kartat 20, butonat 14).
 export const rrezja = {
-  sm: 6,
-  md: 10,
-  lg: 16,
+  sm: 8,
+  md: 14,
+  lg: 20,
   plote: 999,
 } as const;
 
@@ -151,18 +139,19 @@ const ikonatEStatuseve: Record<StatusiTerminit, EmriIkones> = {
   nuk_erdhi: { ios: "person.fill.xmark", android: "person_off" },
 };
 
+// Ngjyrat e sistemit të Apple për statuset.
 export const statusetMetaErrta: StatusetMeta = {
-  ne_pritje: { ngjyra: "#E7C27A", sfondi: "#33301B", ikona: ikonatEStatuseve.ne_pritje },
-  konfirmuar: { ngjyra: "#8FD19E", sfondi: "#1D3A27", ikona: ikonatEStatuseve.konfirmuar },
-  perfunduar: { ngjyra: "#F3E9D6", sfondi: "#2A4234", ikona: ikonatEStatuseve.perfunduar },
-  anuluar: { ngjyra: "#F2786C", sfondi: "#3A1E1A", ikona: ikonatEStatuseve.anuluar },
-  nuk_erdhi: { ngjyra: "#C5BCA8", sfondi: "#203C30", ikona: ikonatEStatuseve.nuk_erdhi },
+  ne_pritje: { ngjyra: "#FFD60A", sfondi: "#332B05", ikona: ikonatEStatuseve.ne_pritje },
+  konfirmuar: { ngjyra: "#30D158", sfondi: "#0E2E17", ikona: ikonatEStatuseve.konfirmuar },
+  perfunduar: { ngjyra: "#D4B483", sfondi: "#2A2418", ikona: ikonatEStatuseve.perfunduar },
+  anuluar: { ngjyra: "#FF453A", sfondi: "#3A1513", ikona: ikonatEStatuseve.anuluar },
+  nuk_erdhi: { ngjyra: "#AEAEB2", sfondi: "#2C2C2E", ikona: ikonatEStatuseve.nuk_erdhi },
 };
 
 export const statusetMetaCelta: StatusetMeta = {
-  ne_pritje: { ngjyra: "#835500", sfondi: "#F3E3BF", ikona: ikonatEStatuseve.ne_pritje },
-  konfirmuar: { ngjyra: "#1E5E34", sfondi: "#D9EAD5", ikona: ikonatEStatuseve.konfirmuar },
-  perfunduar: { ngjyra: "#1F3A2E", sfondi: "#E2E6D6", ikona: ikonatEStatuseve.perfunduar },
-  anuluar: { ngjyra: "#A3221D", sfondi: "#F6E0DA", ikona: ikonatEStatuseve.anuluar },
-  nuk_erdhi: { ngjyra: "#4D5A51", sfondi: "#ECE2CF", ikona: ikonatEStatuseve.nuk_erdhi },
+  ne_pritje: { ngjyra: "#9A6A00", sfondi: "#FFF4CC", ikona: ikonatEStatuseve.ne_pritje },
+  konfirmuar: { ngjyra: "#1E8E3E", sfondi: "#DFF6E4", ikona: ikonatEStatuseve.konfirmuar },
+  perfunduar: { ngjyra: "#111111", sfondi: "#E9E9EE", ikona: ikonatEStatuseve.perfunduar },
+  anuluar: { ngjyra: "#D70015", sfondi: "#FFE9E7", ikona: ikonatEStatuseve.anuluar },
+  nuk_erdhi: { ngjyra: "#5E5E63", sfondi: "#E9E9EE", ikona: ikonatEStatuseve.nuk_erdhi },
 };

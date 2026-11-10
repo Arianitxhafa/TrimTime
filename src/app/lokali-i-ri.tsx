@@ -269,14 +269,14 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingBottom: hapesira.xxl,
     },
     hapi: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.ari,
       fontSize: 13,
       letterSpacing: 0.6,
       textTransform: "uppercase",
     },
     titulli: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 28,
       letterSpacing: -0.5,

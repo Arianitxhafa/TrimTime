@@ -39,13 +39,14 @@ import ZgjedhesiIDites from "../../components/ZgjedhesiIDites";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { ditetEArdhshme, formatoDaten } from "../../lib/datat";
 import { formatoCmimin, formatoKohezgjatjen } from "../../lib/formatimi";
+import { shtoNeKalendar } from "../../lib/kalendari";
 import { planifikoKujtesat } from "../../lib/kujtesat";
 import type { OraELire } from "../../lib/tipet";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 const DITET_PERPARA = 14;
 
-type Suksesi = { data: string; ora: string; konfirmuar: boolean };
+type Suksesi = { data: string; ora: string; konfirmuar: boolean; fillonMe: string; kohezgjatjaMin: number };
 
 export default function Rezervo() {
   const { t } = useTranslation();
@@ -127,7 +128,7 @@ export default function Rezervo() {
         onSuccess: (id) => {
           const konfirmuar = lokali.data!.pranimi_automatik;
           prekja.sukses();
-          setSuksesi({ data, ora: ora.ora, konfirmuar });
+          setSuksesi({ data, ora: ora.ora, konfirmuar, fillonMe: ora.fillon_me, kohezgjatjaMin: sherbimi.kohezgjatja_min });
           // Termini është i rezervuar; fotoja e stilit ngarkohet pas tij dhe nuk e bllokon rezervimin.
           if (fotoStili && sesioni) {
             setFotoNgarkohet(true);
@@ -163,6 +164,7 @@ export default function Rezervo() {
   }
 
   if (suksesi) {
+    const l = lokali.data;
     const dataTekst = formatoDaten(suksesi.data, t).toLowerCase();
     return (
       <View style={[styles.container, styles.qendra, styles.suksesi]}>
@@ -190,6 +192,20 @@ export default function Rezervo() {
             onPress={() => {
               router.dismissAll();
               router.navigate("/terminet-e-mia");
+            }}
+          />
+          <Butoni
+            titulli={t("terminetEMia.shtoNeKalendar")}
+            ikona={ikonat.kalendar}
+            varianti="dytesor"
+            onPress={() => {
+              const fillon = new Date(suksesi.fillonMe);
+              void shtoNeKalendar({
+                titulli: `${sherbimi?.emri ?? ""} · ${l.emri}`,
+                fillon,
+                mbaron: new Date(fillon.getTime() + suksesi.kohezgjatjaMin * 60_000),
+                vendi: `${l.emri}, ${l.adresa}, ${l.qyteti}`,
+              });
             }}
           />
           <Butoni titulli={t("rezervimi.kthehu")} varianti="dytesor" onPress={() => router.back()} />
@@ -449,7 +465,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingBottom: hapesira.xxl,
     },
     seksioni: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       textTransform: "uppercase",
@@ -583,7 +599,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontWeight: "600",
     },
     fundiCmimi: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 20,
     },
@@ -713,7 +729,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.sm,
     },
     suksesiTitulli: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 28,
       letterSpacing: -0.5,

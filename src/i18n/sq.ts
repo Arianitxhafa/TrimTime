@@ -399,6 +399,7 @@ export const sq = {
     gabimLokali: "Ky lokal nuk pranon rezervime online tani.",
   },
   terminetEMia: {
+    shtoNeKalendar: "Shto në Kalendar",
     teArdhshme: "Të ardhshme",
     teKaluara: "Të kaluara",
     boshTitulli: "Asnjë termin ende",

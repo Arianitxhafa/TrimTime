@@ -7,7 +7,6 @@ import { prekja } from "../lib/prekja";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Butoni from "./Butoni";
 import Ikona, { ikonat } from "./Ikona";
-import { ShiritiBerberit } from "./Marka";
 
 // Kategoritë njihen nga serveri sipas emrit të shërbimit (shih sherbimi_ne_kategori).
 export const KATEGORITE = ["qethje", "fade", "mjeker", "femije", "ngjyrosje"] as const;
@@ -72,9 +71,6 @@ export default function FiltratEKerkimit({ iDukshem, filtrat: f, ndrysho, numri,
           <Pressable accessibilityRole="button" accessibilityLabel={t("zbulo.mbyll")} onPress={onMbyll} hitSlop={10}>
             <Ikona emri={ikonat.mbyll} madhesia={22} ngjyra={ngjyrat.teksti} />
           </Pressable>
-        </View>
-        <View style={styles.shiriti}>
-          <ShiritiBerberit lartesia={5} />
         </View>
 
         <ScrollView contentContainerStyle={styles.permbajtja}>
@@ -201,7 +197,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingBottom: hapesira.md,
     },
     titulli: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 32,
       letterSpacing: -0.8,
@@ -227,13 +223,13 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.sm,
     },
     seksioniNumri: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.bronzi,
       fontSize: 12,
       letterSpacing: 0.6,
     },
     seksioniTitulli: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 20,
     },
@@ -256,7 +252,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       borderColor: ngjyrat.ari,
     },
     opsioniTeksti: {
-      fontFamily: shkronjat.etikete,
+      ...shkronjat.etikete,
       color: ngjyrat.teksti,
       fontSize: 13,
     },
@@ -279,7 +275,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingVertical: 6,
     },
     pastroTeksti: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 12,
       letterSpacing: 0.6,

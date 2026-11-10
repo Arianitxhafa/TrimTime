@@ -174,7 +174,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.xl,
     },
     emri: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 24,
       marginTop: hapesira.sm,
@@ -225,7 +225,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: 2,
     },
     statistikaVlera: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 20,
     },
@@ -243,7 +243,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       flex: 1,
     },
     seksioni: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       textTransform: "uppercase",

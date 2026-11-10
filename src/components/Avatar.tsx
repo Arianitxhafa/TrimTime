@@ -39,6 +39,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   teksti: {
-    fontFamily: shkronjat.titullBold,
+    ...shkronjat.titullBold,
   },
 });

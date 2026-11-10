@@ -37,7 +37,8 @@ function eshteZgjedhjeEVlefshme(vlera: string | null): vlera is ZgjedhjaTemes {
 
 export function TemaProvider({ children }: { children: ReactNode }) {
   const skemaESistemit = useColorScheme();
-  const [zgjedhja, setZgjedhja] = useState<ZgjedhjaTemes>("sistemi");
+  // Pamja kryesore e TrimTime është e errëta; te Cilësimet mund të zgjidhet "Sistemi" ose "E çelët".
+  const [zgjedhja, setZgjedhja] = useState<ZgjedhjaTemes>("erret");
   const [ngarkuar, setNgarkuar] = useState(false);
 
   useEffect(() => {

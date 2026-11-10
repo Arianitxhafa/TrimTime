@@ -166,7 +166,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.md,
     },
     kodi: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.ari,
       fontSize: 34,
       letterSpacing: 6,

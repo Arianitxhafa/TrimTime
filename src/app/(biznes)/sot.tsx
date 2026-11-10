@@ -330,7 +330,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontWeight: "600",
     },
     titulli: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 28,
       letterSpacing: -0.5,
@@ -380,14 +380,14 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       opacity: 0.7,
     },
     iRadhesOra: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.mbiAri,
       fontSize: 36,
       letterSpacing: -1,
       fontVariant: ["tabular-nums"],
     },
     iRadhesKlienti: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.mbiAri,
       fontSize: 18,
       marginTop: 2,
@@ -428,7 +428,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     statistikaVlera: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 22,
       fontVariant: ["tabular-nums"],
@@ -494,7 +494,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       color: ngjyrat.sfondi,
     },
     seksioni: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       textTransform: "uppercase",
@@ -519,7 +519,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     boshTitulli: {
-      fontFamily: shkronjat.titullBold,
+      ...shkronjat.titullBold,
       color: ngjyrat.teksti,
       fontSize: 17,
     },

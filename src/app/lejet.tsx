@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { AppState, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Butoni from "../components/Butoni";
-import Marka, { ShiritiBerberit } from "../components/Marka";
+import Marka from "../components/Marka";
 import ZgjedhesiIQytetit from "../components/ZgjedhesiIQytetit";
 import { usePreferencat } from "../context/PreferencatContext";
 import { useStilet } from "../context/TemaContext";
@@ -124,9 +124,6 @@ export default function Lejet() {
       />
       <ScrollView contentContainerStyle={[styles.permbajtja, { paddingTop: insets.top + hapesira.lg }]}>
         <Marka madhesia={30} />
-        <View style={styles.shiriti}>
-          <ShiritiBerberit lartesia={6} gjeresiaEVijes={6} />
-        </View>
         <Text style={styles.mono}>{t("lejet.etiketa")}</Text>
 
         <Text style={styles.titulli}>{t("lejet.titulli")}</Text>
@@ -217,12 +214,13 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingVertical: 6,
     },
     mono: {
-      fontFamily: shkronjat.kursive,
+      ...shkronjat.etikete,
       color: ngjyrat.bronzi,
-      fontSize: 17,
+      fontSize: 15,
+      marginTop: hapesira.xxl,
     },
     titulli: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 42,
       lineHeight: 48,
@@ -230,7 +228,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginTop: 2,
     },
     nentitulli: {
-      fontFamily: shkronjat.kursive,
+      ...shkronjat.kursive,
       color: ngjyrat.tekstiDyte,
       fontSize: 17,
       lineHeight: 24,
@@ -247,13 +245,13 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.sm,
     },
     numri: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.theksi,
       fontSize: 13,
       letterSpacing: 0.6,
     },
     vula: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 12,
       borderWidth: 1,
@@ -268,7 +266,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       borderColor: ngjyrat.theksi,
     },
     seksioniTitulli: {
-      fontFamily: shkronjat.titull,
+      ...shkronjat.titull,
       color: ngjyrat.teksti,
       fontSize: 28,
       letterSpacing: -0.6,
@@ -280,7 +278,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     shenimi: {
-      fontFamily: shkronjat.kursive,
+      ...shkronjat.kursive,
       color: ngjyrat.teksti,
       fontSize: 15,
       lineHeight: 21,
@@ -290,7 +288,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     lejuar: {
-      fontFamily: shkronjat.etiketeBold,
+      ...shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 12,
       letterSpacing: 0.6,
@@ -298,7 +296,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingVertical: hapesira.sm,
     },
     privatesia: {
-      fontFamily: shkronjat.kursive,
+      ...shkronjat.kursive,
       color: ngjyrat.tekstiZbehte,
       fontSize: 14,
       lineHeight: 20,
@@ -319,7 +317,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       opacity: 0.6,
     },
     meDoreTeksti: {
-      fontFamily: shkronjat.etikete,
+      ...shkronjat.etikete,
       color: ngjyrat.tekstiDyte,
       fontSize: 12,
       letterSpacing: 0.8,

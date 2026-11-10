@@ -1,17 +1,19 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { Tabs } from "expo-router";
+import { NativeTabs } from "expo-router/native-tabs";
+import { Platform } from "react-native";
+import TabetWeb from "../../components/TabetWeb";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useListaEPritjesLive } from "../../api/listaEPritjes";
 import { ikonat } from "../../components/Ikona";
-import { degjuesitETabeve, ikonaETabit, useOpsionetETabeve } from "../../components/opsionetETabeve";
+import { useTema } from "../../context/TemaContext";
 import { formatoDaten } from "../../lib/datat";
 import { njoftoOrenELire } from "../../lib/kujtesat";
 import type { NeListenEPritjes } from "../../lib/tipet";
 
 export default function KlientLayout() {
   const { t } = useTranslation();
-  const opsionet = useOpsionetETabeve();
+  const { ngjyrat } = useTema();
   const klienti = useQueryClient();
 
   // Një dëgjues i vetëm për listën e pritjes, i hapur sa kohë klienti është brenda.
@@ -34,15 +36,38 @@ export default function KlientLayout() {
   );
   useListaEPritjesLive(kurLirohet);
 
-  return (
-    <Tabs screenOptions={opsionet} screenListeners={degjuesitETabeve}>
-      <Tabs.Screen name="zbulo" options={{ title: t("tabs.zbulo"), tabBarIcon: ikonaETabit(ikonat.zbulo) }} />
-      <Tabs.Screen name="harta" options={{ title: t("tabs.harta"), tabBarIcon: ikonaETabit(ikonat.harta) }} />
-      <Tabs.Screen
-        name="terminet-e-mia"
-        options={{ title: t("tabs.terminet"), tabBarIcon: ikonaETabit(ikonat.kalendar) }}
+  if (Platform.OS === "web") {
+    return (
+      <TabetWeb
+        tabet={[
+          { emri: "zbulo", titulli: t("tabs.zbulo"), ikona: ikonat.zbulo },
+          { emri: "harta", titulli: t("tabs.harta"), ikona: ikonat.harta },
+          { emri: "terminet-e-mia", titulli: t("tabs.terminet"), ikona: ikonat.kalendar },
+          { emri: "profili", titulli: t("tabs.profili"), ikona: ikonat.personi },
+        ]}
       />
-      <Tabs.Screen name="profili" options={{ title: t("tabs.profili"), tabBarIcon: ikonaETabit(ikonat.personi) }} />
-    </Tabs>
+    );
+  }
+
+  // Shiriti i tab-eve i iOS (Liquid Glass në iOS 26) dhe i Android-it, me ikonat SF Symbols.
+  return (
+    <NativeTabs tintColor={ngjyrat.ari} minimizeBehavior="onScrollDown" backgroundColor={ngjyrat.siperfaqja}>
+      <NativeTabs.Trigger name="zbulo">
+        <NativeTabs.Trigger.Icon sf="sparkle.magnifyingglass" md={ikonat.zbulo.android} />
+        <NativeTabs.Trigger.Label>{t("tabs.zbulo")}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="harta">
+        <NativeTabs.Trigger.Icon sf={{ default: "map", selected: "map.fill" }} md={ikonat.harta.android} />
+        <NativeTabs.Trigger.Label>{t("tabs.harta")}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="terminet-e-mia">
+        <NativeTabs.Trigger.Icon sf="calendar" md={ikonat.kalendar.android} />
+        <NativeTabs.Trigger.Label>{t("tabs.terminet")}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="profili">
+        <NativeTabs.Trigger.Icon sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }} md={ikonat.personi.android} />
+        <NativeTabs.Trigger.Label>{t("tabs.profili")}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }

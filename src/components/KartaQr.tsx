@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
   },
   titulli: {
-    fontFamily: shkronjat.titullBold,
+    ...shkronjat.titullBold,
     color: "#0B0B0F",
     fontSize: 20,
     textAlign: "center",

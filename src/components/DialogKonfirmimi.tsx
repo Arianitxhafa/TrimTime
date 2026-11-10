@@ -65,7 +65,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     alignSelf: "center",
   },
   titulli: {
-    fontFamily: shkronjat.titullBold,
+    ...shkronjat.titullBold,
     color: ngjyrat.teksti,
     fontSize: 19,
     marginBottom: hapesira.sm,
