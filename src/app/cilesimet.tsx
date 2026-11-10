@@ -150,7 +150,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       padding: hapesira.xl,
     },
     seksioni: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       textTransform: "uppercase",

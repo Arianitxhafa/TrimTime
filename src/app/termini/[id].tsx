@@ -464,7 +464,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       lineHeight: 22,
     },
     seksioni: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       textTransform: "uppercase",

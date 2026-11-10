@@ -6,6 +6,7 @@ export type Ngjyrat = {
   siperfaqja: string;
   siperfaqja2: string;
   kufiri: string;
+  // Ngjyra kryesore e veprimeve (butonat, ikonat aktive): e gjelbër berberie në dritë, bronz në errësirë.
   ari: string;
   ariIErret: string;
   teksti: string;
@@ -16,83 +17,105 @@ export type Ngjyrat = {
   rrezikKufiri: string;
   mbiAri: string;
   mbulesa: string;
-  // Gradienti i arit (butonat kryesorë, theksimet): nga i ndriçuari te i thelli.
   gradientiAri: readonly [string, string, string];
-  // Mbushja e kartave "xham" kur blur-i nuk është i disponueshëm (Android, web).
+  // Mbushja e etiketave mbi foto.
   xham: string;
   kufiriXham: string;
   // Gradienti mbi fotot, që teksti i bardhë të lexohet.
   hijaEFotos: readonly [string, string];
-  // E kuqja e revistës: përdoret rrallë, vetëm për theksim (numra, zbritje, pika).
+  // E kuqja e shiritit të berberit: vetëm për theksim (zbritje, pika, njoftime).
   theksi: string;
-  // Vijat e holla që ndajnë seksionet, si në faqen e një reviste.
+  // Vijat e holla prej bronzi që ndajnë seksionet.
   vija: string;
+  // Bronzi i tabelave të berberisë, i errësuar sa duhet që teksti të lexohet.
+  bronzi: string;
+  // Ngjyrat e shiritit të berberit: e kuqe, krem, blu.
+  shiriti: readonly [string, string, string];
+  // Sfondi i tabelave të lokaleve pa foto (zgjidhet sipas emrit).
+  tabelat: readonly string[];
 };
 
-// Dizajni "editorial": letër krem, bojë e zezë dhe një e kuqe. "Ari" mbetet emri i ngjyrës
-// kryesore në kod (butonat, ikonat), por tani është boja e zezë e faqes.
+// "Barbershop klasik" i ditës: letër krem, bojë e gjelbër e thellë dhe bronz.
 export const ngjyratCelta: Ngjyrat = {
-  sfondi: "#F3EEE4",
-  siperfaqja: "#FAF7F0",
-  siperfaqja2: "#E9E2D4",
-  kufiri: "#D5CCBB",
-  ari: "#15130F",
-  ariIErret: "#E6DECE",
-  teksti: "#15130F",
-  tekstiDyte: "#5A5448",
-  tekstiZbehte: "#928A7B",
-  rrezik: "#B8102B",
-  rrezikSfond: "#F4E1DE",
-  rrezikKufiri: "#E7BFB9",
-  mbiAri: "#F3EEE4",
-  mbulesa: "rgba(21,19,15,0.5)",
-  gradientiAri: ["#15130F", "#15130F", "#15130F"],
-  xham: "rgba(243,238,228,0.94)",
-  kufiriXham: "rgba(21,19,15,0.14)",
-  hijaEFotos: ["rgba(21,19,15,0)", "rgba(21,19,15,0.86)"],
-  theksi: "#C8102E",
-  vija: "#15130F",
+  sfondi: "#F4ECDD",
+  siperfaqja: "#FBF7EE",
+  siperfaqja2: "#ECE2CF",
+  kufiri: "#DDCFB4",
+  ari: "#1F3A2E",
+  ariIErret: "#E2E6D6",
+  teksti: "#1B2620",
+  tekstiDyte: "#4D5A51",
+  tekstiZbehte: "#7A8378",
+  rrezik: "#A3221D",
+  rrezikSfond: "#F6E0DA",
+  rrezikKufiri: "#E8BDB4",
+  mbiAri: "#F7F0E2",
+  mbulesa: "rgba(19,38,29,0.5)",
+  gradientiAri: ["#2A4B3C", "#1F3A2E", "#16291F"],
+  xham: "rgba(251,247,238,0.94)",
+  kufiriXham: "rgba(31,58,46,0.16)",
+  hijaEFotos: ["rgba(16,30,23,0)", "rgba(16,30,23,0.85)"],
+  theksi: "#B3261E",
+  vija: "#C9AE7E",
+  bronzi: "#80612F",
+  shiriti: ["#B3261E", "#F7F0E2", "#1F4E8C"],
+  tabelat: ["#1F3A2E", "#3A2A1E", "#1D2E44", "#4A1F24"],
 };
 
-// "Botimi i natës": e njëjta faqe me ngjyrat e kthyera.
+// "Barbershop klasik" i natës: e gjelbër e thellë, krem dhe bronz i ndritshëm.
 export const ngjyratErrta: Ngjyrat = {
-  sfondi: "#11100E",
-  siperfaqja: "#191815",
-  siperfaqja2: "#24221D",
-  kufiri: "#38342C",
-  ari: "#F1EADC",
-  ariIErret: "#2A2721",
-  teksti: "#F1EADC",
-  tekstiDyte: "#ADA594",
-  tekstiZbehte: "#756E61",
-  rrezik: "#EF5A5F",
-  rrezikSfond: "#2C1716",
-  rrezikKufiri: "#4C2422",
-  mbiAri: "#11100E",
-  mbulesa: "rgba(0,0,0,0.72)",
-  gradientiAri: ["#F1EADC", "#F1EADC", "#F1EADC"],
-  xham: "rgba(17,16,14,0.94)",
-  kufiriXham: "rgba(241,234,220,0.14)",
-  hijaEFotos: ["rgba(17,16,14,0)", "rgba(17,16,14,0.88)"],
-  theksi: "#EF5A5F",
-  vija: "#F1EADC",
+  sfondi: "#12241B",
+  siperfaqja: "#183026",
+  siperfaqja2: "#203C30",
+  kufiri: "#2E4C3E",
+  ari: "#CDAA6D",
+  ariIErret: "#24392C",
+  teksti: "#F3E9D6",
+  tekstiDyte: "#C5BCA8",
+  tekstiZbehte: "#8F9C90",
+  rrezik: "#F2786C",
+  rrezikSfond: "#3A1E1A",
+  rrezikKufiri: "#5A2A24",
+  mbiAri: "#12241B",
+  mbulesa: "rgba(0,0,0,0.65)",
+  gradientiAri: ["#DCBD84", "#CDAA6D", "#B8935A"],
+  xham: "rgba(18,36,27,0.92)",
+  kufiriXham: "rgba(205,170,109,0.3)",
+  hijaEFotos: ["rgba(10,22,16,0)", "rgba(10,22,16,0.88)"],
+  theksi: "#E5574D",
+  vija: "#4C6A55",
+  bronzi: "#CDAA6D",
+  shiriti: ["#C7302A", "#F3E9D6", "#2D63A8"],
+  tabelat: ["#1C3A2C", "#3B2B1F", "#1E3048", "#4B2126"],
 };
 
-// Revista është e sheshtë: pa hije. Emrat mbeten që komponentët të mos ndryshojnë.
+// Hije e butë, si një tabelë e varur në mur.
 export const hijet = {
-  karte: {},
-  ari: {},
+  karte: {
+    shadowColor: "#0B1A12",
+    shadowOpacity: 0.12,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 3,
+  },
+  ari: {
+    shadowColor: "#0B1A12",
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+  },
 } as const;
 
-// Titujt me serif (Playfair Display) dhe etiketat me mono (IBM Plex Mono), si në një revistë.
+// Titujt me Fraunces (serif klasik i tabelave) dhe etiketat me Inter, që lexohet mirë edhe e vogël.
 // Ngarkohen te _layout.tsx; teksti i zakonshëm mbetet me shkronjat e sistemit.
 export const shkronjat = {
-  titull: "PlayfairDisplay_900Black",
-  titullBold: "PlayfairDisplay_700Bold",
-  kursive: "PlayfairDisplay_400Regular_Italic",
-  kursiveBold: "PlayfairDisplay_700Bold_Italic",
-  mono: "IBMPlexMono_500Medium",
-  monoBold: "IBMPlexMono_600SemiBold",
+  titull: "Fraunces_700Bold",
+  titullBold: "Fraunces_600SemiBold",
+  kursive: "Fraunces_400Regular_Italic",
+  kursiveBold: "Fraunces_600SemiBold_Italic",
+  etikete: "Inter_600SemiBold",
+  etiketeBold: "Inter_700Bold",
 } as const;
 
 export const hapesira = {
@@ -104,12 +127,12 @@ export const hapesira = {
   xxl: 28,
 } as const;
 
-// Këndet janë pothuajse të drejta, si faqja e shtypur.
+// Kënde të buta, si buzët e një tabele druri.
 export const rrezja = {
-  sm: 2,
-  md: 3,
-  lg: 4,
-  plote: 2,
+  sm: 6,
+  md: 10,
+  lg: 16,
+  plote: 999,
 } as const;
 
 export type MetaStatusi = {
@@ -128,19 +151,18 @@ const ikonatEStatuseve: Record<StatusiTerminit, EmriIkones> = {
   nuk_erdhi: { ios: "person.fill.xmark", android: "person_off" },
 };
 
-// Ngjyra boje të zbehura, si në letër të shtypur.
 export const statusetMetaErrta: StatusetMeta = {
-  ne_pritje: { ngjyra: "#E0B05A", sfondi: "#2B2416", ikona: ikonatEStatuseve.ne_pritje },
-  konfirmuar: { ngjyra: "#7FB98B", sfondi: "#18251B", ikona: ikonatEStatuseve.konfirmuar },
-  perfunduar: { ngjyra: "#F1EADC", sfondi: "#2A2721", ikona: ikonatEStatuseve.perfunduar },
-  anuluar: { ngjyra: "#EF5A5F", sfondi: "#2C1716", ikona: ikonatEStatuseve.anuluar },
-  nuk_erdhi: { ngjyra: "#ADA594", sfondi: "#24221D", ikona: ikonatEStatuseve.nuk_erdhi },
+  ne_pritje: { ngjyra: "#E7C27A", sfondi: "#33301B", ikona: ikonatEStatuseve.ne_pritje },
+  konfirmuar: { ngjyra: "#8FD19E", sfondi: "#1D3A27", ikona: ikonatEStatuseve.konfirmuar },
+  perfunduar: { ngjyra: "#F3E9D6", sfondi: "#2A4234", ikona: ikonatEStatuseve.perfunduar },
+  anuluar: { ngjyra: "#F2786C", sfondi: "#3A1E1A", ikona: ikonatEStatuseve.anuluar },
+  nuk_erdhi: { ngjyra: "#C5BCA8", sfondi: "#203C30", ikona: ikonatEStatuseve.nuk_erdhi },
 };
 
 export const statusetMetaCelta: StatusetMeta = {
-  ne_pritje: { ngjyra: "#8A5A00", sfondi: "#F1E4C8", ikona: ikonatEStatuseve.ne_pritje },
-  konfirmuar: { ngjyra: "#245C33", sfondi: "#DDE8D6", ikona: ikonatEStatuseve.konfirmuar },
-  perfunduar: { ngjyra: "#15130F", sfondi: "#E6DECE", ikona: ikonatEStatuseve.perfunduar },
-  anuluar: { ngjyra: "#B8102B", sfondi: "#F4E1DE", ikona: ikonatEStatuseve.anuluar },
-  nuk_erdhi: { ngjyra: "#5A5448", sfondi: "#E9E2D4", ikona: ikonatEStatuseve.nuk_erdhi },
+  ne_pritje: { ngjyra: "#835500", sfondi: "#F3E3BF", ikona: ikonatEStatuseve.ne_pritje },
+  konfirmuar: { ngjyra: "#1E5E34", sfondi: "#D9EAD5", ikona: ikonatEStatuseve.konfirmuar },
+  perfunduar: { ngjyra: "#1F3A2E", sfondi: "#E2E6D6", ikona: ikonatEStatuseve.perfunduar },
+  anuluar: { ngjyra: "#A3221D", sfondi: "#F6E0DA", ikona: ikonatEStatuseve.anuluar },
+  nuk_erdhi: { ngjyra: "#4D5A51", sfondi: "#ECE2CF", ikona: ikonatEStatuseve.nuk_erdhi },
 };

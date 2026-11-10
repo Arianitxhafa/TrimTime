@@ -376,11 +376,11 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       color: ngjyrat.mbiAri,
       fontSize: 12,
       fontWeight: "800",
-      letterSpacing: 1.2,
+      letterSpacing: 0.6,
       opacity: 0.7,
     },
     iRadhesOra: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.mbiAri,
       fontSize: 36,
       letterSpacing: -1,
@@ -428,7 +428,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     statistikaVlera: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 22,
       fontVariant: ["tabular-nums"],
@@ -494,7 +494,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       color: ngjyrat.sfondi,
     },
     seksioni: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       textTransform: "uppercase",

@@ -470,7 +470,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.lg,
     },
     pritjaTitulli: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       textTransform: "uppercase",

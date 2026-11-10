@@ -269,7 +269,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingBottom: hapesira.xxl,
     },
     hapi: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.ari,
       fontSize: 13,
       letterSpacing: 0.6,
@@ -305,7 +305,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.md,
       backgroundColor: ngjyrat.siperfaqja,
       borderRadius: rrezja.md,
-      borderWidth: 1.5,
+      borderWidth: 1,
       borderColor: ngjyrat.kufiri,
       padding: hapesira.md,
     },

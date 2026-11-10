@@ -4,9 +4,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStilet, useTema } from "../context/TemaContext";
 import { formatoCmimin } from "../lib/formatimi";
 import { prekja } from "../lib/prekja";
-import { hapesira, shkronjat, type Ngjyrat } from "../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Butoni from "./Butoni";
 import Ikona, { ikonat } from "./Ikona";
+import { ShiritiBerberit } from "./Marka";
 
 // Kategoritë njihen nga serveri sipas emrit të shërbimit (shih sherbimi_ne_kategori).
 export const KATEGORITE = ["qethje", "fade", "mjeker", "femije", "ngjyrosje"] as const;
@@ -72,7 +73,9 @@ export default function FiltratEKerkimit({ iDukshem, filtrat: f, ndrysho, numri,
             <Ikona emri={ikonat.mbyll} madhesia={22} ngjyra={ngjyrat.teksti} />
           </Pressable>
         </View>
-        <View style={styles.vijaETrashe} />
+        <View style={styles.shiriti}>
+          <ShiritiBerberit lartesia={5} />
+        </View>
 
         <ScrollView contentContainerStyle={styles.permbajtja}>
           <Seksioni numri="01" titulli={t("zbulo.renditja")}>
@@ -203,10 +206,10 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontSize: 32,
       letterSpacing: -0.8,
     },
-    vijaETrashe: {
-      height: 4,
-      backgroundColor: ngjyrat.vija,
+    shiriti: {
       marginHorizontal: hapesira.xl,
+      borderRadius: 3,
+      overflow: "hidden",
     },
     permbajtja: {
       paddingHorizontal: hapesira.xl,
@@ -214,7 +217,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     seksioni: {
       borderBottomWidth: 1,
-      borderBottomColor: ngjyrat.vija,
+      borderBottomColor: ngjyrat.kufiri,
       paddingVertical: hapesira.lg,
       gap: hapesira.md,
     },
@@ -224,10 +227,10 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.sm,
     },
     seksioniNumri: {
-      fontFamily: shkronjat.monoBold,
-      color: ngjyrat.theksi,
+      fontFamily: shkronjat.etiketeBold,
+      color: ngjyrat.bronzi,
       fontSize: 12,
-      letterSpacing: 1,
+      letterSpacing: 0.6,
     },
     seksioniTitulli: {
       fontFamily: shkronjat.titullBold,
@@ -240,21 +243,22 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.sm,
     },
     opsioni: {
-      paddingHorizontal: 12,
-      height: 36,
-      borderWidth: 1.5,
-      borderColor: ngjyrat.vija,
+      paddingHorizontal: 14,
+      height: 38,
+      borderRadius: rrezja.plote,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
+      backgroundColor: ngjyrat.siperfaqja,
       justifyContent: "center",
     },
     opsioniAktiv: {
       backgroundColor: ngjyrat.ari,
+      borderColor: ngjyrat.ari,
     },
     opsioniTeksti: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etikete,
       color: ngjyrat.teksti,
-      fontSize: 11,
-      letterSpacing: 1,
-      textTransform: "uppercase",
+      fontSize: 13,
     },
     opsioniTekstiAktiv: {
       color: ngjyrat.mbiAri,
@@ -268,17 +272,17 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.lg,
       paddingHorizontal: hapesira.xl,
       paddingTop: hapesira.md,
-      borderTopWidth: 1.5,
-      borderTopColor: ngjyrat.vija,
+      borderTopWidth: 1,
+      borderTopColor: ngjyrat.kufiri,
     },
     pastro: {
       paddingVertical: 6,
     },
     pastroTeksti: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 12,
-      letterSpacing: 1,
+      letterSpacing: 0.6,
       textTransform: "uppercase",
       textDecorationLine: "underline",
     },

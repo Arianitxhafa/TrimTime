@@ -125,7 +125,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontSize: 14,
     },
     seksioni: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       textTransform: "uppercase",

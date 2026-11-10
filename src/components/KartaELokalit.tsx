@@ -1,33 +1,33 @@
-import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import Animated from "react-native-reanimated";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { useStilet, useTema } from "../context/TemaContext";
 import { useShtypja } from "../hooks/useShtypja";
 import { formatoCmimin, formatoDistancen } from "../lib/formatimi";
 import { prekja } from "../lib/prekja";
 import type { LokaliPrane } from "../lib/tipet";
-import { hapesira, shkronjat, type Ngjyrat } from "../theme";
+import { hapesira, hijet, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Ikona, { ikonat } from "./Ikona";
+import KopertinaELokalit from "./KopertinaELokalit";
 
 type Props = {
   lokali: LokaliPrane;
-  // Në hartë karta është më e ngushtë dhe pa foto të madhe.
+  // Në hartë karta është më e ngushtë dhe pa kopertinë.
   kompakte?: boolean;
-  // Numri i artikullit në listë ("01", "02"…), si në një revistë.
+  // Pozicioni në listë: kartat e para hyjnë njëra pas tjetrës.
   indeksi?: number;
 };
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-// Një lokal si artikull reviste: numër, vijë, foto me kënde të drejta, emri me serif dhe
-// detajet me mono.
+// Lokali si kartë berberie: kopertina (foto ose tabelë e gjeneruar), vlerësimi dhe oferta mbi të,
+// pastaj emri me serif dhe detajet.
 export default function KartaELokalit({ lokali, kompakte = false, indeksi }: Props) {
   const { t } = useTranslation();
   const { ngjyrat, statusetMeta } = useTema();
   const styles = useStilet(krijoStilet);
-  const shtypja = useShtypja(0.985);
+  const shtypja = useShtypja(0.98);
   const kaVleresim = lokali.vleresimi_mesatar != null && lokali.nr_vleresimeve > 0;
   const ngjyraEStatusit =
     lokali.ka_orar && lokali.i_hapur_tani ? statusetMeta.konfirmuar.ngjyra : ngjyrat.tekstiZbehte;
@@ -38,12 +38,13 @@ export default function KartaELokalit({ lokali, kompakte = false, indeksi }: Pro
   }
 
   // Orari i panjohur (shumica e lokaleve nga OpenStreetMap): nuk shkruajmë "Mbyllur".
+  const statusi = lokali.ka_orar ? (lokali.i_hapur_tani ? t("lokali.hapur") : t("lokali.mbyllur")) : null;
   const detajet = [
-    lokali.ka_orar ? (lokali.i_hapur_tani ? t("lokali.hapur") : t("lokali.mbyllur")) : null,
+    statusi,
     formatoDistancen(lokali.distanca_m),
     lokali.cmimi_min !== null ? t("lokali.ngaCmimi", { cmimi: formatoCmimin(lokali.cmimi_min) }) : null,
-    lokali.rezervim_online ? null : lokali.telefoni ? t("lokali.meTelefon") : t("lokali.paTermin"),
   ].filter(Boolean);
+  const rezervimi = lokali.rezervim_online ? null : lokali.telefoni ? t("lokali.meTelefon") : t("lokali.paTermin");
 
   if (kompakte) {
     return (
@@ -53,6 +54,7 @@ export default function KartaELokalit({ lokali, kompakte = false, indeksi }: Pro
         onPress={hap}
         style={({ pressed }) => [styles.kompakte, pressed && styles.shtypur]}
       >
+        <KopertinaELokalit emri={lokali.emri} fotoUrl={lokali.kopertina_url} style={styles.kopertinaKompakte} />
         <View style={styles.teksti}>
           <Text style={styles.emriKompakt} numberOfLines={1}>
             {lokali.emri}
@@ -65,34 +67,29 @@ export default function KartaELokalit({ lokali, kompakte = false, indeksi }: Pro
         {lokali.promocioni_max ? (
           <Text style={styles.promo}>{t("promocionet.etiketa", { perqindja: lokali.promocioni_max })}</Text>
         ) : null}
-        <Ikona emri={ikonat.djathtas} madhesia={16} ngjyra={ngjyrat.teksti} />
+        <Ikona emri={ikonat.djathtas} madhesia={16} ngjyra={ngjyrat.tekstiZbehte} />
       </Pressable>
     );
   }
 
   return (
-    <AnimatedPressable
-      accessibilityRole="button"
-      accessibilityLabel={lokali.emri}
-      onPressIn={shtypja.onPressIn}
-      onPressOut={shtypja.onPressOut}
-      onPress={hap}
-      style={[styles.artikulli, shtypja.stili]}
-    >
-      <View style={styles.koka}>
-        <Text style={styles.numri}>{indeksi !== undefined ? String(indeksi + 1).padStart(2, "0") : "—"}</Text>
-        {kaVleresim ? (
-          <Text style={styles.vleresimi}>
-            ★ {Number(lokali.vleresimi_mesatar).toFixed(1)}
-            <Text style={styles.zbehte}> ({lokali.nr_vleresimeve})</Text>
-          </Text>
-        ) : null}
-      </View>
-
-      {/* Pa foto, artikulli mbetet vetëm tekst: lista nuk mbushet me kuti bosh. */}
-      {lokali.kopertina_url ? (
-        <View style={styles.foto}>
-          <Image source={{ uri: lokali.kopertina_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={250} />
+    <Animated.View entering={indeksi !== undefined && indeksi < 8 ? FadeInDown.delay(indeksi * 70).duration(420) : undefined}>
+      <AnimatedPressable
+        accessibilityRole="button"
+        accessibilityLabel={lokali.emri}
+        onPressIn={shtypja.onPressIn}
+        onPressOut={shtypja.onPressOut}
+        onPress={hap}
+        style={[styles.karta, hijet.karte, shtypja.stili]}
+      >
+        <View>
+          <KopertinaELokalit emri={lokali.emri} fotoUrl={lokali.kopertina_url} style={styles.kopertina} />
+          {kaVleresim ? (
+            <View style={styles.vleresimi}>
+              <Text style={styles.vleresimiTeksti}>★ {Number(lokali.vleresimi_mesatar).toFixed(1)}</Text>
+              <Text style={styles.vleresimiNumri}>({lokali.nr_vleresimeve})</Text>
+            </View>
+          ) : null}
           {lokali.promocioni_max ? (
             <View style={styles.promoEtiketa}>
               <Text style={styles.promoEtiketaTeksti}>
@@ -101,128 +98,148 @@ export default function KartaELokalit({ lokali, kompakte = false, indeksi }: Pro
             </View>
           ) : null}
         </View>
-      ) : lokali.promocioni_max ? (
-        <View style={[styles.promoEtiketa, styles.promoNeRresht]}>
-          <Text style={styles.promoEtiketaTeksti}>{t("promocionet.etiketa", { perqindja: lokali.promocioni_max })}</Text>
-        </View>
-      ) : null}
 
-      <Text style={styles.emri} numberOfLines={2}>
-        {lokali.emri}
-      </Text>
-      <Text style={styles.adresa} numberOfLines={1}>
-        {lokali.adresa}, {lokali.qyteti}
-      </Text>
-      <View style={styles.detajet}>
-        <View style={[styles.pika, { backgroundColor: ngjyraEStatusit }]} />
-        <Text style={styles.meta} numberOfLines={1}>
-          {detajet.join("  ·  ")}
-        </Text>
-        <Text style={styles.lexo}>→</Text>
-      </View>
-    </AnimatedPressable>
+        <View style={styles.trupi}>
+          <Text style={styles.emri} numberOfLines={2}>
+            {lokali.emri}
+          </Text>
+          <Text style={styles.adresa} numberOfLines={1}>
+            {lokali.adresa}, {lokali.qyteti}
+          </Text>
+          <View style={styles.detajet}>
+            {statusi ? <View style={[styles.pika, { backgroundColor: ngjyraEStatusit }]} /> : null}
+            <Text style={styles.meta} numberOfLines={1}>
+              {detajet.join("  ·  ")}
+            </Text>
+          </View>
+          {rezervimi ? (
+            <View style={styles.etiketa}>
+              <Ikona emri={lokali.telefoni ? ikonat.telefoni : ikonat.harta} madhesia={13} ngjyra={ngjyrat.bronzi} />
+              <Text style={styles.etiketaTeksti}>{rezervimi}</Text>
+            </View>
+          ) : (
+            <View style={styles.etiketa}>
+              <Ikona emri={ikonat.kalendar} madhesia={13} ngjyra={ngjyrat.bronzi} />
+              <Text style={styles.etiketaTeksti}>{t("zbulo.online")}</Text>
+            </View>
+          )}
+        </View>
+      </AnimatedPressable>
+    </Animated.View>
   );
 }
 
 const krijoStilet = (ngjyrat: Ngjyrat) =>
   StyleSheet.create({
-    artikulli: {
-      borderTopWidth: 1.5,
-      borderTopColor: ngjyrat.vija,
-      paddingTop: hapesira.md,
-    },
-    koka: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: hapesira.md,
-    },
-    numri: {
-      fontFamily: shkronjat.monoBold,
-      color: ngjyrat.theksi,
-      fontSize: 12,
-      letterSpacing: 1.5,
-    },
-    vleresimi: {
-      fontFamily: shkronjat.monoBold,
-      color: ngjyrat.teksti,
-      fontSize: 12,
-      letterSpacing: 0.5,
-    },
-    zbehte: {
-      color: ngjyrat.tekstiZbehte,
-    },
-    foto: {
-      aspectRatio: 4 / 3,
-      backgroundColor: ngjyrat.siperfaqja2,
+    karta: {
+      backgroundColor: ngjyrat.siperfaqja,
+      borderRadius: rrezja.lg,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
       overflow: "hidden",
     },
-    promoNeRresht: {
-      position: "relative",
-      top: 0,
-      right: 0,
-      alignSelf: "flex-start",
+    kopertina: {
+      height: 140,
+    },
+    vleresimi: {
+      position: "absolute",
+      top: 20,
+      left: hapesira.md,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      backgroundColor: ngjyrat.xham,
+      borderRadius: rrezja.plote,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+    },
+    vleresimiTeksti: {
+      fontFamily: shkronjat.etiketeBold,
+      color: ngjyrat.teksti,
+      fontSize: 13,
+    },
+    vleresimiNumri: {
+      fontFamily: shkronjat.etikete,
+      color: ngjyrat.tekstiDyte,
+      fontSize: 12,
     },
     promoEtiketa: {
       position: "absolute",
-      top: hapesira.md,
+      top: 20,
       right: hapesira.md,
       backgroundColor: ngjyrat.theksi,
-      paddingHorizontal: 8,
-      paddingVertical: 4,
+      borderRadius: rrezja.plote,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
     },
     promoEtiketaTeksti: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: "#FFFFFF",
       fontSize: 12,
-      letterSpacing: 1,
+    },
+    trupi: {
+      padding: hapesira.lg,
+      gap: 4,
     },
     emri: {
       fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
-      fontSize: 28,
-      lineHeight: 32,
-      letterSpacing: -0.6,
-      marginTop: hapesira.sm,
+      fontSize: 23,
+      lineHeight: 28,
+      letterSpacing: -0.3,
     },
     adresa: {
       color: ngjyrat.tekstiDyte,
       fontSize: 14,
-      marginTop: 4,
     },
     detajet: {
       flexDirection: "row",
       alignItems: "center",
       gap: hapesira.sm,
-      marginTop: hapesira.md,
+      marginTop: 6,
     },
     pika: {
-      width: 7,
-      height: 7,
+      width: 8,
+      height: 8,
       borderRadius: 4,
     },
     meta: {
       flexShrink: 1,
-      fontFamily: shkronjat.mono,
+      fontFamily: shkronjat.etikete,
       color: ngjyrat.tekstiDyte,
-      fontSize: 11,
-      letterSpacing: 0.8,
-      textTransform: "uppercase",
+      fontSize: 13,
     },
-    lexo: {
-      marginLeft: "auto",
-      fontFamily: shkronjat.monoBold,
-      color: ngjyrat.teksti,
-      fontSize: 16,
+    etiketa: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      alignSelf: "flex-start",
+      marginTop: hapesira.sm,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: rrezja.plote,
+      borderWidth: 1,
+      borderColor: ngjyrat.vija,
+    },
+    etiketaTeksti: {
+      fontFamily: shkronjat.etikete,
+      color: ngjyrat.bronzi,
+      fontSize: 12,
     },
     kompakte: {
       flexDirection: "row",
       alignItems: "center",
       gap: hapesira.md,
-      padding: hapesira.lg,
-      backgroundColor: ngjyrat.sfondi,
-      borderWidth: 1.5,
-      borderColor: ngjyrat.vija,
+      padding: hapesira.md,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderRadius: rrezja.lg,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
+    },
+    kopertinaKompakte: {
+      width: 56,
+      height: 56,
+      borderRadius: rrezja.md,
     },
     shtypur: {
       opacity: 0.85,
@@ -234,10 +251,10 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     emriKompakt: {
       fontFamily: shkronjat.titullBold,
       color: ngjyrat.teksti,
-      fontSize: 19,
+      fontSize: 18,
     },
     promo: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.theksi,
       fontSize: 12,
     },

@@ -449,7 +449,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingBottom: hapesira.xxl,
     },
     seksioni: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       textTransform: "uppercase",
@@ -527,7 +527,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingVertical: hapesira.md,
       paddingHorizontal: hapesira.sm,
       borderRadius: rrezja.md,
-      borderWidth: 1.5,
+      borderWidth: 1,
       borderColor: ngjyrat.kufiri,
       backgroundColor: ngjyrat.siperfaqja,
     },
@@ -550,7 +550,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     berberiNentitulli: {
       color: ngjyrat.tekstiZbehte,
-      fontSize: 11,
+      fontSize: 12,
       marginTop: -4,
     },
     shenime: {

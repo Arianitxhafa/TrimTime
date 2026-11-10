@@ -243,7 +243,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       flex: 1,
     },
     seksioni: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       textTransform: "uppercase",

@@ -280,7 +280,7 @@ export const sq = {
     titulliRevistes: "Berberët",
     titulliQyteti: "në {{qyteti}}.",
     titulliKosova: "e Kosovës.",
-    neKeteBotim: "Në këtë botim",
+    neKeteBotim: "Lokalet pranë teje",
     rezultatet: "{{numri}} lokale",
     asnje: "Asnjë lokal këtu",
     asnjeTeksti: "Provo një kërkim tjetër, hiq filtrat ose zgjero zonën.",

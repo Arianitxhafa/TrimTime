@@ -420,11 +420,11 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingRight: hapesira.lg,
     },
     ora: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       position: "absolute",
       right: 6,
       color: ngjyrat.tekstiZbehte,
-      fontSize: 11,
+      fontSize: 12,
       fontVariant: ["tabular-nums"],
     },
     kolonaTitulli: {
@@ -463,7 +463,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     pushimiTeksti: {
       color: ngjyrat.tekstiZbehte,
-      fontSize: 11,
+      fontSize: 12,
       fontWeight: "700",
     },
     blloku: {
@@ -480,8 +480,8 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       opacity: 0.45,
     },
     bllokuOra: {
-      fontFamily: shkronjat.monoBold,
-      fontSize: 11,
+      fontFamily: shkronjat.etiketeBold,
+      fontSize: 12,
       fontVariant: ["tabular-nums"],
     },
     bllokuKlienti: {
@@ -491,7 +491,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     bllokuSherbimi: {
       color: ngjyrat.tekstiDyte,
-      fontSize: 11,
+      fontSize: 12,
     },
     vijaETanishme: {
       position: "absolute",

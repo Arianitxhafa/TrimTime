@@ -1,9 +1,9 @@
-import { IBMPlexMono_500Medium } from "@expo-google-fonts/ibm-plex-mono/500Medium";
-import { IBMPlexMono_600SemiBold } from "@expo-google-fonts/ibm-plex-mono/600SemiBold";
-import { PlayfairDisplay_400Regular_Italic } from "@expo-google-fonts/playfair-display/400Regular_Italic";
-import { PlayfairDisplay_700Bold } from "@expo-google-fonts/playfair-display/700Bold";
-import { PlayfairDisplay_700Bold_Italic } from "@expo-google-fonts/playfair-display/700Bold_Italic";
-import { PlayfairDisplay_900Black } from "@expo-google-fonts/playfair-display/900Black";
+import { Fraunces_400Regular_Italic } from "@expo-google-fonts/fraunces/400Regular_Italic";
+import { Fraunces_600SemiBold } from "@expo-google-fonts/fraunces/600SemiBold";
+import { Fraunces_600SemiBold_Italic } from "@expo-google-fonts/fraunces/600SemiBold_Italic";
+import { Fraunces_700Bold } from "@expo-google-fonts/fraunces/700Bold";
+import { Inter_600SemiBold } from "@expo-google-fonts/inter/600SemiBold";
+import { Inter_700Bold } from "@expo-google-fonts/inter/700Bold";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
@@ -23,15 +23,15 @@ import { shkronjat } from "../theme";
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
-  // Shkronjat e revistës; splash screen-i mbetet derisa të ngarkohen (ose të dështojnë: atëherë
-  // përdoren shkronjat e sistemit, që aplikacioni të mos ngecë).
+  // Shkronjat e berberisë klasike; splash screen-i mbetet derisa të ngarkohen (ose të dështojnë:
+  // atëherë përdoren shkronjat e sistemit, që aplikacioni të mos ngecë).
   const [shkronjatGati, gabimiShkronjave] = useFonts({
-    PlayfairDisplay_900Black,
-    PlayfairDisplay_700Bold,
-    PlayfairDisplay_400Regular_Italic,
-    PlayfairDisplay_700Bold_Italic,
-    IBMPlexMono_500Medium,
-    IBMPlexMono_600SemiBold,
+    Fraunces_700Bold,
+    Fraunces_600SemiBold,
+    Fraunces_400Regular_Italic,
+    Fraunces_600SemiBold_Italic,
+    Inter_600SemiBold,
+    Inter_700Bold,
   });
   if (!shkronjatGati && !gabimiShkronjave) return null;
 

@@ -31,6 +31,7 @@ export const ikonat = {
   fshi: { ios: "trash", android: "delete" },
   djathtas: { ios: "chevron.right", android: "chevron_right" },
   majtas: { ios: "chevron.left", android: "chevron_left" },
+  poshte: { ios: "chevron.down", android: "expand_more" },
   yll: { ios: "star.fill", android: "star" },
   grafik: { ios: "chart.bar.fill", android: "bar_chart" },
   zhvendos: { ios: "arrow.left.arrow.right", android: "swap_horiz" },

@@ -18,18 +18,16 @@ export default function BadgeStatusi({ statusi }: { statusi: StatusiTerminit }) 
   );
 }
 
-const krijoStilet = (ngjyrat: Ngjyrat) =>
+const krijoStilet = (_ngjyrat: Ngjyrat) =>
   StyleSheet.create({
-  // Vulë e vogël me shkronja mono, si etiketë e shtypur.
+  // Kapsulë me ngjyrën e statusit.
   badge: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     borderRadius: rrezja.plote,
-    borderWidth: 1,
-    borderColor: ngjyrat.kufiri,
     alignSelf: "flex-start",
   },
   pika: {
@@ -38,9 +36,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     borderRadius: 3,
   },
   teksti: {
-    fontFamily: shkronjat.monoBold,
-    fontSize: 10,
-    letterSpacing: 1,
-    textTransform: "uppercase",
+    fontFamily: shkronjat.etiketeBold,
+    fontSize: 12,
   },
 });

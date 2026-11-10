@@ -280,7 +280,7 @@ export const en: Perkthimet = {
     titulliRevistes: "The barbers",
     titulliQyteti: "of {{qyteti}}.",
     titulliKosova: "of Kosovo.",
-    neKeteBotim: "In this issue",
+    neKeteBotim: "Shops near you",
     rezultatet: "{{numri}} shops",
     asnje: "No shops here",
     asnjeTeksti: "Try another search, remove filters or widen the area.",

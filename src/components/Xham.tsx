@@ -9,11 +9,11 @@ type Props = {
   intensiteti?: number;
 };
 
-// Etiketë letre me kornizë të hollë boje, mbi foto ose në kokë të ekranit.
+// Etiketë e butë mbi foto ose në kokë të ekranit.
 export default function Xham({ children, style }: Props) {
   const { ngjyrat } = useTema();
   return (
-    <View style={[styles.baza, { backgroundColor: ngjyrat.xham, borderColor: ngjyrat.vija }, style]}>{children}</View>
+    <View style={[styles.baza, { backgroundColor: ngjyrat.xham, borderColor: ngjyrat.kufiriXham }, style]}>{children}</View>
   );
 }
 
@@ -21,5 +21,6 @@ const styles = StyleSheet.create({
   baza: {
     overflow: "hidden",
     borderWidth: 1,
+    borderRadius: 12,
   },
 });

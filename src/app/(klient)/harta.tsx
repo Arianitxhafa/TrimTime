@@ -153,7 +153,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingVertical: 6,
       borderRadius: rrezja.plote,
       backgroundColor: ngjyrat.siperfaqja,
-      borderWidth: 1.5,
+      borderWidth: 1,
       borderColor: ngjyrat.ari,
     },
     shenjuesiZgjedhur: {
@@ -223,7 +223,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     atribuimiTeksti: {
       color: ngjyrat.tekstiDyte,
-      fontSize: 11,
+      fontSize: 12,
       fontWeight: "600",
     },
     karta: {

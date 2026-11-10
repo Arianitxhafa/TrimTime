@@ -4,13 +4,13 @@ import { useTranslation } from "react-i18next";
 import { AppState, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Butoni from "../components/Butoni";
-import Marka from "../components/Marka";
+import Marka, { ShiritiBerberit } from "../components/Marka";
 import ZgjedhesiIQytetit from "../components/ZgjedhesiIQytetit";
 import { usePreferencat } from "../context/PreferencatContext";
 import { useStilet } from "../context/TemaContext";
 import { gjendjaENjoftimeve, kerkoLejenENjoftimeve, type GjendjaELejes } from "../lib/kujtesat";
 import { prekja } from "../lib/prekja";
-import { hapesira, shkronjat, type Ngjyrat } from "../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 
 // "perafert": leja është dhënë, por vetëm për vendndodhjen e përafërt (iOS 14+ / Android 12+).
 // "mohuar": përdoruesi tha jo, por mund të pyetet sërish; "refuzuar": vetëm nga Cilësimet.
@@ -124,11 +124,10 @@ export default function Lejet() {
       />
       <ScrollView contentContainerStyle={[styles.permbajtja, { paddingTop: insets.top + hapesira.lg }]}>
         <Marka madhesia={30} />
-        <View style={styles.vijaETrashe} />
-        <View style={styles.rreshtiMono}>
-          <Text style={styles.mono}>{t("lejet.etiketa")}</Text>
+        <View style={styles.shiriti}>
+          <ShiritiBerberit lartesia={6} gjeresiaEVijes={6} />
         </View>
-        <View style={styles.vijaEHolle} />
+        <Text style={styles.mono}>{t("lejet.etiketa")}</Text>
 
         <Text style={styles.titulli}>{t("lejet.titulli")}</Text>
         <Text style={styles.nentitulli}>{t("lejet.nentitulli")}</Text>
@@ -204,14 +203,12 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingHorizontal: hapesira.xl,
       paddingBottom: hapesira.xxl,
     },
-    vijaETrashe: {
-      height: 4,
-      backgroundColor: ngjyrat.vija,
-      marginTop: hapesira.sm,
-    },
-    vijaEHolle: {
-      height: 1,
-      backgroundColor: ngjyrat.vija,
+    shiriti: {
+      width: 64,
+      borderRadius: 3,
+      overflow: "hidden",
+      marginTop: hapesira.lg,
+      marginBottom: hapesira.md,
     },
     rreshtiMono: {
       flexDirection: "row",
@@ -220,19 +217,17 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingVertical: 6,
     },
     mono: {
-      fontFamily: shkronjat.mono,
-      color: ngjyrat.teksti,
-      fontSize: 10,
-      letterSpacing: 1.2,
-      textTransform: "uppercase",
+      fontFamily: shkronjat.kursive,
+      color: ngjyrat.bronzi,
+      fontSize: 17,
     },
     titulli: {
       fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
-      fontSize: 46,
-      lineHeight: 50,
-      letterSpacing: -1.4,
-      marginTop: hapesira.xl,
+      fontSize: 42,
+      lineHeight: 48,
+      letterSpacing: -0.8,
+      marginTop: 2,
     },
     nentitulli: {
       fontFamily: shkronjat.kursive,
@@ -243,28 +238,30 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.lg,
     },
     seksioni: {
-      borderTopWidth: 1.5,
-      borderTopColor: ngjyrat.vija,
-      paddingTop: hapesira.sm,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderRadius: rrezja.lg,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
+      padding: hapesira.lg,
       marginTop: hapesira.lg,
       gap: hapesira.sm,
     },
     numri: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.theksi,
       fontSize: 13,
-      letterSpacing: 1,
+      letterSpacing: 0.6,
     },
     vula: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
-      fontSize: 10,
-      letterSpacing: 1.2,
-      textTransform: "uppercase",
+      fontSize: 12,
       borderWidth: 1,
       borderColor: ngjyrat.tekstiDyte,
-      paddingHorizontal: 6,
-      paddingVertical: 2,
+      borderRadius: rrezja.plote,
+      paddingHorizontal: 10,
+      paddingVertical: 3,
+      overflow: "hidden",
     },
     vulaKuqe: {
       color: ngjyrat.theksi,
@@ -293,10 +290,10 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     lejuar: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 12,
-      letterSpacing: 1.2,
+      letterSpacing: 0.6,
       textTransform: "uppercase",
       paddingVertical: hapesira.sm,
     },
@@ -322,9 +319,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       opacity: 0.6,
     },
     meDoreTeksti: {
-      fontFamily: shkronjat.mono,
+      fontFamily: shkronjat.etikete,
       color: ngjyrat.tekstiDyte,
-      fontSize: 11,
+      fontSize: 12,
       letterSpacing: 0.8,
       textTransform: "uppercase",
       textDecorationLine: "underline",

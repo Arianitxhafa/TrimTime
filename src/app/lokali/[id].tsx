@@ -21,6 +21,7 @@ import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
 import GaleriaEPlote from "../../components/GaleriaEPlote";
 import KartaEBesnikerise from "../../components/KartaEBesnikerise";
 import KartaEVleresimit from "../../components/KartaEVleresimit";
+import KopertinaELokalit from "../../components/KopertinaELokalit";
 import { celesiIDites, RENDI_I_DITEVE } from "../../components/RedaktoriIOrarit";
 import { useAuth } from "../../context/AuthContext";
 import { useStilet, useTema } from "../../context/TemaContext";
@@ -70,7 +71,6 @@ export default function ProfiliILokalit() {
   const berberet = (stafi.data ?? []).filter((a) => a.aktiv);
   const sot = new Date().getDay();
   const ngaOsm = l.burimi === "osm";
-  const kaFoto = Boolean(l.kopertina_url);
   // Pa orar në TrimTime (shumica e lokaleve nga OpenStreetMap) nuk themi "Mbyllur": orari nuk dihet.
   const kaOrar = (orari.data ?? []).length > 0;
   // Vetëm klientët rezervojnë; pronari e sheh profilin si parapamje.
@@ -87,31 +87,19 @@ export default function ProfiliILokalit() {
   return (
     <View style={styles.container}>
       <Stack.Screen
-        options={{ title: "", headerTransparent: true, headerTintColor: kaFoto ? "#FFFFFF" : ngjyrat.teksti }}
+        options={{ title: "", headerTransparent: true, headerStyle: { backgroundColor: "transparent" }, headerTintColor: "#FFFFFF" }}
       />
       <ScrollView contentContainerStyle={{ paddingBottom: (mundTeRezervoje || meTelefon ? 120 : hapesira.xxl) + insets.bottom }}>
-        {kaFoto ? (
-          // Me foto: emri i bardhë mbi foton e errësuar poshtë.
-          <View style={[styles.kopertina, { height: 320 + insets.top }]}>
-            <Image source={{ uri: l.kopertina_url! }} style={StyleSheet.absoluteFill} contentFit="cover" transition={250} />
-            <LinearGradient colors={["rgba(17,16,14,0.55)", "rgba(17,16,14,0)"]} style={styles.hijaLart} />
-            <LinearGradient colors={ngjyrat.hijaEFotos} style={styles.hijaPoshte} />
-            <View style={styles.koka}>
-              <Text style={[styles.rubrika, styles.mbiFoto]}>{l.qyteti}</Text>
-              <Text style={[styles.emri, styles.mbiFoto]}>{l.emri}</Text>
-              <Statusi lokali={l} kaOrar={kaOrar} mbiFoto />
-            </View>
+        {/* Fotoja e lokalit, ose tabela e gjeneruar e berberisë kur fotoja mungon. */}
+        <View style={[styles.kopertina, { height: 320 + insets.top }]}>
+          <KopertinaELokalit emri={l.emri} fotoUrl={l.kopertina_url} meHije style={StyleSheet.absoluteFill} />
+          <LinearGradient colors={["rgba(10,22,16,0.55)", "rgba(10,22,16,0)"]} style={styles.hijaLart} />
+          <View style={styles.koka}>
+            <Text style={[styles.rubrika, styles.mbiFoto]}>{l.qyteti}</Text>
+            <Text style={[styles.emri, styles.mbiFoto]}>{l.emri}</Text>
+            <Statusi lokali={l} kaOrar={kaOrar} mbiFoto />
           </View>
-        ) : (
-          // Pa foto: faqe reviste me emrin me bojë të zezë mbi letër.
-          <View style={[styles.kokaELetres, { paddingTop: insets.top + 64 }]}>
-            <View style={styles.vijaETrashe} />
-            <Text style={styles.rubrika}>{l.qyteti}</Text>
-            <Text style={styles.emri}>{l.emri}</Text>
-            <Statusi lokali={l} kaOrar={kaOrar} />
-            <View style={styles.vijaEHolle} />
-          </View>
-        )}
+        </View>
 
         <View style={styles.permbajtja}>
           <View style={styles.adresaRreshti}>
@@ -490,25 +478,11 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       paddingHorizontal: hapesira.xl,
       paddingBottom: hapesira.xl,
     },
-    kokaELetres: {
-      paddingHorizontal: hapesira.xl,
-      gap: 6,
-    },
-    vijaETrashe: {
-      height: 4,
-      backgroundColor: ngjyrat.vija,
-      marginBottom: hapesira.md,
-    },
-    vijaEHolle: {
-      height: 1,
-      backgroundColor: ngjyrat.vija,
-      marginTop: hapesira.lg,
-    },
     rubrika: {
-      fontFamily: shkronjat.monoBold,
-      color: ngjyrat.theksi,
-      fontSize: 11,
-      letterSpacing: 1.5,
+      fontFamily: shkronjat.etiketeBold,
+      color: "#E3C690",
+      fontSize: 12,
+      letterSpacing: 0.6,
       textTransform: "uppercase",
     },
     mbiFoto: {
@@ -517,9 +491,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     emri: {
       fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
-      fontSize: 44,
-      lineHeight: 48,
-      letterSpacing: -1.2,
+      fontSize: 38,
+      lineHeight: 44,
+      letterSpacing: -0.6,
     },
     statusiRreshti: {
       flexDirection: "row",
@@ -534,9 +508,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       borderRadius: 4,
     },
     statusi: {
-      fontFamily: shkronjat.monoBold,
-      fontSize: 11,
-      letterSpacing: 1,
+      fontFamily: shkronjat.etiketeBold,
+      fontSize: 12,
+      letterSpacing: 0.6,
       textTransform: "uppercase",
     },
     adresaRreshti: {
@@ -560,27 +534,25 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       alignItems: "center",
       justifyContent: "center",
       gap: 6,
-      height: 68,
-      borderWidth: 1.5,
-      borderColor: ngjyrat.vija,
+      height: 72,
+      borderRadius: rrezja.lg,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
     },
     veprimiTeksti: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etikete,
       color: ngjyrat.teksti,
-      fontSize: 11,
-      letterSpacing: 1,
-      textTransform: "uppercase",
+      fontSize: 13,
     },
     shtypur: {
       opacity: 0.8,
     },
     seksioni: {
-      fontFamily: shkronjat.monoBold,
-      color: ngjyrat.tekstiDyte,
-      fontSize: 13,
-      textTransform: "uppercase",
-      letterSpacing: 0.8,
-      marginTop: hapesira.lg,
+      fontFamily: shkronjat.titullBold,
+      color: ngjyrat.teksti,
+      fontSize: 22,
+      marginTop: hapesira.xl,
       marginBottom: hapesira.md,
     },
     paTeDhena: {
@@ -750,7 +722,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontSize: 14,
     },
     orariOret: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 14,
       fontVariant: ["tabular-nums"],
@@ -767,9 +739,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       lineHeight: 22,
     },
     atribuimi: {
-      fontFamily: shkronjat.mono,
+      fontFamily: shkronjat.etikete,
       color: ngjyrat.tekstiZbehte,
-      fontSize: 10,
+      fontSize: 12,
       letterSpacing: 0.5,
       marginTop: hapesira.xxl,
     },

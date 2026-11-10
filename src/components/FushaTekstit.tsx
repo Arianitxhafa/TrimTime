@@ -81,32 +81,28 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     fusha: {
       marginBottom: hapesira.lg,
     },
-    // Etiketë mono e vogël mbi një fushë me vetëm vijë poshtë, si formular në letër.
+    // Etiketa sipër dhe kutia e plotë me kënde të buta.
     etiketa: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etikete,
       color: ngjyrat.tekstiDyte,
-      fontSize: 11,
-      letterSpacing: 1.2,
-      textTransform: "uppercase",
-      marginBottom: 2,
+      fontSize: 13,
+      marginBottom: 6,
     },
     kutia: {
       flexDirection: "row",
       alignItems: "center",
       gap: hapesira.sm,
-      backgroundColor: "transparent",
-      borderRadius: 0,
-      borderBottomWidth: 1.5,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderRadius: rrezja.md,
+      borderWidth: 1,
       borderColor: ngjyrat.kufiri,
-      height: 50,
+      paddingHorizontal: hapesira.md,
+      height: 52,
     },
     kutiaShumeRreshta: {
       height: 112,
       alignItems: "flex-start",
       paddingVertical: hapesira.md,
-      borderWidth: 1.5,
-      borderRadius: rrezja.sm,
-      paddingHorizontal: hapesira.md,
     },
     kutiaFokus: {
       borderColor: ngjyrat.ari,

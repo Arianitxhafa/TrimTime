@@ -122,9 +122,9 @@ export default function FjalekalimiIRi() {
 const krijoStilet = (ngjyrat: Ngjyrat) =>
   StyleSheet.create({
     shenim: {
-      fontFamily: shkronjat.mono,
+      fontFamily: shkronjat.etikete,
       color: ngjyrat.tekstiZbehte,
-      fontSize: 11,
+      fontSize: 12,
       letterSpacing: 0.5,
       marginBottom: 16,
     },

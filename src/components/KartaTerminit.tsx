@@ -94,7 +94,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     arritiTeksti: {
       color: ngjyrat.mbiAri,
-      fontSize: 11,
+      fontSize: 12,
       fontWeight: "800",
     },
     kolonaOres: {
@@ -102,7 +102,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       width: 48,
     },
     ora: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 15,
       fontVariant: ["tabular-nums"],

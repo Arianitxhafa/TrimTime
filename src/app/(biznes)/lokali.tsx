@@ -395,7 +395,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.sm,
     },
     kushtetTitulli: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 12,
       textTransform: "uppercase",
@@ -414,7 +414,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       color: ngjyrat.teksti,
     },
     seksioni: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       textTransform: "uppercase",

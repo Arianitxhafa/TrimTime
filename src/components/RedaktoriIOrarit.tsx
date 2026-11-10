@@ -210,7 +210,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       justifyContent: "center",
     },
     butoniIOresTeksti: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 15,
       fontVariant: ["tabular-nums"],
@@ -271,7 +271,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       backgroundColor: ngjyrat.ari,
     },
     oraTeksti: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 14,
       fontVariant: ["tabular-nums"],

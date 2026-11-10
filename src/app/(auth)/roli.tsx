@@ -123,7 +123,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.lg,
       backgroundColor: ngjyrat.siperfaqja,
       borderRadius: rrezja.lg,
-      borderWidth: 1.5,
+      borderWidth: 1,
       borderColor: ngjyrat.kufiri,
       padding: hapesira.lg,
     },

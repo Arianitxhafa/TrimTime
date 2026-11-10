@@ -11,24 +11,22 @@ type OpsionetETabeve = Exclude<
   (...args: never[]) => unknown
 >;
 
-// Shiriti i poshtëm si fundi i faqes: letër, vijë boje sipër dhe etiketa mono të mëdha.
+// Shiriti i poshtëm: sipërfaqja e kartave, vijë e hollë sipër dhe etiketa që lexohen mirë.
 export function useOpsionetETabeve(): OpsionetETabeve {
   const { ngjyrat } = useTema();
   return {
     headerShown: false,
-    tabBarActiveTintColor: ngjyrat.teksti,
+    tabBarActiveTintColor: ngjyrat.ari,
     tabBarInactiveTintColor: ngjyrat.tekstiZbehte,
     tabBarStyle: {
-      backgroundColor: ngjyrat.sfondi,
-      borderTopColor: ngjyrat.vija,
-      borderTopWidth: 1.5,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderTopColor: ngjyrat.kufiri,
+      borderTopWidth: 1,
       paddingTop: 6,
     },
     tabBarLabelStyle: {
-      fontFamily: shkronjat.monoBold,
-      fontSize: 10,
-      letterSpacing: 1,
-      textTransform: "uppercase",
+      fontFamily: shkronjat.etikete,
+      fontSize: 12,
     },
     sceneStyle: { backgroundColor: ngjyrat.sfondi },
   };

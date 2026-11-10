@@ -1,9 +1,9 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from "react-native";
 import Animated from "react-native-reanimated";
 import { useTema } from "../context/TemaContext";
 import { useShtypja } from "../hooks/useShtypja";
 import { prekja } from "../lib/prekja";
-import { rrezja, shkronjat, type Ngjyrat } from "../theme";
+import { hijet, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Ikona, { type EmriIkones } from "./Ikona";
 
 type Varianti = "kryesor" | "dytesor" | "rrezik";
@@ -34,8 +34,8 @@ function ngjyratEVariantit(
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-// Butoni i revistës: drejtkëndësh me bojë të zezë (ose vetëm kornizë), shkronja mono të mëdha
-// dhe shigjetë te butoni kryesor. Shtypet me animacion dhe dridhje.
+// Butoni i berberisë: e gjelbër e thellë (bronz natën) me shkronja të trasha, ose vetëm kornizë
+// prej bronzi. Shtypet me animacion dhe dridhje.
 export default function Butoni({
   titulli,
   onPress,
@@ -65,6 +65,7 @@ export default function Butoni({
       style={[
         styles.butoni,
         { backgroundColor: s.sfondi, borderColor: s.kufiri },
+        varianti === "kryesor" && !joAktiv && hijet.ari,
         joAktiv && styles.joAktiv,
         shtypja.stili,
         style,
@@ -73,16 +74,11 @@ export default function Butoni({
       {ngarkohet ? (
         <ActivityIndicator color={s.teksti} />
       ) : (
-        ikona && <Ikona emri={ikona} madhesia={17} ngjyra={s.teksti} />
+        ikona && <Ikona emri={ikona} madhesia={18} ngjyra={s.teksti} />
       )}
       <Text style={[styles.teksti, { color: s.teksti }]} numberOfLines={1}>
         {titulli}
       </Text>
-      {varianti === "kryesor" && !ngarkohet ? (
-        <View style={styles.shigjeta}>
-          <Text style={[styles.teksti, { color: s.teksti }]}>→</Text>
-        </View>
-      ) : null}
     </AnimatedPressable>
   );
 }
@@ -91,23 +87,19 @@ const styles = StyleSheet.create({
   butoni: {
     minHeight: 54,
     paddingHorizontal: 20,
-    borderRadius: rrezja.sm,
-    borderWidth: 1.5,
+    borderRadius: rrezja.md,
+    borderWidth: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
   },
   joAktiv: {
-    opacity: 0.35,
+    opacity: 0.4,
   },
   teksti: {
-    fontFamily: shkronjat.monoBold,
-    fontSize: 14,
-    letterSpacing: 1.4,
-    textTransform: "uppercase",
-  },
-  shigjeta: {
-    marginLeft: 2,
+    fontFamily: shkronjat.etiketeBold,
+    fontSize: 15,
+    letterSpacing: 0.3,
   },
 });

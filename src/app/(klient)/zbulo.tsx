@@ -13,7 +13,7 @@ import FiltratEKerkimit, {
 } from "../../components/FiltratEKerkimit";
 import Ikona, { ikonat } from "../../components/Ikona";
 import KartaELokalit from "../../components/KartaELokalit";
-import Marka from "../../components/Marka";
+import Marka, { ShiritiBerberit } from "../../components/Marka";
 import { SkeletiIKartes } from "../../components/Skeleti";
 import ZgjedhesiIQytetit from "../../components/ZgjedhesiIQytetit";
 import { useAuth } from "../../context/AuthContext";
@@ -21,25 +21,14 @@ import { useStilet, useTema } from "../../context/TemaContext";
 import { useVonesa } from "../../hooks/useVonesa";
 import { useZonaIme } from "../../hooks/useZonaIme";
 import { prekja } from "../../lib/prekja";
-import { hapesira, shkronjat, type Ngjyrat } from "../../theme";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 // Përveç qytetit, shfaqen edhe lokalet brenda kësaj rrezeje nga klienti (lagjet në periferi).
 const RREZJA_KM = 10;
 
-type CelesiIMuajit = `koha.m${0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11}`;
-
 function pershendetjaESotme(): "zbulo.mirmengjes" | "zbulo.mirdita" | "zbulo.mirembrema" {
   const ora = new Date().getHours();
   return ora < 11 ? "zbulo.mirmengjes" : ora < 18 ? "zbulo.mirdita" : "zbulo.mirembrema";
-}
-
-// Numri i "botimit" është java e vitit (ISO 8601), si numri i një reviste javore.
-function javaEVitit(d: Date): number {
-  const data = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-  const dita = data.getUTCDay() || 7;
-  data.setUTCDate(data.getUTCDate() + 4 - dita);
-  const filliVitit = new Date(Date.UTC(data.getUTCFullYear(), 0, 1));
-  return Math.ceil(((data.getTime() - filliVitit.getTime()) / 86_400_000 + 1) / 7);
 }
 
 export default function Zbulo() {
@@ -80,8 +69,6 @@ export default function Zbulo() {
 
   const kaFiltra = nrFiltrave > 0 || kerkimi.trim() !== "";
   const emriIPare = emriIShfaqur.includes("@") ? "" : emriIShfaqur.split(" ")[0];
-  const sot = new Date();
-  const botimi = `No.${javaEVitit(sot)} · ${t(`koha.m${sot.getMonth()}` as CelesiIMuajit)} ${sot.getFullYear()}`;
 
   function pastroFiltrat() {
     setKerkimi("");
@@ -103,10 +90,11 @@ export default function Zbulo() {
             hitSlop={6}
             style={({ pressed }) => [styles.qyteti, pressed && styles.shtypur]}
           >
+            <Ikona emri={ikonat.harta} madhesia={14} ngjyra={ngjyrat.bronzi} />
             <Text style={styles.qytetiTeksti} numberOfLines={1}>
               {zona.qyteti?.emri ?? t("zona.zgjidhQytetin")}
             </Text>
-            <Text style={styles.qytetiTeksti}>↓</Text>
+            <Ikona emri={ikonat.poshte} madhesia={12} ngjyra={ngjyrat.tekstiDyte} />
           </Pressable>
           <Pressable
             accessibilityRole="button"
@@ -123,26 +111,23 @@ export default function Zbulo() {
         </View>
       </View>
 
-      <View style={styles.vijaETrashe} />
-      <View style={styles.botimi}>
-        <Text style={styles.botimiTeksti}>{botimi}</Text>
-        <Text style={styles.botimiTeksti} numberOfLines={1}>
-          {t(pershendetjaESotme())}
-          {emriIPare ? `, ${emriIPare}` : ""}
-        </Text>
-      </View>
-      <View style={styles.vijaEHolle} />
-
+      <Text style={styles.pershendetja} numberOfLines={1}>
+        {t(pershendetjaESotme())}
+        {emriIPare ? `, ${emriIPare}` : ""}
+      </Text>
       <Text style={styles.titulli}>{t("zbulo.titulliRevistes")}</Text>
       <Text style={styles.titulliKursive}>
         {zona.qyteti
           ? t("zbulo.titulliQyteti", { qyteti: zona.qyteti.emri })
           : t("zbulo.titulliKosova")}
       </Text>
+      <View style={styles.ornamenti}>
+        <ShiritiBerberit lartesia={6} gjeresiaEVijes={6} />
+      </View>
       <Text style={styles.hyrja}>{t("zbulo.gatiPerLook")}</Text>
 
       <View style={styles.kerkimi}>
-        <Ikona emri={ikonat.kerko} madhesia={18} ngjyra={ngjyrat.teksti} />
+        <Ikona emri={ikonat.kerko} madhesia={18} ngjyra={ngjyrat.tekstiDyte} />
         <TextInput
           value={kerkimi}
           onChangeText={setKerkimi}
@@ -205,7 +190,7 @@ export default function Zbulo() {
 
       {lokalet.data && lokalet.data.length > 0 && (
         <View style={styles.seksioni}>
-          <Text style={styles.seksioniTeksti}>{t("zbulo.neKeteBotim")}</Text>
+          <Text style={styles.seksioniTitulli}>{t("zbulo.neKeteBotim")}</Text>
           <Text style={styles.seksioniTeksti}>{t("zbulo.rezultatet", { numri: lokalet.data.length })}</Text>
         </View>
       )}
@@ -234,7 +219,7 @@ export default function Zbulo() {
         keyExtractor={(l) => l.id}
         keyboardShouldPersistTaps="handled"
         ListHeaderComponent={koka}
-        ItemSeparatorComponent={() => <View style={{ height: hapesira.xxl }} />}
+        ItemSeparatorComponent={() => <View style={{ height: hapesira.lg }} />}
         ListFooterComponent={
           (lokalet.data ?? []).some((l) => l.burimi === "osm") ? (
             <Text style={styles.atribuimi}>{t("pergjithshme.atribuimiOsm")}</Text>
@@ -304,7 +289,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       alignItems: "center",
       justifyContent: "space-between",
       gap: hapesira.md,
-      paddingBottom: hapesira.sm,
+      paddingBottom: hapesira.lg,
     },
     veprimet: {
       flexDirection: "row",
@@ -316,73 +301,64 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
-      maxWidth: 160,
-      paddingHorizontal: 10,
-      height: 34,
-      borderWidth: 1.5,
-      borderColor: ngjyrat.vija,
+      maxWidth: 170,
+      paddingHorizontal: 12,
+      height: 38,
+      borderRadius: rrezja.plote,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
     },
     qytetiTeksti: {
       flexShrink: 1,
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etikete,
       color: ngjyrat.teksti,
-      fontSize: 11,
-      letterSpacing: 1,
-      textTransform: "uppercase",
+      fontSize: 13,
     },
     skano: {
-      width: 34,
-      height: 34,
+      width: 38,
+      height: 38,
+      borderRadius: 19,
       alignItems: "center",
       justifyContent: "center",
-      borderWidth: 1.5,
-      borderColor: ngjyrat.vija,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
     },
     shtypur: {
       opacity: 0.6,
     },
-    vijaETrashe: {
-      height: 4,
-      backgroundColor: ngjyrat.vija,
-    },
-    botimi: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      gap: hapesira.md,
-      paddingVertical: 6,
-    },
-    botimiTeksti: {
-      flexShrink: 1,
-      fontFamily: shkronjat.mono,
-      color: ngjyrat.teksti,
-      fontSize: 10,
-      letterSpacing: 1.2,
-      textTransform: "uppercase",
-    },
-    vijaEHolle: {
-      height: 1,
-      backgroundColor: ngjyrat.vija,
+    pershendetja: {
+      fontFamily: shkronjat.kursive,
+      color: ngjyrat.bronzi,
+      fontSize: 17,
+      marginTop: hapesira.sm,
     },
     titulli: {
       fontFamily: shkronjat.titull,
       color: ngjyrat.teksti,
-      fontSize: 52,
-      lineHeight: 54,
-      letterSpacing: -1.6,
-      marginTop: hapesira.xl,
+      fontSize: 42,
+      lineHeight: 48,
+      letterSpacing: -0.8,
+      marginTop: 2,
     },
     titulliKursive: {
       fontFamily: shkronjat.kursive,
       color: ngjyrat.teksti,
-      fontSize: 44,
-      lineHeight: 50,
-      letterSpacing: -1,
+      fontSize: 34,
+      lineHeight: 42,
+      letterSpacing: -0.4,
+    },
+    ornamenti: {
+      width: 64,
+      borderRadius: 3,
+      overflow: "hidden",
+      marginTop: hapesira.md,
     },
     hyrja: {
-      fontFamily: shkronjat.kursive,
       color: ngjyrat.tekstiDyte,
-      fontSize: 17,
-      lineHeight: 24,
+      fontSize: 16,
+      lineHeight: 23,
       marginTop: hapesira.md,
       marginBottom: hapesira.xl,
     },
@@ -390,10 +366,14 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       flexDirection: "row",
       alignItems: "center",
       gap: hapesira.sm,
-      borderBottomWidth: 1.5,
-      borderBottomColor: ngjyrat.vija,
-      height: 50,
-      marginBottom: hapesira.lg,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderRadius: rrezja.md,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
+      paddingLeft: hapesira.md,
+      paddingRight: 6,
+      height: 54,
+      marginBottom: hapesira.md,
     },
     kerkimiInput: {
       flex: 1,
@@ -405,20 +385,18 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
-      paddingHorizontal: 10,
-      height: 34,
-      borderWidth: 1.5,
-      borderColor: ngjyrat.vija,
+      paddingHorizontal: 12,
+      height: 40,
+      borderRadius: rrezja.sm,
+      backgroundColor: ngjyrat.siperfaqja2,
     },
     filtratButoniAktiv: {
       backgroundColor: ngjyrat.ari,
     },
     filtratTeksti: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etikete,
       color: ngjyrat.teksti,
-      fontSize: 11,
-      letterSpacing: 1,
-      textTransform: "uppercase",
+      fontSize: 13,
     },
     filtratTekstiAktiv: {
       color: ngjyrat.mbiAri,
@@ -433,21 +411,22 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       gap: hapesira.sm,
     },
     chip: {
-      paddingHorizontal: 12,
-      height: 34,
-      borderWidth: 1.5,
-      borderColor: ngjyrat.vija,
+      paddingHorizontal: 14,
+      height: 36,
+      borderRadius: rrezja.plote,
+      borderWidth: 1,
+      borderColor: ngjyrat.kufiri,
+      backgroundColor: ngjyrat.siperfaqja,
       justifyContent: "center",
     },
     chipAktiv: {
       backgroundColor: ngjyrat.ari,
+      borderColor: ngjyrat.ari,
     },
     chipTeksti: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etikete,
       color: ngjyrat.teksti,
-      fontSize: 11,
-      letterSpacing: 1,
-      textTransform: "uppercase",
+      fontSize: 13,
     },
     chipTekstiAktiv: {
       color: ngjyrat.mbiAri,
@@ -467,31 +446,35 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       lineHeight: 21,
     },
     lejaButoni: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.theksi,
       fontSize: 12,
-      letterSpacing: 1,
+      letterSpacing: 0.6,
       textTransform: "uppercase",
     },
     seksioni: {
       flexDirection: "row",
       justifyContent: "space-between",
+      alignItems: "baseline",
       marginBottom: hapesira.md,
     },
+    seksioniTitulli: {
+      fontFamily: shkronjat.titullBold,
+      color: ngjyrat.teksti,
+      fontSize: 22,
+    },
     seksioniTeksti: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etikete,
       color: ngjyrat.tekstiDyte,
-      fontSize: 11,
-      letterSpacing: 1.2,
-      textTransform: "uppercase",
+      fontSize: 13,
     },
     skeletet: {
       gap: hapesira.xl,
     },
     atribuimi: {
-      fontFamily: shkronjat.mono,
+      fontFamily: shkronjat.etikete,
       color: ngjyrat.tekstiZbehte,
-      fontSize: 10,
+      fontSize: 12,
       letterSpacing: 0.5,
       textAlign: "center",
       marginTop: hapesira.xxl,

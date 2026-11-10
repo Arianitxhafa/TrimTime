@@ -81,7 +81,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       opacity: 0.8,
     },
     oraTeksti: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 15,
       fontVariant: ["tabular-nums"],

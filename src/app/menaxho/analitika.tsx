@@ -279,7 +279,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       borderColor: ngjyrat.ari,
     },
     kartaVlera: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.teksti,
       fontSize: 24,
       fontVariant: ["tabular-nums"],
@@ -293,7 +293,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontWeight: "600",
     },
     seksioni: {
-      fontFamily: shkronjat.monoBold,
+      fontFamily: shkronjat.etiketeBold,
       color: ngjyrat.tekstiDyte,
       fontSize: 13,
       textTransform: "uppercase",
@@ -325,7 +325,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     etiketaEShtylles: {
       color: ngjyrat.tekstiZbehte,
-      fontSize: 10,
+      fontSize: 12,
       fontWeight: "600",
       marginTop: 4,
     },
