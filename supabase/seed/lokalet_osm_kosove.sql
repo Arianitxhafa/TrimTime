@@ -2,7 +2,7 @@
 -- Gjeneruar më 2026-10-28T21:29:01.350Z nga scripts/importo-lokalet-osm.mjs (379 lokale).
 -- Të dhënat: © OpenStreetMap contributors, ODbL — https://www.openstreetmap.org/copyright
 --
--- Ekzekutohet pas migrimit 20261028150000_zona_dhe_kamera.sql. Mund të ekzekutohet sa herë të duash:
+-- Ekzekutohet pas migrimit 20261111090000_vetem_meshkuj.sql. Mund të ekzekutohet sa herë të duash:
 -- lokalet ekzistuese përditësohen, nuk dyfishohen, dhe lokalet që i ka marrë një pronar nuk preken.
 
 begin;
@@ -441,6 +441,10 @@ where public.lokalet.burimi = 'osm';
 
 -- Çdo lokal (edhe ato të krijuara në TrimTime) lidhet me qytetin më të afërt.
 update public.lokalet set qyteti_id = public.qyteti_me_i_afert(vendndodhja);
+
+-- Sallonet për femra që OSM nuk i shënon, njihen nga emri (TrimTime tani për tani është vetëm për meshkuj).
+update public.lokalet set klientela = 'femra'
+where burimi = 'osm' and klientela = 'meshkuj' and public.eshte_per_femra(emri);
 
 delete from public.oraret_e_lokalit o
 using public.lokalet l

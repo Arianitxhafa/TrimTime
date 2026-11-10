@@ -138,7 +138,7 @@ export const sq = {
     paTermin: "Hyr direkt",
     krijoTitulli: "Krijo lokalin tënd",
     krijoTeksti:
-      "Shto shërbimet, çmimet, orarin dhe vendndodhjen. Klientët do të të gjejnë në hartë dhe do të rezervojnë vetë.",
+      "TrimTime tani për tani është për berberë dhe lokale qethjeje për meshkuj. Shto shërbimet, çmimet, orarin dhe vendndodhjen: klientët do të të gjejnë në hartë dhe do të rezervojnë vetë.",
     krijo: "Krijo lokalin",
     keKod: "Punon në një lokal? Bashkohu me kodin e ftesës",
     publikuar: "I publikuar",

@@ -139,7 +139,7 @@ export const en: Perkthimet = {
     paTermin: "Walk-in",
     krijoTitulli: "Create your shop",
     krijoTeksti:
-      "Add your services, prices, hours and location. Clients will find you on the map and book on their own.",
+      "For now, TrimTime is for men's barbers and barbershops. Add your services, prices, hours and location: clients will find you on the map and book on their own.",
     krijo: "Create shop",
     keKod: "Work at a shop? Join with an invite code",
     publikuar: "Published",
