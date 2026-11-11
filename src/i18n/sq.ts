@@ -119,10 +119,38 @@ export const sq = {
     temaSistemi: "Sipas sistemit",
     temaSistemiPershkrimi: "Ndjek cilësimet e telefonit",
     temaCelet: "I çelët",
-    temaCeletPershkrimi: "Sfond i bardhë i ngrohtë",
+    temaCeletPershkrimi: "Gri e Apple me karta të bardha",
     temaErret: "I errët",
-    temaErretPershkrimi: "Më i qetë për sytë natën",
+    temaErretPershkrimi: "E zezë me ar: pamja kryesore",
     gjuha: "Gjuha",
+    llogaria: "Llogaria",
+    fshiLlogarine: "Fshi llogarinë",
+    fshiLlogarineTeksti: "Fshin përgjithmonë llogarinë, terminet e ardhshme dhe të dhënat e tua.",
+    fshirjaTitulli: "Ta fshijmë llogarinë?",
+    fshirjaMesazhi:
+      "Kjo nuk mund të kthehet. Fshihen profili, vlerësimet, kartat e besnikërisë, fotot e stilit dhe, nëse je pronar, lokali yt me të gjitha terminet. Terminet e ardhshme anulohen.",
+    fshirjaKonfirmo: "Fshije",
+    fshirjaNeVazhdim: "Duke fshirë…",
+    fshirjaGabim: "Llogaria nuk u fshi. Kontrollo internetin dhe provo përsëri.",
+  },
+  privatesia: {
+    titulli: "Privatësia",
+    perditesuar: "Përditësuar më 12 nëntor 2026",
+    hyrja: "TrimTime lidh klientët me berberët në Kosovë. Mbledhim vetëm atë që duhet për të gjetur lokale dhe për të rezervuar termine.",
+    cfareTitulli: "Çfarë ruajmë",
+    cfareTeksti:
+      "Email-in dhe fjalëkalimin (të enkriptuar) për hyrjen; emrin dhe, nëse e shton, telefonin; terminet, vlerësimet dhe kartat e besnikërisë; fotot që ngarkon vetë (stili që dëshiron, portofoli i lokalit).",
+    vendndodhjaTitulli: "Vendndodhja",
+    vendndodhjaTeksti:
+      "Përdoret në telefon për të gjetur lokalet pranë teje dhe distancat. Nuk e ruajmë në server dhe nuk e ndajmë me askënd.",
+    kushTitulli: "Kush i sheh",
+    kushTeksti:
+      "Lokali ku rezervon sheh emrin, telefonin, shërbimin dhe foton e stilit për atë termin. Të dhënat ruhen te Supabase. Nuk i shesim dhe nuk i përdorim për reklama.",
+    fshirjaTitulli: "Fshirja",
+    fshirjaTeksti:
+      "Mund ta fshish llogarinë kurdo te Cilësimet → Fshi llogarinë. Të dhënat e tua fshihen përgjithmonë; terminet e kaluara mbeten te lokali vetëm si \"Llogari e fshirë\".",
+    osmTitulli: "Lokalet",
+    osmTeksti: "Të dhënat e lokaleve që nuk janë regjistruar vetë vijnë nga © OpenStreetMap contributors (ODbL).",
   },
   ditet: {
     d0: "E diel",

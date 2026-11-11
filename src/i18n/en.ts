@@ -120,10 +120,38 @@ export const en: Perkthimet = {
     temaSistemi: "System",
     temaSistemiPershkrimi: "Follows your phone's setting",
     temaCelet: "Light",
-    temaCeletPershkrimi: "Warm white background",
+    temaCeletPershkrimi: "Apple gray with white cards",
     temaErret: "Dark",
-    temaErretPershkrimi: "Easier on the eyes at night",
+    temaErretPershkrimi: "Black and gold: the main look",
     gjuha: "Language",
+    llogaria: "Account",
+    fshiLlogarine: "Delete account",
+    fshiLlogarineTeksti: "Permanently deletes your account, upcoming appointments and your data.",
+    fshirjaTitulli: "Delete your account?",
+    fshirjaMesazhi:
+      "This can't be undone. Your profile, reviews, loyalty cards, style photos and, if you're an owner, your shop with all its appointments will be deleted. Upcoming appointments are cancelled.",
+    fshirjaKonfirmo: "Delete",
+    fshirjaNeVazhdim: "Deleting…",
+    fshirjaGabim: "Your account wasn't deleted. Check your connection and try again.",
+  },
+  privatesia: {
+    titulli: "Privacy",
+    perditesuar: "Updated November 12, 2026",
+    hyrja: "TrimTime connects clients with barbers in Kosovo. We only collect what's needed to find shops and book appointments.",
+    cfareTitulli: "What we store",
+    cfareTeksti:
+      "Your email and password (encrypted) for signing in; your name and, if you add it, your phone; your appointments, reviews and loyalty cards; photos you upload yourself (the style you want, a shop's portfolio).",
+    vendndodhjaTitulli: "Location",
+    vendndodhjaTeksti:
+      "Used on your phone to find shops near you and distances. We don't store it on our servers or share it with anyone.",
+    kushTitulli: "Who sees it",
+    kushTeksti:
+      "The shop you book with sees your name, phone, service and style photo for that appointment. Data is stored with Supabase. We don't sell it or use it for ads.",
+    fshirjaTitulli: "Deletion",
+    fshirjaTeksti:
+      "You can delete your account any time in Settings → Delete account. Your data is deleted permanently; past appointments stay with the shop only as \"Deleted account\".",
+    osmTitulli: "Shops",
+    osmTeksti: "Data for shops that haven't signed up themselves comes from © OpenStreetMap contributors (ODbL).",
   },
   ditet: {
     d0: "Sunday",

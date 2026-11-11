@@ -1,7 +1,11 @@
+import { router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import DialogKonfirmimi from "../components/DialogKonfirmimi";
 import Ikona, { ikonat, type EmriIkones } from "../components/Ikona";
+import { GabimiIFormes } from "../components/KornizaAuth";
+import { useAuth } from "../context/AuthContext";
 import { usePreferencat } from "../context/PreferencatContext";
 import { useStilet, useTema, type ZgjedhjaTemes } from "../context/TemaContext";
 import { gjuhaAktuale, gjuhet, ndryshoGjuhen, type Gjuha } from "../i18n";
@@ -21,6 +25,23 @@ export default function Cilesimet() {
   const styles = useStilet(krijoStilet);
   const { kycjaBiometrike, ndryshoKycjen } = usePreferencat();
   const [gabimiBiometrise, setGabimiBiometrise] = useState<string | null>(null);
+  const { fshijLlogarine } = useAuth();
+  const [dialogFshirja, setDialogFshirja] = useState(false);
+  const [dukeFshire, setDukeFshire] = useState(false);
+  const [gabimiFshirjes, setGabimiFshirjes] = useState<string | null>(null);
+
+  async function konfirmoFshirjen() {
+    setDialogFshirja(false);
+    setDukeFshire(true);
+    setGabimiFshirjes(null);
+    try {
+      await fshijLlogarine();
+      prekja.sukses();
+    } catch {
+      setGabimiFshirjes(t("cilesimet.fshirjaGabim"));
+      setDukeFshire(false);
+    }
+  }
 
   // Para aktivizimit, përdoruesi verifikohet një herë, që të mos kyçet jashtë aplikacionit.
   async function ndryshoBiometrine(aktive: boolean) {
@@ -102,6 +123,50 @@ export default function Cilesimet() {
           />
         ))}
       </View>
+
+      <Text style={[styles.seksioni, styles.seksioniTjeter]}>{t("cilesimet.llogaria")}</Text>
+      <GabimiIFormes mesazhi={gabimiFshirjes} />
+      <View style={styles.grupi}>
+        <Pressable
+          accessibilityRole="link"
+          onPress={() => router.push("/privatesia")}
+          style={({ pressed }) => [styles.rreshti, pressed && styles.shtypur]}
+        >
+          <View style={styles.ikona}>
+            <Ikona emri={ikonat.dryni} madhesia={18} ngjyra={ngjyrat.tekstiDyte} />
+          </View>
+          <View style={styles.teksti}>
+            <Text style={styles.titulli}>{t("privatesia.titulli")}</Text>
+          </View>
+          <Ikona emri={ikonat.djathtas} madhesia={14} ngjyra={ngjyrat.tekstiZbehte} />
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          disabled={dukeFshire}
+          onPress={() => setDialogFshirja(true)}
+          style={({ pressed }) => [styles.rreshti, styles.rreshtiMeKufi, pressed && styles.shtypur]}
+        >
+          <View style={styles.ikona}>
+            <Ikona emri={ikonat.fshi} madhesia={18} ngjyra={ngjyrat.rrezik} />
+          </View>
+          <View style={styles.teksti}>
+            <Text style={[styles.titulli, { color: ngjyrat.rrezik }]}>
+              {dukeFshire ? t("cilesimet.fshirjaNeVazhdim") : t("cilesimet.fshiLlogarine")}
+            </Text>
+            <Text style={styles.pershkrimi}>{t("cilesimet.fshiLlogarineTeksti")}</Text>
+          </View>
+        </Pressable>
+      </View>
+
+      <DialogKonfirmimi
+        iDukshem={dialogFshirja}
+        titulli={t("cilesimet.fshirjaTitulli")}
+        mesazhi={t("cilesimet.fshirjaMesazhi")}
+        tekstiKonfirmimit={t("cilesimet.fshirjaKonfirmo")}
+        rrezik
+        onAnulo={() => setDialogFshirja(false)}
+        onKonfirmo={() => void konfirmoFshirjen()}
+      />
     </ScrollView>
   );
 }

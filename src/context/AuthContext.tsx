@@ -1,4 +1,6 @@
 import type { Session } from "@supabase/supabase-js";
+import * as Notifications from "expo-notifications";
+import { Platform } from "react-native";
 import {
   createContext,
   useContext,
@@ -26,6 +28,8 @@ type VleraKontekstit = {
   roli: Modi | null;
   ngarkohet: boolean;
   dil: () => Promise<void>;
+  // Fshin përgjithmonë llogarinë dhe të dhënat e saj (Apple dhe Google e kërkojnë brenda aplikacionit).
+  fshijLlogarine: () => Promise<void>;
   // Ruan emrin dhe telefonin; profili në aplikacion përditësohet menjëherë.
   ruajProfilin: (ndryshimet: { emri: string; telefoni: string | null }) => Promise<void>;
 };
@@ -86,6 +90,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ngarkohet,
       dil: async () => {
         await supabase.auth.signOut();
+      },
+      fshijLlogarine: async () => {
+        const id = sesioni?.user.id;
+        if (!id) throw new Error("Pa sesion");
+        // Fotot e stilit në Storage: SQL nuk mund t'i fshijë, ndaj i fshin aplikacioni së pari.
+        const { data: fotot } = await supabase.storage.from("stilet").list(id, { limit: 1000 });
+        if (fotot && fotot.length > 0) {
+          await supabase.storage.from("stilet").remove(fotot.map((f) => `${id}/${f.name}`));
+        }
+        const { error } = await supabase.rpc("fshij_llogarine");
+        if (error) throw error;
+        if (Platform.OS !== "web") await Notifications.cancelAllScheduledNotificationsAsync().catch(() => {});
+        // Llogaria s'ekziston më në server: sesioni pastrohet vetëm në këtë telefon.
+        await supabase.auth.signOut({ scope: "local" });
       },
       ruajProfilin: async ({ emri, telefoni }) => {
         if (!sesioni) throw new Error("Pa sesion");

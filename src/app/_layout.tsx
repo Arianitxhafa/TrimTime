@@ -133,6 +133,8 @@ function Navigimi() {
 
         {/* Lidhja e rivendosjes së fjalëkalimit hapet nga email-i, me ose pa sesion. */}
         <Stack.Screen name="fjalekalimi-i-ri" options={{ headerShown: false, animation: "fade" }} />
+        {/* Politika e privatësisë: e hapur me ose pa llogari (App Store e kërkon). */}
+        <Stack.Screen name="privatesia" options={{ title: t("privatesia.titulli") }} />
       </Stack>
     </KycjaBiometrike>
   );
