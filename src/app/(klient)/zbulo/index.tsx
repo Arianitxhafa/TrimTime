@@ -1,4 +1,4 @@
-import { router, Stack } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FlatList, Platform, Pressable, RefreshControl, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
@@ -40,6 +40,16 @@ export default function Zbulo() {
 
   const [kerkimi, setKerkimi] = useState("");
   const [filtrat, setFiltrat] = useState<Filtrat>(FILTRAT_FILLESTARE);
+
+  // Nga asistenti ("Gjej berber" te një stil): filtri i shërbimit vendoset vetë. Kontrollohet gjatë
+  // vizatimit, që ndryshimi i parametrit të aplikohet menjëherë, pa efekt.
+  const { sherbimi: sherbimiNgaParametri } = useLocalSearchParams<{ sherbimi?: string }>();
+  const [parametriIFundit, setParametriIFundit] = useState<string | undefined>(undefined);
+  if (sherbimiNgaParametri !== parametriIFundit) {
+    setParametriIFundit(sherbimiNgaParametri);
+    const kategoria = KATEGORITE.find((k) => k === sherbimiNgaParametri);
+    if (kategoria) setFiltrat((f) => ({ ...f, sherbimi: kategoria }));
+  }
   const [fleta, setFleta] = useState(false);
   const kerkimiIVonuar = useVonesa(kerkimi);
   const nrFiltrave = numeroFiltrat(filtrat);
@@ -77,6 +87,18 @@ export default function Zbulo() {
 
   const veprimetEHeaderit = () => (
         <View style={styles.veprimet}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t("asistenti.titulli")}
+            onPress={() => {
+              prekja.lehte();
+              router.push("/asistenti");
+            }}
+            hitSlop={6}
+            style={({ pressed }) => [styles.skano, pressed && styles.shtypur]}
+          >
+            <Ikona emri={ikonat.asistenti} madhesia={17} ngjyra={ngjyrat.ari} />
+          </Pressable>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel={t("zona.zgjidhQytetin")}

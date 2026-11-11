@@ -57,11 +57,14 @@ export default function Rezervo() {
     lokaliId,
     sherbimiId: sherbimiNgaParametri,
     data: dataNgaParametri,
+    ora: oraNgaParametri,
   } = useLocalSearchParams<{
     lokaliId: string;
     sherbimiId?: string;
     // Nga lista e pritjes: hapet direkt dita kur u lirua ora.
     data?: string;
+    // Nga asistenti AI: ora e gjetur ("HH:MM") zgjidhet vetë sapo ngarkohen oraret.
+    ora?: string;
   }>();
 
   const lokali = useLokali(lokaliId);
@@ -73,7 +76,8 @@ export default function Rezervo() {
   const [sherbimiId, setSherbimiId] = useState<string | null>(sherbimiNgaParametri ?? null);
   const [berberiId, setBerberiId] = useState<string | null>(null);
   const [data, setData] = useState(dataNgaParametri && ditet.includes(dataNgaParametri) ? dataNgaParametri : ditet[0]);
-  const [ora, setOra] = useState<OraELire | null>(null);
+  const [oraEZgjedhur, setOra] = useState<OraELire | null>(null);
+  const [oraNgaAsistenti, setOraNgaAsistenti] = useState<string | null>(oraNgaParametri ?? null);
   const [shenime, setShenime] = useState("");
   const [suksesi, setSuksesi] = useState<Suksesi | null>(null);
   const { sesioni } = useAuth();
@@ -93,6 +97,8 @@ export default function Rezervo() {
   }
 
   const oraret = useOraretELira({ lokaliId, sherbimiId, data, berberiId });
+  // Ora e zgjedhur me dorë, ose ajo që solli asistenti (nëse është ende e lirë).
+  const ora = oraEZgjedhur ?? (oraNgaAsistenti ? (oraret.data?.find((o) => o.ora === oraNgaAsistenti) ?? null) : null);
   // Çmimi me promocionin e orës së zgjedhur (i njëjti llogaritje si gjatë rezervimit).
   const cmimi = useCmimiITerminit(lokaliId, sherbimiId, ora?.fillon_me ?? null);
 
@@ -101,17 +107,21 @@ export default function Rezervo() {
   const berberet = (stafi.data ?? []).filter((a) => a.aktiv);
 
   // Çdo ndryshim sipër e bën orën e zgjedhur të pavlefshme.
+  function pastroOren() {
+    setOra(null);
+    setOraNgaAsistenti(null);
+  }
   function zgjidhSherbimin(id: string) {
     setSherbimiId(id);
-    setOra(null);
+    pastroOren();
   }
   function zgjidhBerberin(id: string | null) {
     setBerberiId(id);
-    setOra(null);
+    pastroOren();
   }
   function zgjidhDiten(d: string) {
     setData(d);
-    setOra(null);
+    pastroOren();
   }
 
   function konfirmo() {
@@ -149,7 +159,7 @@ export default function Rezervo() {
           );
         },
         // Ora u zu nga dikush tjetër: hiqet zgjedhja, oraret rifreskohen vetë.
-        onError: () => setOra(null),
+        onError: () => pastroOren(),
       },
     );
   }

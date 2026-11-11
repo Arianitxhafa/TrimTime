@@ -8,6 +8,7 @@ const SEKSIONET = [
   ["privatesia.vendndodhjaTitulli", "privatesia.vendndodhjaTeksti"],
   ["privatesia.kushTitulli", "privatesia.kushTeksti"],
   ["privatesia.fshirjaTitulli", "privatesia.fshirjaTeksti"],
+  ["privatesia.aiTitulli", "privatesia.aiTeksti"],
   ["privatesia.osmTitulli", "privatesia.osmTeksti"],
 ] as const;
 

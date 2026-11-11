@@ -99,6 +99,7 @@ function Navigimi() {
             <Stack.Screen name="riplanifiko/[id]" options={{ title: t("terminetEMia.ndryshoTitulli") }} />
             <Stack.Screen name="vlereso/[terminiId]" options={{ title: "", presentation: "modal" }} />
             <Stack.Screen name="kartat" options={{ title: t("profili.kartat") }} />
+            <Stack.Screen name="asistenti" options={{ title: t("asistenti.titulli"), presentation: "modal" }} />
           </Stack.Protected>
 
           <Stack.Protected guard={modi === "biznes"} redirectTo="/zbulo">
