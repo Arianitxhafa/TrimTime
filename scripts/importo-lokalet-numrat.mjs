@@ -1,4 +1,5 @@
-// Merr nga katalogu Numrat.com të gjithë berberët e Kosovës (emri, telefoni, qyteti, koordinatat)
+// Merr nga katalogu Numrat.com të gjithë berberët e Kosovës (emri, telefoni, qyteti, koordinatat
+// dhe adresa e rrugës nga faqja e detajeve të secilit)
 // dhe shkruan supabase/seed/lokalet_numrat_kosove.sql, që ekzekutohet në Supabase → SQL Editor
 // pas seed-it të OpenStreetMap.
 //
@@ -44,14 +45,15 @@ const pastro = (t) =>
 function lexoFaqen(html) {
   const listimet = [];
   for (const rreshti of html.split('<li class="lrow">').slice(1)) {
-    const lidhja = rreshti.match(/href="\/biznes\/([A-Za-z0-9]+)\/[^"]*\/">([\s\S]*?)<\/a>/);
+    const lidhja = rreshti.match(/href="(\/biznes\/([A-Za-z0-9]+)\/[^"]*\/)">([\s\S]*?)<\/a>/);
     const qyteti = rreshti.match(/class="lcell lcity">([\s\S]*?)<\/div>/);
     const telefoni = rreshti.match(/class="num">([\s\S]*?)<\/span>/);
     const pika = rreshti.match(/destination=(-?\d+(?:\.\d+)?)%2C(-?\d+(?:\.\d+)?)/);
     if (!lidhja) continue;
     listimet.push({
-      id: lidhja[1],
-      emri: pastro(lidhja[2]),
+      id: lidhja[2],
+      faqja: lidhja[1],
+      emri: pastro(lidhja[3]),
       qyteti: qyteti ? pastro(qyteti[1]) : null,
       telefoni: telefoni ? pastro(telefoni[1]) : null,
       lat: pika ? Number(pika[1]) : null,
@@ -60,6 +62,22 @@ function lexoFaqen(html) {
   }
   const faqet = [...new Set([...html.matchAll(/\?faqe=(\d+)"/g)].map((m) => Number(m[1])))];
   return { listimet, faqet };
+}
+
+// Adresa e rrugës nga të dhënat e strukturuara (schema.org LocalBusiness) të faqes së detajeve.
+function lexoAdresen(html) {
+  for (const m of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+    try {
+      const d = JSON.parse(m[1]);
+      if (d["@type"] === "LocalBusiness") {
+        const rruga = d.address?.streetAddress?.trim();
+        return rruga && rruga.length >= 3 ? rruga.slice(0, 200) : null;
+      }
+    } catch {
+      // JSON i dëmtuar: kalohet.
+    }
+  }
+  return null;
 }
 
 const sql = (v) => (v === null || v === undefined ? "null" : `'${String(v).replace(/'/g, "''")}'`);
@@ -91,35 +109,50 @@ const lokalet = [...teGjitha.values()];
 const meVendndodhje = lokalet.filter((l) => l.lat !== null && brendaKosoves(l));
 console.log(`Lokale: ${lokalet.length} (me koordinata në Kosovë: ${meVendndodhje.length})`);
 
+console.log("Duke marrë adresat nga faqet e detajeve…");
+let meAdrese = 0;
+for (const [i, l] of meVendndodhje.entries()) {
+  await prit(PAUZA_MS);
+  try {
+    l.adresa = lexoAdresen(await merr(BAZA + l.faqja));
+  } catch {
+    l.adresa = null;
+  }
+  if (l.adresa) meAdrese++;
+  if ((i + 1) % 25 === 0) console.log(`  ${i + 1}/${meVendndodhje.length}`);
+}
+console.log(`Me adresë: ${meAdrese}`);
+
 const rreshtat = meVendndodhje.map(
   (l) =>
-    `  (${sql(`numrat/${l.id}`)}, ${sql(l.emri.slice(0, 120))}, ${sql(l.qyteti)}, ${sql(l.telefoni?.slice(0, 30))}, 'SRID=4326;POINT(${l.lng} ${l.lat})')`,
+    `  (${sql(`numrat/${l.id}`)}, ${sql(l.emri.slice(0, 120))}, ${sql(l.adresa)}, ${sql(l.qyteti)}, ${sql(l.telefoni?.slice(0, 30))}, 'SRID=4326;POINT(${l.lng} ${l.lat})')`,
 );
 
 const permbajtja = `-- TrimTime · Berberët e Kosovës nga katalogu Numrat.com
 -- Gjeneruar më ${new Date().toISOString()} nga scripts/importo-lokalet-numrat.mjs (${meVendndodhje.length} lokale).
 -- Burimi: https://numrat.com/kosove/kategori/berber/
 --
--- Ekzekutohet pas migrimit 20261114090000_lokalet_numrat.sql dhe pas seed-it të OpenStreetMap.
+-- Ekzekutohet pas migrimit 20261114120000_adresat_numrat.sql dhe pas seed-it të OpenStreetMap.
 -- Mund të ekzekutohet sa herë të duash. Një lokal që ekziston tashmë (nga OSM ose TrimTime, brenda
 -- 150 m me emër të ngjashëm ose me të njëjtin telefon) nuk shtohet dy herë: lokali nga OSM merr
--- vetëm telefonin, nëse s'e ka.
+-- vetëm telefonin dhe adresën, nëse s'i ka.
 
 begin;
 
 create temporary table numrat_e_reja (
   osm_id text,
   emri text,
+  adresa text,
   qyteti text,
   telefoni text,
   vendndodhja extensions.geography
 ) on commit drop;
 
-insert into numrat_e_reja (osm_id, emri, qyteti, telefoni, vendndodhja)
-select v.osm_id, v.emri, v.qyteti, v.telefoni, v.vendndodhja::extensions.geography
+insert into numrat_e_reja (osm_id, emri, adresa, qyteti, telefoni, vendndodhja)
+select v.osm_id, v.emri, v.adresa, v.qyteti, v.telefoni, v.vendndodhja::extensions.geography
 from (values
 ${rreshtat.join(",\n")}
-) as v(osm_id, emri, qyteti, telefoni, vendndodhja);
+) as v(osm_id, emri, adresa, qyteti, telefoni, vendndodhja);
 
 select public.bashko_lokalet_e_numrat();
 
