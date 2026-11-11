@@ -5,11 +5,13 @@ import { useTranslation } from "react-i18next";
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import {
+  aiAktiv,
   GabimIAsistentit,
   merrFotonPerAsistentin,
   useKeshillaEStilit,
   useRezervoMeFjale,
   type FotojaPerAsistentin,
+  type KerkesaERezervimit,
   type OraEAsistentit,
 } from "../api/asistenti";
 import Butoni from "../components/Butoni";
@@ -37,6 +39,12 @@ export default function Asistenti() {
   const [foto, setFoto] = useState<FotojaPerAsistentin | null>(null);
   const [paLejeKamere, setPaLejeKamere] = useState(false);
   const stili = useKeshillaEStilit();
+
+  // "Fade · Nesër · 17:00–21:00": çfarë kuptoi asistenti, që përdoruesi ta shohë dhe ta ndreqë.
+  function pershkrimi(k: KerkesaERezervimit): string {
+    const sherbimi = k.kategoria === "asnje" ? t("asistenti.cdoSherbim") : t(`zbulo.k_${k.kategoria}`);
+    return `${sherbimi} · ${formatoDaten(k.data, t)} · ${k.ora_nga}–${k.ora_deri}`;
+  }
 
   function mesazhiIGabimit(e: unknown): string {
     return t(`asistenti.g_${e instanceof GabimIAsistentit ? e.kodi : "rrjeti"}`);
@@ -83,7 +91,7 @@ export default function Asistenti() {
             <Ikona emri={ikonat.asistenti} madhesia={26} ngjyra={ngjyrat.mbiAri} />
           </View>
           <Text style={styles.hyrjaTitulli}>{t("asistenti.hyrjaTitulli")}</Text>
-          <Text style={styles.hyrjaTeksti}>{t("asistenti.hyrjaTeksti")}</Text>
+          <Text style={styles.hyrjaTeksti}>{aiAktiv ? t("asistenti.hyrjaTeksti") : t("asistenti.hyrjaTekstiFalas")}</Text>
         </View>
 
         {/* Rezervo me fjalë */}
@@ -133,7 +141,7 @@ export default function Asistenti() {
             <Animated.View entering={FadeInDown.duration(300)} style={styles.rezultatet}>
               {rezervo.data.kerkesa.e_qarte ? (
                 <>
-                  <Text style={styles.kuptova}>{t("asistenti.kuptova", { teksti: rezervo.data.kerkesa.kuptova })}</Text>
+                  <Text style={styles.kuptova}>{t("asistenti.kuptova", { teksti: pershkrimi(rezervo.data.kerkesa) })}</Text>
                   {rezervo.data.oraret.length === 0 ? (
                     <Text style={styles.shenim}>{t("asistenti.asnjeOre")}</Text>
                   ) : (
@@ -168,7 +176,8 @@ export default function Asistenti() {
           ) : null}
         </View>
 
-        {/* Këshilltari i stilit */}
+        {/* Këshilltari i stilit: vetëm me Claude (analiza e fotos ka nevojë për AI). */}
+        {aiAktiv && (
         <View style={styles.karta}>
           <View style={styles.kartaKoka}>
             <Ikona emri={ikonat.gershere} madhesia={18} ngjyra={ngjyrat.bronzi} />
@@ -239,8 +248,9 @@ export default function Asistenti() {
               ))
             : null}
         </View>
+        )}
 
-        <Text style={styles.privatesia}>{t("asistenti.privatesia")}</Text>
+        <Text style={styles.privatesia}>{aiAktiv ? t("asistenti.privatesia") : t("asistenti.privatesiaFalas")}</Text>
       </ScrollView>
     </KeyboardAvoidingView>
   );

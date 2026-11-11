@@ -4,10 +4,16 @@ import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import type { Kategoria } from "../components/FiltratEKerkimit";
 import { gjuhaAktuale } from "../i18n";
+import { kuptoKerkesen } from "../lib/kuptoKerkesen";
 import { supabase } from "../lib/supabase";
 import type { Koordinata } from "../lib/tipet";
 
 export type KategoriaEAsistentit = Kategoria | "asnje";
+
+// Claude (Edge Function "asistenti") përdoret vetëm kur aktivizohet me EXPO_PUBLIC_ASISTENTI_AI=po
+// (pasi të shtohet çelësi i Anthropic në Supabase). Pa të, kërkesat kuptohen falas në telefon
+// dhe këshilltari i stilit (që ka nevojë për AI) nuk shfaqet.
+export const aiAktiv = process.env.EXPO_PUBLIC_ASISTENTI_AI === "po";
 
 export type StiliIRekomanduar = {
   emri: string;
@@ -29,7 +35,6 @@ export type KerkesaERezervimit = {
   data: string;
   ora_nga: string;
   ora_deri: string;
-  kuptova: string;
 };
 
 export type OraEAsistentit = {
@@ -108,11 +113,14 @@ export function useKeshillaEStilit() {
 
 export type RezultatiIRezervimit = { kerkesa: KerkesaERezervimit; oraret: OraEAsistentit[] };
 
-// Claude e kthen fjalinë në shërbim + ditë + orë; pastaj serveri gjen orët e lira në lokalet pranë.
+// Fjalia kthehet në shërbim + ditë + orë (nga Claude, ose falas në telefon); pastaj serveri gjen
+// orët e lira në lokalet pranë.
 export function useRezervoMeFjale() {
   return useMutation({
     mutationFn: async (p: { teksti: string; pika: Koordinata; qytetiId: number | null }): Promise<RezultatiIRezervimit> => {
-      const kerkesa = await thirrAsistentin<KerkesaERezervimit>({ veprimi: "rezervo", teksti: p.teksti });
+      const kerkesa = aiAktiv
+        ? await thirrAsistentin<KerkesaERezervimit>({ veprimi: "rezervo", teksti: p.teksti })
+        : kuptoKerkesen(p.teksti);
       if (!kerkesa.e_qarte) return { kerkesa, oraret: [] };
       const { data, error } = await supabase.rpc("oraret_per_asistentin", {
         p_lat: p.pika.lat,
