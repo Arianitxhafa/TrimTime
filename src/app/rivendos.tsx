@@ -3,14 +3,14 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text } from "react-native";
-import Butoni from "../../components/Butoni";
-import FushaTekstit from "../../components/FushaTekstit";
-import { ikonat } from "../../components/Ikona";
-import KornizaAuth, { GabimiIFormes } from "../../components/KornizaAuth";
-import { useStilet } from "../../context/TemaContext";
-import { emailIVlefshem, mesazhiIGabimit } from "../../lib/gabimetEAuth";
-import { supabase } from "../../lib/supabase";
-import { shkronjat, type Ngjyrat } from "../../theme";
+import Butoni from "../components/Butoni";
+import FushaTekstit from "../components/FushaTekstit";
+import { ikonat } from "../components/Ikona";
+import KornizaAuth, { GabimiIFormes } from "../components/KornizaAuth";
+import { useStilet } from "../context/TemaContext";
+import { emailIVlefshem, mesazhiIGabimit } from "../lib/gabimetEAuth";
+import { supabase } from "../lib/supabase";
+import { shkronjat, type Ngjyrat } from "../theme";
 
 // Hapi i parë i rivendosjes: Supabase dërgon një lidhje që hap aplikacionin te "fjalekalimi-i-ri".
 export default function Rivendos() {

@@ -2,17 +2,17 @@ import { Link, router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
-import Butoni from "../../components/Butoni";
-import FushaTekstit from "../../components/FushaTekstit";
-import Ikona, { ikonat } from "../../components/Ikona";
-import KornizaAuth, { GabimiIFormes } from "../../components/KornizaAuth";
-import RoliIZgjedhur from "../../components/RoliIZgjedhur";
-import { usePreferencat } from "../../context/PreferencatContext";
-import { useStilet, useTema } from "../../context/TemaContext";
-import { gjuhaAktuale } from "../../i18n";
-import { emailIVlefshem, mesazhiIGabimit } from "../../lib/gabimetEAuth";
-import { supabase } from "../../lib/supabase";
-import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import Butoni from "../components/Butoni";
+import FushaTekstit from "../components/FushaTekstit";
+import Ikona, { ikonat } from "../components/Ikona";
+import KornizaAuth, { GabimiIFormes } from "../components/KornizaAuth";
+import RoliIZgjedhur from "../components/RoliIZgjedhur";
+import { usePreferencat } from "../context/PreferencatContext";
+import { useStilet, useTema } from "../context/TemaContext";
+import { gjuhaAktuale } from "../i18n";
+import { emailIVlefshem, mesazhiIGabimit } from "../lib/gabimetEAuth";
+import { supabase } from "../lib/supabase";
+import { hapesira, rrezja, type Ngjyrat } from "../theme";
 
 const GJATESIA_MIN_FJALEKALIMIT = 8;
 

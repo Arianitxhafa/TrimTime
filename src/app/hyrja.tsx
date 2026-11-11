@@ -2,16 +2,16 @@ import { Link } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text } from "react-native";
-import Butoni from "../../components/Butoni";
-import FushaTekstit from "../../components/FushaTekstit";
-import { ikonat } from "../../components/Ikona";
-import KornizaAuth, { GabimiIFormes } from "../../components/KornizaAuth";
-import RoliIZgjedhur from "../../components/RoliIZgjedhur";
-import { usePreferencat } from "../../context/PreferencatContext";
-import { useStilet } from "../../context/TemaContext";
-import { emailIVlefshem, mesazhiIGabimit } from "../../lib/gabimetEAuth";
-import { supabase } from "../../lib/supabase";
-import { type Ngjyrat } from "../../theme";
+import Butoni from "../components/Butoni";
+import FushaTekstit from "../components/FushaTekstit";
+import { ikonat } from "../components/Ikona";
+import KornizaAuth, { GabimiIFormes } from "../components/KornizaAuth";
+import RoliIZgjedhur from "../components/RoliIZgjedhur";
+import { usePreferencat } from "../context/PreferencatContext";
+import { useStilet } from "../context/TemaContext";
+import { emailIVlefshem, mesazhiIGabimit } from "../lib/gabimetEAuth";
+import { supabase } from "../lib/supabase";
+import { type Ngjyrat } from "../theme";
 
 export default function Hyrja() {
   const { t } = useTranslation();

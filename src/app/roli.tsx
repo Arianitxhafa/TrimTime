@@ -2,12 +2,12 @@ import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
-import Marka, { Drita } from "../../components/Marka";
-import { usePreferencat, type Modi } from "../../context/PreferencatContext";
-import { prekja } from "../../lib/prekja";
-import { useStilet, useTema } from "../../context/TemaContext";
-import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
+import Ikona, { ikonat, type EmriIkones } from "../components/Ikona";
+import Marka, { Drita } from "../components/Marka";
+import { usePreferencat, type Modi } from "../context/PreferencatContext";
+import { prekja } from "../lib/prekja";
+import { useStilet, useTema } from "../context/TemaContext";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 
 const rolet = [
   { vlera: "klient", titulli: "roli.klient", teksti: "roli.klientTeksti", ikona: ikonat.gershere },

@@ -60,7 +60,7 @@ function Navigimi() {
   const kaHyre = sesioni !== null;
 
   // Stack.Protected ridrejton nga ekranet që nuk lejohen. Që nga SDK 58, pa `redirectTo` Expo Router
-  // shkon te route-i i parë i lejuar, që për grupin (auth) do të ishte "/(auth)", pa ekran.
+  // shkon te route-i i parë i lejuar; për ekranet e hyrjes ai duhet të jetë "/roli".
   const hyrjaPerTeLejuarit = !onboardingIPare ? "/onboarding" : !kaHyre ? "/roli" : "/lejet";
   return (
     <KycjaBiometrike aktive={kaHyre}>
@@ -82,7 +82,11 @@ function Navigimi() {
         </Stack.Protected>
 
         <Stack.Protected guard={onboardingIPare && !kaHyre} redirectTo={onboardingIPare ? "/" : "/onboarding"}>
-          <Stack.Screen name="(auth)" options={{ headerShown: false, animation: "fade" }} />
+          {/* Hyrja: roli → hyrja / regjistrimi → rivendos, në të njëjtin stack (mbrapa kthen te roli). */}
+          <Stack.Screen name="roli" options={{ headerShown: false, animation: "fade" }} />
+          <Stack.Screen name="hyrja" options={{ headerShown: false, animation: "fade" }} />
+          <Stack.Screen name="regjistrimi" options={{ headerShown: false, animation: "fade" }} />
+          <Stack.Screen name="rivendos" options={{ headerShown: false, animation: "fade" }} />
         </Stack.Protected>
 
         {/* Pas hyrjes së parë: lejo njoftimet dhe vendndodhjen, një herë në këtë telefon. */}
