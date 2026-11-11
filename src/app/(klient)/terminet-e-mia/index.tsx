@@ -5,8 +5,6 @@ import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
   FlatList,
-  Linking,
-  Platform,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -27,7 +25,7 @@ import { formatoCmimin } from "../../../lib/formatimi";
 import { shtoNeKalendar } from "../../../lib/kalendari";
 import { anuloKujtesat, sinkronizoKujtesat } from "../../../lib/kujtesat";
 import type { TerminiIKlientit } from "../../../lib/tipet";
-import { lidhjaEUdhezimeve } from "../../../lib/vendndodhja";
+import { useHapUdhezimet } from "../../../api/udhezimet";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../../theme";
 
 type Skeda = "teArdhshme" | "teKaluara";
@@ -217,6 +215,7 @@ type KartaProps = {
 
 function KartaETerminit({ termini, iArdhshem, onAnulo }: KartaProps) {
   const { t } = useTranslation();
+  const hapUdhezimet = useHapUdhezimet();
   const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
 
@@ -276,7 +275,7 @@ function KartaETerminit({ termini, iArdhshem, onAnulo }: KartaProps) {
             <Veprimi
               ikona={ikonat.harta}
               teksti={t("terminetEMia.udhezimet")}
-              onPress={() => Linking.openURL(lidhjaEUdhezimeve(termini, Platform.OS))}
+              onPress={() => hapUdhezimet({ id: termini.lokali_id, lat: termini.lat, lng: termini.lng })}
             />
           </View>
         ) : (
@@ -285,7 +284,7 @@ function KartaETerminit({ termini, iArdhshem, onAnulo }: KartaProps) {
             <Veprimi
               ikona={ikonat.harta}
               teksti={t("terminetEMia.udhezimet")}
-              onPress={() => Linking.openURL(lidhjaEUdhezimeve(termini, Platform.OS))}
+              onPress={() => hapUdhezimet({ id: termini.lokali_id, lat: termini.lat, lng: termini.lng })}
             />
           </View>
         )

@@ -100,6 +100,19 @@ function Navigimi() {
             <Stack.Screen name="vlereso/[terminiId]" options={{ title: "", presentation: "modal" }} />
             <Stack.Screen name="kartat" options={{ title: t("profili.kartat") }} />
             <Stack.Screen name="asistenti" options={{ title: t("asistenti.titulli"), presentation: "modal" }} />
+            {/* Fleta mbi hartë, si te Apple Maps: gjysmë ekrani, harta mbetet e prekshme pas saj. */}
+            <Stack.Screen
+              name="harta-lokali/[id]"
+              options={{
+                headerShown: false,
+                presentation: "formSheet",
+                sheetAllowedDetents: [0.5, 0.92],
+                sheetGrabberVisible: true,
+                sheetCornerRadius: 24,
+                sheetLargestUndimmedDetentIndex: 0,
+                contentStyle: { backgroundColor: ngjyrat.sfondi },
+              }}
+            />
           </Stack.Protected>
 
           <Stack.Protected guard={modi === "biznes"} redirectTo="/zbulo">

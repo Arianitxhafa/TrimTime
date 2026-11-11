@@ -1,14 +1,14 @@
 import * as LidhjetExpo from "expo-linking";
 import { Link, router } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { Linking, Platform, Pressable, Share, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, Share, StyleSheet, Text, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useStilet, useTema } from "../context/TemaContext";
 import { useShtypja } from "../hooks/useShtypja";
 import { formatoCmimin, formatoDistancen } from "../lib/formatimi";
 import { prekja } from "../lib/prekja";
 import type { LokaliPrane } from "../lib/tipet";
-import { lidhjaEUdhezimeve } from "../lib/vendndodhja";
+import { useHapUdhezimet } from "../api/udhezimet";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Ikona, { ikonat } from "./Ikona";
 import KopertinaELokalit from "./KopertinaELokalit";
@@ -46,7 +46,8 @@ export default function KartaELokalit({ lokali, kompakte = false, indeksi }: Pro
 
   const href = { pathname: "/lokali/[id]", params: { id: lokali.id } } as const;
   const thirr = () => Linking.openURL(`tel:${lokali.telefoni?.replace(/\s/g, "")}`);
-  const udhezimet = () => Linking.openURL(lidhjaEUdhezimeve(lokali, Platform.OS));
+  const hapUdhezimet = useHapUdhezimet();
+  const udhezimet = () => hapUdhezimet(lokali);
   const ndaj = () =>
     Share.share({
       message: `${lokali.emri} · ${lokali.adresa}, ${lokali.qyteti}\n${LidhjetExpo.createURL(`/lokali/${lokali.id}`)}`,

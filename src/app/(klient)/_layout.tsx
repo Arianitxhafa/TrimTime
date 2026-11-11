@@ -1,4 +1,5 @@
 import { useQueryClient } from "@tanstack/react-query";
+import { usePathname } from "expo-router";
 import { NativeTabs } from "expo-router/native-tabs";
 import { Platform } from "react-native";
 import TabetWeb from "../../components/TabetWeb";
@@ -15,6 +16,13 @@ export default function KlientLayout() {
   const { t } = useTranslation();
   const { ngjyrat } = useTema();
   const klienti = useQueryClient();
+  // Çdo tab ka ngjyrën e vet kur zgjidhet: Zbulo ar, Harta portokalli, Terminet blu, Profili ar.
+  const shtegu = usePathname();
+  const ngjyraETabit = shtegu.startsWith("/harta")
+    ? ngjyrat.portokalli
+    : shtegu.startsWith("/terminet-e-mia")
+      ? ngjyrat.blu
+      : ngjyrat.ari;
 
   // Një dëgjues i vetëm për listën e pritjes, i hapur sa kohë klienti është brenda.
   const kurLirohet = useCallback(
@@ -51,7 +59,7 @@ export default function KlientLayout() {
 
   // Shiriti i tab-eve i iOS (Liquid Glass në iOS 26) dhe i Android-it, me ikonat SF Symbols.
   return (
-    <NativeTabs tintColor={ngjyrat.ari} minimizeBehavior="onScrollDown" backgroundColor={ngjyrat.siperfaqja}>
+    <NativeTabs tintColor={ngjyraETabit} minimizeBehavior="onScrollDown" backgroundColor={ngjyrat.siperfaqja}>
       <NativeTabs.Trigger name="zbulo">
         <NativeTabs.Trigger.Icon sf="sparkle.magnifyingglass" md={ikonat.zbulo.android} />
         <NativeTabs.Trigger.Label>{t("tabs.zbulo")}</NativeTabs.Trigger.Label>

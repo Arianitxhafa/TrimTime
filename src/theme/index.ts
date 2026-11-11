@@ -33,6 +33,9 @@ export type Ngjyrat = {
   shiriti: readonly [string, string, string];
   // Sfondi i kopertinave të lokaleve pa foto (zgjidhet sipas emrit).
   tabelat: readonly string[];
+  // Ngjyrat e tab-eve dhe të hartës, si te aplikacionet e Apple (Harta portokalli, Terminet blu).
+  portokalli: string;
+  blu: string;
 };
 
 // Pamja e ndritshme në stilin e Apple: gri e sistemit, karta të bardha, butona të zinj dhe ar
@@ -61,6 +64,8 @@ export const ngjyratCelta: Ngjyrat = {
   bronzi: "#9A7B45",
   shiriti: ["#FF3B30", "#FFFFFF", "#0A84FF"],
   tabelat: ["#2C2C2E", "#2B241A", "#1E2633", "#2E1F22"],
+  portokalli: "#FF9500",
+  blu: "#007AFF",
 };
 
 // Pamja kryesore: e zezë OLED, karta gri të errëta dhe ar shampanjë vetëm te veprimet.
@@ -88,6 +93,8 @@ export const ngjyratErrta: Ngjyrat = {
   bronzi: "#D4B483",
   shiriti: ["#FF453A", "#FFFFFF", "#0A84FF"],
   tabelat: ["#1C1C1E", "#2A2418", "#1A2230", "#2A1C1F"],
+  portokalli: "#FF9F0A",
+  blu: "#0A84FF",
 };
 
 // Si Apple: pa hije në errësirë; vetëm një hije shumë e lehtë te kartat në dritë.

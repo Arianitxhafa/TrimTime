@@ -4,7 +4,7 @@ import * as LidhjetExpo from "expo-linking";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Linking, Platform, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokali } from "../../api/lokalet";
 import { useOrari } from "../../api/orari";
@@ -30,7 +30,7 @@ import { dataISO } from "../../lib/datat";
 import { formatoCmimin, formatoKohezgjatjen } from "../../lib/formatimi";
 import { pershkrimiIPromocionit, vlenSot } from "../../lib/promocionet";
 import type { Lokali, Sherbimi } from "../../lib/tipet";
-import { lidhjaEUdhezimeve } from "../../lib/vendndodhja";
+import { useHapUdhezimet } from "../../api/udhezimet";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 export default function ProfiliILokalit() {
@@ -44,6 +44,7 @@ export default function ProfiliILokalit() {
   const orari = useOrari(id);
   const stafi = useStafi(id);
   const modi = useModiAktiv();
+  const hapUdhezimet = useHapUdhezimet();
 
   if (!lokali.data && !lokali.isSuccess) {
     return (
@@ -79,7 +80,7 @@ export default function ProfiliILokalit() {
   // Lokalet pa rezervim online: shiriti poshtë thërret lokalin ose hap udhëzimet.
   const meTelefon = !mundTeRezervoje && modi === "klient";
   const thirr = () => Linking.openURL(`tel:${l.telefoni?.replace(/\s/g, "")}`);
-  const udhezimet = () => Linking.openURL(lidhjaEUdhezimeve(l, Platform.OS));
+  const udhezimet = () => hapUdhezimet(l);
 
   function hapRezervimin(sherbimiId?: string) {
     router.push({ pathname: "/rezervo/[lokaliId]", params: { lokaliId: l.id, ...(sherbimiId ? { sherbimiId } : {}) } });
