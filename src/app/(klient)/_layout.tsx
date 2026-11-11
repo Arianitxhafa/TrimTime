@@ -62,22 +62,37 @@ export default function KlientLayout() {
 
   // Shiriti i tab-eve i iOS (Liquid Glass në iOS 26) dhe i Android-it, me ikonat SF Symbols.
   return (
-    <NativeTabs tintColor={ngjyraETabit} minimizeBehavior="onScrollDown" backgroundColor={ngjyrat.siperfaqja}>
+    // Ngjyra vendoset te çdo tab (ikona + etiketa), që thjerrëza e Liquid Glass ta tregojë ngjyrën e
+    // tab-it edhe kur gishti mbahet e zhvendoset mbi to; tintColor mbetet si rezervë.
+    <NativeTabs
+      tintColor={ngjyraETabit}
+      iconColor={ngjyrat.tekstiZbehte}
+      minimizeBehavior="onScrollDown"
+      backgroundColor={ngjyrat.siperfaqja}
+    >
       <NativeTabs.Trigger name="zbulo">
-        <NativeTabs.Trigger.Icon sf="sparkle.magnifyingglass" md={ikonat.zbulo.android} />
-        <NativeTabs.Trigger.Label>{t("tabs.zbulo")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="sparkle.magnifyingglass" md={ikonat.zbulo.android} selectedColor={ngjyrat.jeshile} />
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.jeshile }}>{t("tabs.zbulo")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="harta">
-        <NativeTabs.Trigger.Icon sf={{ default: "map", selected: "map.fill" }} md={ikonat.harta.android} />
-        <NativeTabs.Trigger.Label>{t("tabs.harta")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          sf={{ default: "map", selected: "map.fill" }}
+          md={ikonat.harta.android}
+          selectedColor={ngjyrat.portokalli}
+        />
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.portokalli }}>{t("tabs.harta")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="terminet-e-mia">
-        <NativeTabs.Trigger.Icon sf="calendar" md={ikonat.kalendar.android} />
-        <NativeTabs.Trigger.Label>{t("tabs.terminet")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="calendar" md={ikonat.kalendar.android} selectedColor={ngjyrat.blu} />
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.blu }}>{t("tabs.terminet")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profili">
-        <NativeTabs.Trigger.Icon sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }} md={ikonat.personi.android} />
-        <NativeTabs.Trigger.Label>{t("tabs.profili")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon
+          sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }}
+          md={ikonat.personi.android}
+          selectedColor={ngjyrat.vjollce}
+        />
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.vjollce }}>{t("tabs.profili")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );
