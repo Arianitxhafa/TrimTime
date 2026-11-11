@@ -16,13 +16,16 @@ export default function KlientLayout() {
   const { t } = useTranslation();
   const { ngjyrat } = useTema();
   const klienti = useQueryClient();
-  // Çdo tab ka ngjyrën e vet kur zgjidhet: Zbulo ar, Harta portokalli, Terminet blu, Profili ar.
+  // Çdo tab ka ngjyrën e vet kur zgjidhet: Zbulo jeshile, Harta portokalli, Terminet blu,
+  // Profili vjollcë (fletët dhe ekranet që hapen sipër mbajnë ngjyrën e Zbulo).
   const shtegu = usePathname();
   const ngjyraETabit = shtegu.startsWith("/harta")
     ? ngjyrat.portokalli
     : shtegu.startsWith("/terminet-e-mia")
       ? ngjyrat.blu
-      : ngjyrat.ari;
+      : shtegu.startsWith("/profili")
+        ? ngjyrat.vjollce
+        : ngjyrat.jeshile;
 
   // Një dëgjues i vetëm për listën e pritjes, i hapur sa kohë klienti është brenda.
   const kurLirohet = useCallback(
