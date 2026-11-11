@@ -60,7 +60,8 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "lint": "expo lint",
-    "importo:osm": "node scripts/importo-lokalet-osm.mjs"
+    "importo:osm": "node scripts/importo-lokalet-osm.mjs",
+    "importo:numrat": "node scripts/importo-lokalet-numrat.mjs"
   },
   "private": true
 }

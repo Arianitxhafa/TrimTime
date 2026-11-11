@@ -70,7 +70,8 @@ export default function ProfiliILokalit() {
   const sherbimetAktive = (sherbimet.data ?? []).filter((s) => s.aktiv);
   const berberet = (stafi.data ?? []).filter((a) => a.aktiv);
   const sot = new Date().getDay();
-  const ngaOsm = l.burimi === "osm";
+  // Lokal nga OpenStreetMap ose Numrat.com: pa pronar, pa shërbime dhe pa rezervim online.
+  const ngaOsm = l.burimi !== "trimtime";
   // Pa orar në TrimTime (shumica e lokaleve nga OpenStreetMap) nuk themi "Mbyllur": orari nuk dihet.
   const kaOrar = (orari.data ?? []).length > 0;
   // Vetëm klientët rezervojnë; pronari e sheh profilin si parapamje.
@@ -213,7 +214,11 @@ export default function ProfiliILokalit() {
             </>
           ) : null}
 
-          {ngaOsm && <Text style={styles.atribuimi}>{t("pergjithshme.atribuimiOsm")}</Text>}
+          {ngaOsm && (
+            <Text style={styles.atribuimi}>
+              {l.burimi === "numrat" ? t("pergjithshme.atribuimiNumrat") : t("pergjithshme.atribuimiOsm")}
+            </Text>
+          )}
         </View>
       </ScrollView>
 

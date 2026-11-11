@@ -32,7 +32,8 @@ export type Lokali = {
 };
 
 // "osm": lokal i importuar nga OpenStreetMap, pa pronar në TrimTime.
-export type BurimiILokalit = "trimtime" | "osm";
+// "osm" dhe "numrat": lokale pa pronar në TrimTime (nga OpenStreetMap dhe katalogu Numrat.com).
+export type BurimiILokalit = "trimtime" | "osm" | "numrat";
 
 export type LokaliPrane = {
   id: string;

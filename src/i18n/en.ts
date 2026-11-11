@@ -7,6 +7,7 @@ export const en: Perkthimet = {
     gabimPapritur: "Something went wrong. Please try again.",
     seShpejti: "Coming soon",
     atribuimiOsm: "Shop data: © OpenStreetMap contributors",
+    atribuimiNumrat: "Some shop data from the Numrat.com directory",
   },
   onboarding: {
     kalo: "Skip",
@@ -153,7 +154,7 @@ export const en: Perkthimet = {
     aiTitulli: "AI assistant",
     aiTeksti: "The assistant understands your request on your phone. Only if the AI assistant is switched on are your photo or text sent to Claude (Anthropic) for the answer, and TrimTime doesn't store them.",
     osmTitulli: "Shops",
-    osmTeksti: "Data for shops that haven't signed up themselves comes from © OpenStreetMap contributors (ODbL).",
+    osmTeksti: "Data for shops that haven't signed up themselves comes from © OpenStreetMap contributors (ODbL) and the public Numrat.com directory.",
   },
   asistenti: {
     titulli: "Assistant",

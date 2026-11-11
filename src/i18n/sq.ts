@@ -5,6 +5,7 @@ export const sq = {
     gabimPapritur: "Ndodhi një gabim. Provo përsëri.",
     seShpejti: "Së shpejti",
     atribuimiOsm: "Të dhënat e lokaleve: © OpenStreetMap contributors",
+    atribuimiNumrat: "Të dhëna lokalesh nga katalogu Numrat.com",
   },
   onboarding: {
     kalo: "Kalo",
@@ -152,7 +153,7 @@ export const sq = {
     aiTitulli: "Asistenti AI",
     aiTeksti: "Asistenti e kupton kërkesën në telefonin tënd. Vetëm nëse aktivizohet asistenti AI, fotoja ose teksti dërgohen te Claude (Anthropic) për përgjigjen dhe nuk ruhen nga TrimTime.",
     osmTitulli: "Lokalet",
-    osmTeksti: "Të dhënat e lokaleve që nuk janë regjistruar vetë vijnë nga © OpenStreetMap contributors (ODbL).",
+    osmTeksti: "Të dhënat e lokaleve që nuk janë regjistruar vetë vijnë nga © OpenStreetMap contributors (ODbL) dhe nga katalogu publik Numrat.com.",
   },
   asistenti: {
     titulli: "Asistenti",

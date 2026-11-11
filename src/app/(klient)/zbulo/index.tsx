@@ -256,8 +256,15 @@ export default function Zbulo() {
         ListHeaderComponent={koka}
         ItemSeparatorComponent={() => <View style={{ height: hapesira.lg }} />}
         ListFooterComponent={
-          (lokalet.data ?? []).some((l) => l.burimi === "osm") ? (
-            <Text style={styles.atribuimi}>{t("pergjithshme.atribuimiOsm")}</Text>
+          (lokalet.data ?? []).some((l) => l.burimi !== "trimtime") ? (
+            <Text style={styles.atribuimi}>
+              {[
+                (lokalet.data ?? []).some((l) => l.burimi === "osm") ? t("pergjithshme.atribuimiOsm") : null,
+                (lokalet.data ?? []).some((l) => l.burimi === "numrat") ? t("pergjithshme.atribuimiNumrat") : null,
+              ]
+                .filter(Boolean)
+                .join("\n")}
+            </Text>
           ) : undefined
         }
         renderItem={({ item, index }) => <KartaELokalit lokali={item} indeksi={index} />}

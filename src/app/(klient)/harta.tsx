@@ -127,9 +127,13 @@ export default function Harta() {
         </Pressable>
       )}
 
-      {!lokaliIZgjedhur && (lokalet.data ?? []).some((l) => l.burimi === "osm") && (
+      {!lokaliIZgjedhur && (lokalet.data ?? []).some((l) => l.burimi !== "trimtime") && (
         <View style={styles.atribuimi} pointerEvents="none">
-          <Text style={styles.atribuimiTeksti}>© OpenStreetMap contributors</Text>
+          <Text style={styles.atribuimiTeksti}>
+            {(lokalet.data ?? []).some((l) => l.burimi === "numrat")
+              ? "© OpenStreetMap contributors · Numrat.com"
+              : "© OpenStreetMap contributors"}
+          </Text>
         </View>
       )}
 

@@ -23,7 +23,7 @@ Llogaria fshihet kurdo nga aplikacioni: **Cilësimet → Fshi llogarinë**. Të 
 Asistenti e kupton kërkesën në telefonin tënd. Vetëm nëse aktivizohet asistenti AI, fotoja ose teksti dërgohen te Claude (Anthropic) për përgjigjen dhe nuk ruhen nga TrimTime.
 
 ## Lokalet
-Të dhënat e lokaleve që nuk janë regjistruar vetë vijnë nga © OpenStreetMap contributors (ODbL).
+Të dhënat e lokaleve që nuk janë regjistruar vetë vijnë nga © OpenStreetMap contributors (ODbL) dhe nga katalogu publik Numrat.com.
 
 ---
 
@@ -38,4 +38,4 @@ TrimTime connects clients with barbers in Kosovo. We only collect what's needed 
 - **Who sees it:** the shop you book with sees your name, phone, service and style photo for that appointment. Data is stored with Supabase. We don't sell it or use it for ads.
 - **Deletion:** delete your account any time in **Settings → Delete account**. Your data is deleted permanently; past appointments stay with the shop only as "Deleted account".
 - **AI assistant:** requests are understood on your phone. Only if the AI assistant is switched on are your photo or text sent to Claude (Anthropic) for the answer; TrimTime doesn't store them.
-- **Shops:** data for shops that haven't signed up comes from © OpenStreetMap contributors (ODbL).
+- **Shops:** data for shops that haven't signed up comes from © OpenStreetMap contributors (ODbL) and the public Numrat.com directory.

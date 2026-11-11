@@ -19,7 +19,7 @@ TrimTime connects men's barbershops with their clients, starting in Kosovo. Buil
 
 - Copy `.env.example` to `.env`. It holds only the project URL and the publishable (anon) key. Never put a `service_role`/secret key or the database password in the app, in the repo or in chat.
 - Schema changes go in a **new** file in `supabase/migrations/`. Never edit a migration that has already been run. Migrations are run by hand, in filename order, in Supabase → SQL Editor. Every new table needs RLS and explicit grants.
-- After the last migration, run `supabase/seed/lokalet_osm_kosove.sql` (cities and shops from OpenStreetMap). `npm run importo:osm` regenerates it. Keep the "© OpenStreetMap contributors" attribution wherever these shops appear.
+- After the last migration, run `supabase/seed/lokalet_osm_kosove.sql` and then `supabase/seed/lokalet_numrat_kosove.sql` (barbers from the Numrat.com directory; `npm run importo:numrat` regenerates it) (cities and shops from OpenStreetMap). `npm run importo:osm` regenerates it. Keep the "© OpenStreetMap contributors" attribution wherever these shops appear.
 - Prices, booking times and discounts are calculated on the server, not in the app.
 
 ## Expo has changed — do not trust your training data
