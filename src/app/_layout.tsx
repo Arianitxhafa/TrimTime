@@ -86,6 +86,7 @@ function Navigimi() {
           <Stack.Screen name="roli" options={{ headerShown: false, animation: "fade" }} />
           <Stack.Screen name="hyrja" options={{ headerShown: false, animation: "fade" }} />
           <Stack.Screen name="regjistrimi" options={{ headerShown: false, animation: "fade" }} />
+          <Stack.Screen name="verifiko" options={{ headerShown: false, animation: "fade" }} />
           <Stack.Screen name="rivendos" options={{ headerShown: false, animation: "fade" }} />
         </Stack.Protected>
 
@@ -100,6 +101,10 @@ function Navigimi() {
           <Stack.Protected guard={modi === "klient"} redirectTo="/sot">
             <Stack.Screen name="(klient)" options={{ headerShown: false, animation: "fade" }} />
             <Stack.Screen name="rezervo/[lokaliId]" options={{ title: t("rezervimi.titulli"), presentation: "modal" }} />
+            <Stack.Screen
+              name="kerko-termin/[lokaliId]"
+              options={{ title: t("kerkoTermin.titulli"), presentation: "modal" }}
+            />
             <Stack.Screen name="riplanifiko/[id]" options={{ title: t("terminetEMia.ndryshoTitulli") }} />
             <Stack.Screen name="vlereso/[terminiId]" options={{ title: "", presentation: "modal" }} />
             <Stack.Screen name="kartat" options={{ title: t("profili.kartat") }} />

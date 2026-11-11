@@ -98,11 +98,20 @@ export default function LokaliNeHarte() {
             )}
           />
         ) : null}
+        {!mundTeRezervoje && l.telefoni ? (
+          <Veprimi
+            ikona={ikonat.kalendar}
+            teksti={t("harta.kerkoTermin")}
+            kryesor
+            onPress={veprimi(() =>
+              router.push({ pathname: "/kerko-termin/[lokaliId]", params: { lokaliId: l.id } }),
+            )}
+          />
+        ) : null}
         {l.telefoni ? (
           <Veprimi
             ikona={ikonat.telefoni}
             teksti={t("profiliLokalit.thirr")}
-            kryesor={!mundTeRezervoje}
             onPress={veprimi(() => void Linking.openURL(`tel:${l.telefoni?.replace(/\s/g, "")}`))}
           />
         ) : null}

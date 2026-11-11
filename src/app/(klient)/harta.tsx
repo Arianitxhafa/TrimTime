@@ -1,28 +1,35 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, Keyboard, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import MapView, { Marker, Polyline, type Region } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokali, useLokaletPrane } from "../../api/lokalet";
 import { useRruga, type MenyraEUdhetimit } from "../../api/udhezimet";
 import Ikona, { ikonat } from "../../components/Ikona";
+import Xham from "../../components/Xham";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { useVendndodhjaIme } from "../../hooks/useVendndodhjaIme";
-import { formatoCmimin, formatoDistancen, formatoKohezgjatjen } from "../../lib/formatimi";
+import { useVonesa } from "../../hooks/useVonesa";
+import { formatoDistancen, formatoKohezgjatjen } from "../../lib/formatimi";
 import { prekja } from "../../lib/prekja";
 import type { Koordinata } from "../../lib/tipet";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
-const ZMADHIMI = { latitudeDelta: 0.08, longitudeDelta: 0.08 };
+// Zmadhimi fillestar: lagjja rreth klientit, aq afër sa emrat e lokaleve të lexohen.
+const ZMADHIMI = { latitudeDelta: 0.03, longitudeDelta: 0.03 };
+// Emrat shfaqen pranë gjilpërave vetëm kur harta është afër; më larg do të mbuloheshin njëri-tjetrin.
+const KUFIRI_I_EMRAVE = 0.05;
+// Kërkimi me emër mbulon gjithë Kosovën, jo vetëm zonën në ekran.
+const RREZJA_E_KERKIMIT_KM = 200;
 
 // Rrezja e kërkimit sa gjysma e lartësisë së hartës (1° gjerësi ≈ 111 km).
 function rrezjaERajonit(r: Region): number {
   return Math.min(Math.max((r.latitudeDelta * 111) / 2, 1), 100);
 }
 
-// Harta: berberët pranë, fleta me detaje kur preket njëri dhe udhëzimet (rruga portokalli) pa dalë
-// nga aplikacioni.
+// Harta, si te Google Maps: çdo berber me gjilpërë dhe emër, kërkim sipër, fleta me detaje kur preket
+// njëri dhe udhëzimet (rruga portokalli) pa dalë nga aplikacioni.
 export default function Harta() {
   const { t } = useTranslation();
   const { ngjyrat, eshteErret } = useTema();
@@ -38,6 +45,13 @@ export default function Harta() {
   const kerkimi = kerkimiManual ?? { qendra: pika, rrezjaKm: 10 };
   const [rajoniILevizur, setRajoniILevizur] = useState<Region | null>(null);
   const [zgjedhuri, setZgjedhuri] = useState<string | null>(null);
+  const [meEmra, setMeEmra] = useState(true);
+
+  // Kërkimi me emër dhe dy filtrat e shpejtë.
+  const [teksti, setTeksti] = useState("");
+  const tekstiIVonuar = useVonesa(teksti).trim();
+  const [vetemHapur, setVetemHapur] = useState(false);
+  const [vetemOnline, setVetemOnline] = useState(false);
 
   // Udhëzimet: "/harta?udhezime=<lokali>" vjen nga fleta, profili, kartat dhe terminet.
   const { udhezime } = useLocalSearchParams<{ udhezime?: string }>();
@@ -64,15 +78,39 @@ export default function Harta() {
   const lokalet = useLokaletPrane(
     {
       pika: kerkimi.qendra,
-      rrezjaKm: kerkimi.rrezjaKm,
-      kerkimi: "",
-      vetemHapur: false,
+      rrezjaKm: tekstiIVonuar ? RREZJA_E_KERKIMIT_KM : kerkimi.rrezjaKm,
+      kerkimi: tekstiIVonuar,
+      vetemHapur,
       cmimiMax: null,
       renditja: "distanca",
       limit: 300,
+      vetemOnline,
     },
     kaLeje !== null,
   );
+
+  // Rezultatet e një kërkimi me emër mund të jenë në qytet tjetër: harta i shfaq të gjitha.
+  const rezultatet = lokalet.data;
+  const rezultatetEVjetra = lokalet.isPlaceholderData;
+  const kerkimiIShfaqur = useRef("");
+  useEffect(() => {
+    if (!tekstiIVonuar) {
+      kerkimiIShfaqur.current = "";
+      return;
+    }
+    if (rezultatetEVjetra || !rezultatet || kerkimiIShfaqur.current === tekstiIVonuar) return;
+    kerkimiIShfaqur.current = tekstiIVonuar;
+    if (rezultatet.length === 0) return;
+    if (rezultatet.length === 1) {
+      const iVetmi = rezultatet[0];
+      harta.current?.animateToRegion({ latitude: iVetmi.lat, longitude: iVetmi.lng, ...ZMADHIMI }, 400);
+      return;
+    }
+    harta.current?.fitToCoordinates(
+      rezultatet.slice(0, 40).map((l) => ({ latitude: l.lat, longitude: l.lng })),
+      { edgePadding: { top: insets.top + 150, right: 50, bottom: poshte + 60, left: 50 }, animated: true },
+    );
+  }, [tekstiIVonuar, rezultatet, rezultatetEVjetra, insets.top, poshte]);
 
   function kerkoKetu() {
     if (!rajoniILevizur) return;
@@ -86,6 +124,7 @@ export default function Harta() {
 
   function hapFleten(id: string) {
     prekja.lehte();
+    Keyboard.dismiss();
     setZgjedhuri(id);
     router.push({ pathname: "/harta-lokali/[id]", params: { id } });
   }
@@ -114,10 +153,14 @@ export default function Harta() {
         showsUserLocation={kaLeje === true}
         showsMyLocationButton={false}
         tintColor={ngjyrat.portokalli}
-        onPress={() => setZgjedhuri(null)}
+        onPress={() => {
+          Keyboard.dismiss();
+          setZgjedhuri(null);
+        }}
         onRegionChangeComplete={(r, detajet) => {
+          setMeEmra(r.latitudeDelta <= KUFIRI_I_EMRAVE);
           // Vetëm lëvizjet e përdoruesit e shfaqin butonin "Kërko në këtë zonë".
-          if (detajet?.isGesture && !udhezime) setRajoniILevizur(r);
+          if (detajet?.isGesture && !udhezime && !tekstiIVonuar) setRajoniILevizur(r);
         }}
       >
         {rruga.data ? (
@@ -132,21 +175,20 @@ export default function Harta() {
 
         {(lokalet.data ?? []).map((l) => {
           const theksuar = l.id === zgjedhuri || l.id === udhezime;
+          const meEmer = meEmra || theksuar;
           return (
             <Marker
-              key={l.id}
+              // Çelësi ndryshon bashkë me pamjen: gjilpëra rivizatohet edhe me tracksViewChanges={false}.
+              key={`${l.id}-${meEmer ? "e" : "p"}-${theksuar ? "z" : "n"}`}
               coordinate={{ latitude: l.lat, longitude: l.lng }}
+              zIndex={theksuar ? 3 : l.rezervim_online ? 2 : 1}
               onPress={(e) => {
                 e.stopPropagation();
                 hapFleten(l.id);
               }}
               tracksViewChanges={false}
             >
-              <View style={[styles.shenjuesi, theksuar && styles.shenjuesiZgjedhur]}>
-                <Text style={[styles.shenjuesiTeksti, theksuar && styles.shenjuesiTekstiZgjedhur]}>
-                  {l.cmimi_min !== null ? formatoCmimin(l.cmimi_min) : l.emri.charAt(0)}
-                </Text>
-              </View>
+              <Shenjuesi emri={l.emri} meEmer={meEmer} theksuar={theksuar} online={l.rezervim_online} />
             </Marker>
           );
         })}
@@ -160,16 +202,14 @@ export default function Harta() {
               hapFleten(destinacioni.id);
             }}
           >
-            <View style={[styles.shenjuesi, styles.shenjuesiZgjedhur]}>
-              <Text style={[styles.shenjuesiTeksti, styles.shenjuesiTekstiZgjedhur]}>{destinacioni.emri.charAt(0)}</Text>
-            </View>
+            <Shenjuesi emri={destinacioni.emri} meEmer theksuar online={false} />
           </Marker>
         ) : null}
       </MapView>
 
-      <View style={[styles.siper, { top: insets.top + hapesira.md }]} pointerEvents="box-none">
+      <View style={[styles.siper, { top: insets.top + hapesira.sm }]} pointerEvents="box-none">
         {udhezime ? (
-          <View style={styles.rruga}>
+          <Xham style={styles.rruga}>
             <View style={styles.rrugaKoka}>
               <Ikona emri={ikonat.harta} madhesia={18} ngjyra={ngjyrat.portokalli} />
               <Text style={styles.rrugaEmri} numberOfLines={1}>
@@ -215,17 +255,54 @@ export default function Harta() {
                 </Pressable>
               ))}
             </View>
-          </View>
-        ) : rajoniILevizur ? (
-          <Pressable accessibilityRole="button" onPress={kerkoKetu} style={styles.kerkoKetu}>
-            <Ikona emri={ikonat.kerko} madhesia={16} ngjyra={ngjyrat.mbiAri} />
-            <Text style={styles.kerkoKetuTeksti}>{t("harta.kerkoKetu")}</Text>
-          </Pressable>
-        ) : lokalet.isFetching ? (
-          <View style={styles.ngarkimi}>
-            <ActivityIndicator color={ngjyrat.portokalli} />
-          </View>
-        ) : null}
+          </Xham>
+        ) : (
+          <>
+            {/* Shiriti i kërkimit prej xhami, si te Google Maps dhe Apple Maps. */}
+            <Xham style={styles.kerkimi}>
+              <Ikona emri={ikonat.kerko} madhesia={18} ngjyra={ngjyrat.tekstiDyte} />
+              <TextInput
+                value={teksti}
+                onChangeText={setTeksti}
+                placeholder={t("harta.kerko")}
+                placeholderTextColor={ngjyrat.tekstiZbehte}
+                accessibilityLabel={t("harta.kerko")}
+                returnKeyType="search"
+                autoCorrect={false}
+                autoCapitalize="none"
+                style={styles.kerkimiFusha}
+              />
+              {lokalet.isFetching ? (
+                <ActivityIndicator color={ngjyrat.portokalli} />
+              ) : teksti ? (
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t("harta.pastroKerkimin")}
+                  onPress={() => setTeksti("")}
+                  hitSlop={10}
+                >
+                  <Ikona emri={ikonat.pastro} madhesia={18} ngjyra={ngjyrat.tekstiZbehte} />
+                </Pressable>
+              ) : null}
+            </Xham>
+
+            <View style={styles.filtrat}>
+              <Filtri teksti={t("harta.hapurTani")} aktiv={vetemHapur} onPress={() => setVetemHapur((v) => !v)} />
+              <Filtri teksti={t("harta.rezervoOnline")} aktiv={vetemOnline} onPress={() => setVetemOnline((v) => !v)} />
+            </View>
+
+            {rajoniILevizur ? (
+              <Pressable accessibilityRole="button" onPress={kerkoKetu} style={styles.kerkoKetu}>
+                <Ikona emri={ikonat.kerko} madhesia={16} ngjyra="#FFFFFF" />
+                <Text style={styles.kerkoKetuTeksti}>{t("harta.kerkoKetu")}</Text>
+              </Pressable>
+            ) : tekstiIVonuar && lokalet.isSuccess && !lokalet.isFetching && (lokalet.data ?? []).length === 0 ? (
+              <Xham style={styles.paRezultate}>
+                <Text style={styles.paRezultateTeksti}>{t("harta.paRezultate", { kerkimi: tekstiIVonuar })}</Text>
+              </Xham>
+            ) : null}
+          </>
+        )}
       </View>
 
       {kaLeje && (
@@ -237,16 +314,73 @@ export default function Harta() {
           }
           style={[styles.butoniVendit, { bottom: poshte + hapesira.md }]}
         >
-          <Ikona emri={ikonat.harta} madhesia={20} ngjyra={ngjyrat.portokalli} />
+          <Xham style={styles.butoniVenditXham} iPrekshem>
+            <Ikona emri={ikonat.vendi} madhesia={20} ngjyra={ngjyrat.portokalli} />
+          </Xham>
         </Pressable>
       )}
 
       {atribuimi ? (
         <View style={[styles.atribuimi, { bottom: poshte + hapesira.sm }]} pointerEvents="none">
-          <Text style={styles.atribuimiTeksti}>{atribuimi}</Text>
+          <Xham style={styles.atribuimiXham}>
+            <Text style={styles.atribuimiTeksti}>{atribuimi}</Text>
+          </Xham>
         </View>
       ) : null}
     </View>
+  );
+}
+
+// Gjilpëra e një lokali: rreth me gërshërë (jeshil kur rezervohet në aplikacion) dhe emri poshtë.
+// Hapësira bosh sipër është sa etiketa poshtë, që qendra e pamjes, pra pika në hartë, të bjerë
+// saktësisht te rrethi, njësoj në Apple Maps dhe Google Maps.
+function Shenjuesi({
+  emri,
+  meEmer,
+  theksuar,
+  online,
+}: {
+  emri: string;
+  meEmer: boolean;
+  theksuar: boolean;
+  online: boolean;
+}) {
+  const { ngjyrat } = useTema();
+  const styles = useStilet(krijoStilet);
+  const ngjyra = online ? ngjyrat.jeshile : ngjyrat.portokalli;
+  return (
+    <View style={[styles.shenjuesi, !meEmer && styles.shenjuesiPaEmer]}>
+      {meEmer ? <View style={styles.shenjuesiHapesira} /> : null}
+      <View style={[styles.gjilpera, { backgroundColor: ngjyra }, theksuar && styles.gjilperaZgjedhur]}>
+        <Ikona emri={ikonat.gershere} madhesia={theksuar ? 16 : 13} ngjyra="#FFFFFF" />
+      </View>
+      {meEmer ? (
+        <View style={styles.shenjuesiHapesira}>
+          <Text style={[styles.emriNeHarte, theksuar && styles.emriNeHarteZgjedhur]} numberOfLines={2}>
+            {emri}
+          </Text>
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+function Filtri({ teksti, aktiv, onPress }: { teksti: string; aktiv: boolean; onPress: () => void }) {
+  const { ngjyrat } = useTema();
+  const styles = useStilet(krijoStilet);
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected: aktiv }}
+      onPress={() => {
+        prekja.zgjedhje();
+        onPress();
+      }}
+    >
+      <Xham style={styles.filtri} ngjyrimi={aktiv ? ngjyrat.portokalli : undefined} iPrekshem>
+        <Text style={[styles.filtriTeksti, aktiv && styles.filtriTekstiAktiv]}>{teksti}</Text>
+      </Xham>
+    </Pressable>
   );
 }
 
@@ -257,47 +391,111 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       backgroundColor: ngjyrat.sfondi,
     },
     shenjuesi: {
-      minWidth: 34,
-      paddingHorizontal: 10,
-      paddingVertical: 6,
-      borderRadius: rrezja.plote,
-      backgroundColor: ngjyrat.siperfaqja,
-      borderWidth: 1.5,
-      borderColor: ngjyrat.portokalli,
+      width: 132,
       alignItems: "center",
     },
-    shenjuesiZgjedhur: {
-      backgroundColor: ngjyrat.portokalli,
-      transform: [{ scale: 1.15 }],
+    shenjuesiPaEmer: {
+      width: 34,
     },
-    shenjuesiTeksti: {
+    // E njëjta lartësi sipër dhe poshtë rrethit (shih Shenjuesi).
+    shenjuesiHapesira: {
+      height: 34,
+      alignItems: "center",
+      justifyContent: "flex-start",
+      paddingTop: 2,
+    },
+    gjilpera: {
+      width: 26,
+      height: 26,
+      borderRadius: 13,
+      borderWidth: 2,
+      borderColor: "#FFFFFF",
+      alignItems: "center",
+      justifyContent: "center",
+      shadowColor: "#000",
+      shadowOpacity: 0.3,
+      shadowRadius: 3,
+      shadowOffset: { width: 0, height: 1 },
+      elevation: 3,
+    },
+    gjilperaZgjedhur: {
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      marginVertical: -4,
+    },
+    emriNeHarte: {
       ...shkronjat.etiketeBold,
       color: ngjyrat.teksti,
-      fontSize: 13,
+      fontSize: 11,
+      lineHeight: 13,
+      textAlign: "center",
+      backgroundColor: ngjyrat.xham,
+      borderRadius: 6,
+      overflow: "hidden",
+      paddingHorizontal: 5,
+      paddingVertical: 1,
     },
-    shenjuesiTekstiZgjedhur: {
-      color: "#FFFFFF",
+    emriNeHarteZgjedhur: {
+      fontSize: 12,
+      backgroundColor: ngjyrat.siperfaqja,
     },
     siper: {
       position: "absolute",
       left: hapesira.lg,
       right: hapesira.lg,
       alignItems: "center",
+      gap: hapesira.sm,
+    },
+    kerkimi: {
+      alignSelf: "stretch",
+      flexDirection: "row",
+      alignItems: "center",
+      gap: hapesira.sm,
+      height: 50,
+      borderRadius: 25,
+      paddingHorizontal: hapesira.lg,
+    },
+    kerkimiFusha: {
+      flex: 1,
+      height: 50,
+      color: ngjyrat.teksti,
+      fontSize: 17,
+    },
+    filtrat: {
+      alignSelf: "stretch",
+      flexDirection: "row",
+      gap: hapesira.sm,
+    },
+    filtri: {
+      height: 36,
+      borderRadius: 18,
+      paddingHorizontal: 14,
+      justifyContent: "center",
+    },
+    filtriTeksti: {
+      ...shkronjat.etiketeBold,
+      color: ngjyrat.teksti,
+      fontSize: 14,
+    },
+    filtriTekstiAktiv: {
+      color: "#FFFFFF",
+    },
+    paRezultate: {
+      borderRadius: rrezja.md,
+      paddingHorizontal: hapesira.lg,
+      paddingVertical: hapesira.md,
+    },
+    paRezultateTeksti: {
+      color: ngjyrat.teksti,
+      fontSize: 14,
+      textAlign: "center",
     },
     rruga: {
       alignSelf: "stretch",
-      backgroundColor: ngjyrat.xham,
       borderRadius: rrezja.lg,
-      borderCurve: "continuous",
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: ngjyrat.kufiriXham,
       padding: hapesira.md,
       gap: hapesira.sm,
-      shadowColor: "#000",
-      shadowOpacity: 0.18,
-      shadowRadius: 14,
-      shadowOffset: { width: 0, height: 6 },
-      elevation: 5,
     },
     rrugaKoka: {
       flexDirection: "row",
@@ -381,28 +579,22 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       color: "#FFFFFF",
       fontSize: 14,
     },
-    ngarkimi: {
-      backgroundColor: ngjyrat.siperfaqja,
-      borderRadius: rrezja.plote,
-      padding: hapesira.sm,
-    },
     butoniVendit: {
       position: "absolute",
       right: hapesira.lg,
+    },
+    butoniVenditXham: {
       width: 48,
       height: 48,
       borderRadius: 24,
-      backgroundColor: ngjyrat.xham,
-      borderWidth: StyleSheet.hairlineWidth,
-      borderColor: ngjyrat.kufiriXham,
       alignItems: "center",
       justifyContent: "center",
-      elevation: 3,
     },
     atribuimi: {
       position: "absolute",
       left: hapesira.md,
-      backgroundColor: ngjyrat.xham,
+    },
+    atribuimiXham: {
       borderRadius: rrezja.sm,
       paddingHorizontal: 8,
       paddingVertical: 4,

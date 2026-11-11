@@ -1,4 +1,4 @@
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text } from "react-native";
@@ -40,6 +40,11 @@ export default function Hyrja() {
     });
     setNgarkohet(false);
     if (error) {
+      // Llogari e krijuar por e pakonfirmuar: dërgohet kod i ri dhe hapet ekrani i verifikimit.
+      if (error.code === "email_not_confirmed") {
+        router.push({ pathname: "/verifiko", params: { email: email.trim(), dergo: "1" } });
+        return;
+      }
       setGabimi(mesazhiIGabimit(error, t));
       return;
     }

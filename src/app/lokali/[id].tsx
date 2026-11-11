@@ -22,6 +22,7 @@ import GaleriaEPlote from "../../components/GaleriaEPlote";
 import KartaEBesnikerise from "../../components/KartaEBesnikerise";
 import KartaEVleresimit from "../../components/KartaEVleresimit";
 import KopertinaELokalit from "../../components/KopertinaELokalit";
+import Xham from "../../components/Xham";
 import { celesiIDites, RENDI_I_DITEVE } from "../../components/RedaktoriIOrarit";
 import { useAuth } from "../../context/AuthContext";
 import { useStilet, useTema } from "../../context/TemaContext";
@@ -224,7 +225,7 @@ export default function ProfiliILokalit() {
       </ScrollView>
 
       {mundTeRezervoje && (
-        <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>
+        <Xham style={[styles.fundi, { bottom: insets.bottom + hapesira.sm }]}>
           <View style={styles.fundiTeksti}>
             {l.cmimi_min !== null && (
               <Text style={styles.fundiCmimi}>{t("lokali.ngaCmimi", { cmimi: formatoCmimin(l.cmimi_min) })}</Text>
@@ -236,23 +237,28 @@ export default function ProfiliILokalit() {
             </Text>
           </View>
           <Butoni titulli={t("profiliLokalit.rezervo")} ikona={ikonat.kalendar} onPress={() => hapRezervimin()} style={styles.rezervo} />
-        </View>
+        </Xham>
       )}
 
       {meTelefon && (
-        <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>
+        <Xham style={[styles.fundi, { bottom: insets.bottom + hapesira.sm }]}>
           <View style={styles.fundiTeksti}>
-            <Text style={styles.fundiCmimi}>{l.telefoni ? t("lokali.meTelefon") : t("lokali.paTermin")}</Text>
+            <Text style={styles.fundiCmimi}>{l.telefoni ? t("profiliLokalit.kerkoTermin") : t("lokali.paTermin")}</Text>
             <Text style={styles.fundiShenim}>
-              {l.telefoni ? t("profiliLokalit.meTelefonTeksti") : t("profiliLokalit.paTerminTeksti")}
+              {l.telefoni ? t("profiliLokalit.kerkoTerminTeksti") : t("profiliLokalit.paTerminTeksti")}
             </Text>
           </View>
           {l.telefoni ? (
-            <Butoni titulli={t("profiliLokalit.thirr")} ikona={ikonat.telefoni} onPress={thirr} style={styles.rezervo} />
+            <Butoni
+              titulli={t("profiliLokalit.kerkoTermin")}
+              ikona={ikonat.kalendar}
+              onPress={() => router.push({ pathname: "/kerko-termin/[lokaliId]", params: { lokaliId: l.id } })}
+              style={styles.rezervo}
+            />
           ) : (
             <Butoni titulli={t("profiliLokalit.udhezimet")} ikona={ikonat.harta} onPress={udhezimet} style={styles.rezervo} />
           )}
-        </View>
+        </Xham>
       )}
     </View>
   );
@@ -753,17 +759,15 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     fundi: {
       position: "absolute",
-      left: 0,
-      right: 0,
-      bottom: 0,
+      left: hapesira.md,
+      right: hapesira.md,
       flexDirection: "row",
       alignItems: "center",
       gap: hapesira.md,
-      paddingHorizontal: hapesira.xl,
-      paddingTop: hapesira.md,
-      backgroundColor: ngjyrat.siperfaqja,
-      borderTopWidth: 1,
-      borderTopColor: ngjyrat.kufiri,
+      paddingLeft: hapesira.xl,
+      paddingRight: hapesira.md,
+      paddingVertical: hapesira.md,
+      borderRadius: 30,
     },
     fundiTeksti: {
       flex: 1,

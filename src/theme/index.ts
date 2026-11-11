@@ -39,6 +39,8 @@ export type Ngjyrat = {
   portokalli: string;
   blu: string;
   vjollce: string;
+  // Tab-i Lokali te berberi.
+  roze: string;
 };
 
 // Pamja e ndritshme në stilin e Apple: gri e sistemit, karta të bardha, butona të zinj dhe ar
@@ -71,6 +73,7 @@ export const ngjyratCelta: Ngjyrat = {
   portokalli: "#FF9500",
   blu: "#007AFF",
   vjollce: "#AF52DE",
+  roze: "#FF2D55",
 };
 
 // Pamja kryesore: e zezë OLED, karta gri të errëta dhe ar shampanjë vetëm te veprimet.
@@ -102,6 +105,7 @@ export const ngjyratErrta: Ngjyrat = {
   portokalli: "#FF9F0A",
   blu: "#0A84FF",
   vjollce: "#BF5AF2",
+  roze: "#FF375F",
 };
 
 // Si Apple: pa hije në errësirë; vetëm një hije shumë e lehtë te kartat në dritë.

@@ -1,24 +1,23 @@
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text } from "react-native";
 import Butoni from "../components/Butoni";
 import FushaTekstit from "../components/FushaTekstit";
-import Ikona, { ikonat } from "../components/Ikona";
+import { ikonat } from "../components/Ikona";
 import KornizaAuth, { GabimiIFormes } from "../components/KornizaAuth";
 import RoliIZgjedhur from "../components/RoliIZgjedhur";
 import { usePreferencat } from "../context/PreferencatContext";
-import { useStilet, useTema } from "../context/TemaContext";
+import { useStilet } from "../context/TemaContext";
 import { gjuhaAktuale } from "../i18n";
 import { emailIVlefshem, mesazhiIGabimit } from "../lib/gabimetEAuth";
 import { supabase } from "../lib/supabase";
-import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import { type Ngjyrat } from "../theme";
 
 const GJATESIA_MIN_FJALEKALIMIT = 8;
 
 export default function Regjistrimi() {
   const { t } = useTranslation();
-  const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
   const { modi } = usePreferencat();
   const [emri, setEmri] = useState("");
@@ -27,7 +26,6 @@ export default function Regjistrimi() {
   const [provuar, setProvuar] = useState(false);
   const [ngarkohet, setNgarkohet] = useState(false);
   const [gabimi, setGabimi] = useState<string | null>(null);
-  const [priteKonfirmimin, setPriteKonfirmimin] = useState(false);
 
   const gabimet = {
     emri: emri.trim().length >= 2 ? null : t("auth.gabimEmri"),
@@ -60,26 +58,8 @@ export default function Regjistrimi() {
       setGabimi(t("auth.gabimEkziston"));
       return;
     }
-    // Pa sesion do të thotë që projekti kërkon konfirmimin e email-it.
-    if (!data.session) setPriteKonfirmimin(true);
-  }
-
-  if (priteKonfirmimin) {
-    return (
-      <KornizaAuth
-        titulli={t("auth.kontrolloEmailinTitulli")}
-        nentitulli={t("auth.kontrolloEmailinTeksti", { email: email.trim() })}
-      >
-        <View style={styles.ikonaEmailit}>
-          <Ikona emri={ikonat.email} madhesia={36} ngjyra={ngjyrat.ari} />
-        </View>
-        <Butoni
-          titulli={t("auth.kthehuTeHyrja")}
-          varianti="dytesor"
-          onPress={() => router.replace("/hyrja")}
-        />
-      </KornizaAuth>
-    );
+    // Pa sesion do të thotë që projekti kërkon konfirmimin e email-it: kodi 6-shifror u dërgua.
+    if (!data.session) router.replace({ pathname: "/verifiko", params: { email: email.trim() } });
   }
 
   return (
@@ -154,14 +134,5 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       color: ngjyrat.ari,
       fontSize: 15,
       fontWeight: "700",
-    },
-    ikonaEmailit: {
-      width: 88,
-      height: 88,
-      borderRadius: rrezja.lg,
-      backgroundColor: ngjyrat.ariIErret,
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: hapesira.xl,
     },
   });

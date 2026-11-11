@@ -1,13 +1,16 @@
 import * as Location from "expo-location";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { AppState, Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { AppState, Linking, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, { FadeIn, FadeInDown, ZoomIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Butoni from "../components/Butoni";
+import Ikona, { ikonat } from "../components/Ikona";
 import Marka from "../components/Marka";
+import Xham from "../components/Xham";
 import ZgjedhesiIQytetit from "../components/ZgjedhesiIQytetit";
 import { usePreferencat } from "../context/PreferencatContext";
-import { useStilet } from "../context/TemaContext";
+import { useStilet, useTema } from "../context/TemaContext";
 import { gjendjaENjoftimeve, kerkoLejenENjoftimeve, type GjendjaELejes } from "../lib/kujtesat";
 import { prekja } from "../lib/prekja";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
@@ -15,6 +18,7 @@ import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 // "perafert": leja është dhënë, por vetëm për vendndodhjen e përafërt (iOS 14+ / Android 12+).
 // "mohuar": përdoruesi tha jo, por mund të pyetet sërish; "refuzuar": vetëm nga Cilësimet.
 type GjendjaEVendit = "pa_pyetur" | "lejuar" | "perafert" | "mohuar" | "refuzuar";
+type Hapi = "njoftimet" | "vendndodhja";
 
 function lexoLejen(leja: Location.LocationPermissionResponse): GjendjaEVendit {
   if (!leja.granted) {
@@ -34,33 +38,42 @@ async function lexoLejet(): Promise<{ leja: GjendjaEVendit; njoft: GjendjaELejes
   return { leja, njoft };
 }
 
-// Ekrani i parë pas krijimit të llogarisë. Vendndodhja e saktë është e detyrueshme: pa të nuk ka
-// lokale pranë, distanca as udhëzime. Kush e refuzon gjen shpjegimin, butonin për Cilësimet dhe,
-// si rrugëdalje e fundit, zgjedhjen e qytetit me dorë (Apple nuk lejon bllokim të plotë).
+// Pas krijimit të llogarisë, si te aplikacionet e Apple: një ekran për çdo leje, me dritaren e
+// sistemit pas butonit. Së pari njoftimet (opsionale), pastaj vendndodhja e saktë. Kjo e fundit është
+// e detyrueshme: pa të nuk ka lokale pranë, distanca as udhëzime. Kush e refuzon gjen shpjegimin,
+// butonin për Cilësimet dhe, si rrugëdalje, zgjedhjen e qytetit me dorë (Apple nuk lejon bllokim).
 export default function Lejet() {
   const { t } = useTranslation();
+  const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
   const insets = useSafeAreaInsets();
   const { perfundoLejet, qytetiIZgjedhur } = usePreferencat();
+  const [hapi, setHapi] = useState<Hapi>("njoftimet");
   const [vendndodhja, setVendndodhja] = useState<GjendjaEVendit>("pa_pyetur");
-  const [njoftimet, setNjoftimet] = useState<GjendjaELejes>("pa_pyetur");
+  const [gati, setGati] = useState(false);
+  const [nePritje, setNePritje] = useState(false);
   const [zgjedhesi, setZgjedhesi] = useState(false);
 
   useEffect(() => {
     let aktiv = true;
-    const perditeso = ({ leja, njoft }: { leja: GjendjaEVendit; njoft: GjendjaELejes }) => {
+    lexoLejet().then(({ leja, njoft }) => {
       if (!aktiv) return;
       setVendndodhja(leja);
-      setNjoftimet(njoft);
-    };
-    // Kush i ka dhënë të dyja lejet më parë (p.sh. në versionin e kaluar), nuk e sheh më këtë ekran.
-    lexoLejet().then((gjendja) => {
-      perditeso(gjendja);
-      if (aktiv && gjendja.leja === "lejuar" && gjendja.njoft !== "pa_pyetur") perfundoLejet();
+      // Kush i ka vendosur të dyja më parë (p.sh. në versionin e kaluar), nuk e sheh më këtë ekran.
+      if (leja === "lejuar" && njoft !== "pa_pyetur") {
+        perfundoLejet();
+        return;
+      }
+      // Njoftimet pyeten vetëm një herë: kur janë vendosur, fillohet nga vendndodhja.
+      if (njoft !== "pa_pyetur") setHapi("vendndodhja");
+      setGati(true);
     });
     // Kthimi nga Cilësimet e telefonit: leja mund të ketë ndryshuar.
     const abonimi = AppState.addEventListener("change", (gjendja) => {
-      if (gjendja === "active") void lexoLejet().then(perditeso);
+      if (gjendja !== "active") return;
+      void lexoLejet().then(({ leja }) => {
+        if (aktiv) setVendndodhja(leja);
+      });
     });
     return () => {
       aktiv = false;
@@ -68,10 +81,25 @@ export default function Lejet() {
     };
   }, [perfundoLejet]);
 
+  // Vendndodhja e saktë u lejua (këtu ose te Cilësimet): klienti vazhdon vetë, pa një prekje tjetër.
+  useEffect(() => {
+    if (!gati || hapi !== "vendndodhja" || vendndodhja !== "lejuar") return;
+    const kohematesi = setTimeout(perfundoLejet, 650);
+    return () => clearTimeout(kohematesi);
+  }, [gati, hapi, vendndodhja, perfundoLejet]);
+
   // Rrugëdalja: pasi zgjidhet një qytet me dorë, klienti vazhdon.
   useEffect(() => {
     if (qytetiIZgjedhur && vendndodhja !== "lejuar") perfundoLejet();
   }, [qytetiIZgjedhur, vendndodhja, perfundoLejet]);
+
+  async function lejoNjoftimet() {
+    setNePritje(true);
+    const gjendja = await kerkoLejenENjoftimeve().catch((): GjendjaELejes => "refuzuar");
+    setNePritje(false);
+    if (gjendja === "lejuar") prekja.sukses();
+    setHapi("vendndodhja");
+  }
 
   async function lejoVendndodhjen() {
     // iOS nuk e pyet më përdoruesin pas refuzimit ose lejes së përafërt: duhen Cilësimet.
@@ -81,111 +109,124 @@ export default function Lejet() {
       void Linking.openSettings();
       return;
     }
+    setNePritje(true);
     const leja = await Location.requestForegroundPermissionsAsync().catch(() => null);
+    setNePritje(false);
     const gjendja = leja ? lexoLejen(leja) : "refuzuar";
     setVendndodhja(gjendja);
     if (gjendja === "lejuar") prekja.sukses();
     else prekja.gabim();
   }
 
-  async function lejoNjoftimet() {
-    if (njoftimet === "refuzuar" && Platform.OS !== "web") {
-      void Linking.openSettings();
-      return;
-    }
-    const gjendja = await kerkoLejenENjoftimeve().catch((): GjendjaELejes => "refuzuar");
-    setNjoftimet(gjendja);
-    if (gjendja === "lejuar") prekja.sukses();
-  }
+  // Derisa të lexohen lejet, ekrani mbetet bosh (një çast), që hapi i gabuar të mos shfaqet kot.
+  if (!gati) return <View style={styles.container} />;
 
+  const teNjoftimet = hapi === "njoftimet";
   const lejuar = vendndodhja === "lejuar";
-  const shenimi =
-    vendndodhja === "refuzuar"
+  const ngjyraEHapit = teNjoftimet ? ngjyrat.blu : ngjyrat.jeshile;
+  const shenimi = teNjoftimet
+    ? null
+    : vendndodhja === "refuzuar"
       ? t("lejet.refuzuar")
       : vendndodhja === "mohuar"
         ? t("lejet.mohuar")
         : vendndodhja === "perafert"
-        ? Platform.OS === "android"
-          ? t("lejet.perafertAndroid")
-          : t("lejet.perafert")
-        : null;
-  const tekstiIButonit =
-    vendndodhja === "refuzuar" || (vendndodhja === "perafert" && Platform.OS === "ios")
-      ? t("lejet.hapCilesimet")
-      : t("lejet.lejoVendndodhjen");
+          ? Platform.OS === "android"
+            ? t("lejet.perafertAndroid")
+            : t("lejet.perafert")
+          : null;
+  const teCilesimet = vendndodhja === "refuzuar" || (vendndodhja === "perafert" && Platform.OS === "ios");
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top + hapesira.lg }]}>
       <ZgjedhesiIQytetit
         iDukshem={zgjedhesi}
         qytetiAktual={null}
         onMbyll={() => setZgjedhesi(false)}
         onVendndodhjaIme={() => void lejoVendndodhjen()}
       />
-      <ScrollView contentContainerStyle={[styles.permbajtja, { paddingTop: insets.top + hapesira.lg }]}>
-        <Marka madhesia={30} />
-        <Text style={styles.mono}>{t("lejet.etiketa")}</Text>
 
-        <Text style={styles.titulli}>{t("lejet.titulli")}</Text>
-        <Text style={styles.nentitulli}>{t("lejet.nentitulli")}</Text>
+      <View style={styles.koka}>
+        <Marka madhesia={24} />
+        <View style={styles.pikat} accessibilityLabel={t("lejet.hapi", { numri: teNjoftimet ? 1 : 2 })}>
+          <View style={[styles.pika, teNjoftimet && { backgroundColor: ngjyraEHapit, width: 22 }]} />
+          <View style={[styles.pika, !teNjoftimet && { backgroundColor: ngjyraEHapit, width: 22 }]} />
+        </View>
+      </View>
 
-        <View style={styles.seksioni}>
-          <View style={styles.rreshtiMono}>
-            <Text style={styles.numri}>01</Text>
-            <Text style={[styles.vula, styles.vulaKuqe]}>{t("lejet.detyrueshme")}</Text>
-          </View>
-          <Text style={styles.seksioniTitulli}>{t("lejet.vendndodhja")}</Text>
-          <Text style={styles.seksioniTeksti}>{t("lejet.vendndodhjaTeksti")}</Text>
-          {shenimi ? (
-            <Text style={styles.shenimi} accessibilityLiveRegion="polite">
+      {/* `key` e rinis animacionin kur ndërron hapi. */}
+      <View key={hapi} style={styles.qendra}>
+        <Animated.View entering={ZoomIn.springify().damping(14)}>
+          <Xham style={styles.disku} ngjyrimi={ngjyraEHapit}>
+            <Ikona
+              emri={teNjoftimet ? ikonat.zile : lejuar ? ikonat.konfirmo : ikonat.vendi}
+              madhesia={46}
+              ngjyra="#FFFFFF"
+            />
+          </Xham>
+        </Animated.View>
+
+        <Animated.Text entering={FadeInDown.delay(90).duration(380)} style={styles.titulli}>
+          {teNjoftimet ? t("lejet.njoftimetTitulli") : lejuar ? t("lejet.gatiTitulli") : t("lejet.titulli")}
+        </Animated.Text>
+        <Animated.Text entering={FadeInDown.delay(160).duration(380)} style={styles.teksti}>
+          {teNjoftimet ? t("lejet.njoftimetTeksti") : lejuar ? t("lejet.lejuarSakte") : t("lejet.vendndodhjaTeksti")}
+        </Animated.Text>
+
+        {shenimi ? (
+          <Animated.View entering={FadeIn.duration(250)} style={styles.shenimi}>
+            <Ikona emri={ikonat.gabim} madhesia={16} ngjyra={ngjyrat.theksi} />
+            <Text style={styles.shenimiTeksti} accessibilityLiveRegion="polite">
               {shenimi}
             </Text>
-          ) : null}
-          {lejuar ? (
-            <Text style={styles.lejuar}>✓ {t("lejet.lejuarSakte")}</Text>
-          ) : (
-            <Butoni titulli={tekstiIButonit} onPress={() => void lejoVendndodhjen()} />
-          )}
-        </View>
+          </Animated.View>
+        ) : null}
+      </View>
 
-        <View style={styles.seksioni}>
-          <View style={styles.rreshtiMono}>
-            <Text style={styles.numri}>02</Text>
-            <Text style={styles.vula}>{t("lejet.opsionale")}</Text>
-          </View>
-          <Text style={styles.seksioniTitulli}>{t("lejet.njoftimet")}</Text>
-          <Text style={styles.seksioniTeksti}>{t("lejet.njoftimetTeksti")}</Text>
-          {njoftimet === "lejuar" ? (
-            <Text style={styles.lejuar}>✓ {t("lejet.lejuar")}</Text>
-          ) : (
+      <Animated.View
+        entering={FadeInDown.delay(220).duration(380)}
+        style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.lg }]}
+      >
+        <Text style={styles.privatesia}>{teNjoftimet ? t("lejet.njoftimetShenimi") : t("lejet.privatesia")}</Text>
+
+        {teNjoftimet ? (
+          <>
             <Butoni
-              titulli={njoftimet === "refuzuar" ? t("lejet.hapCilesimet") : t("lejet.lejo")}
-              varianti="dytesor"
+              titulli={t("lejet.lejoNjoftimet")}
+              ikona={ikonat.zile}
+              ngarkohet={nePritje}
               onPress={() => void lejoNjoftimet()}
             />
-          )}
-        </View>
-
-        <Text style={styles.privatesia}>{t("lejet.privatesia")}</Text>
-      </ScrollView>
-
-      <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.lg }]}>
-        <Butoni
-          titulli={t("lejet.vazhdo")}
-          joAktiv={!lejuar}
-          onPress={perfundoLejet}
-        />
-        {!lejuar && vendndodhja !== "pa_pyetur" && (
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => setZgjedhesi(true)}
-            hitSlop={8}
-            style={({ pressed }) => [styles.meDore, pressed && styles.shtypur]}
-          >
-            <Text style={styles.meDoreTeksti}>{t("lejet.zgjidhMeDore")}</Text>
-          </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              onPress={() => setHapi("vendndodhja")}
+              hitSlop={8}
+              style={({ pressed }) => [styles.dytesor, pressed && styles.shtypur]}
+            >
+              <Text style={styles.dytesorTeksti}>{t("lejet.joTani")}</Text>
+            </Pressable>
+          </>
+        ) : lejuar ? null : (
+          <>
+            <Butoni
+              titulli={teCilesimet ? t("lejet.hapCilesimet") : t("lejet.lejoVendndodhjen")}
+              ikona={teCilesimet ? ikonat.cilesimet : ikonat.vendi}
+              ngarkohet={nePritje}
+              onPress={() => void lejoVendndodhjen()}
+            />
+            {vendndodhja !== "pa_pyetur" ? (
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => setZgjedhesi(true)}
+                hitSlop={8}
+                style={({ pressed }) => [styles.dytesor, pressed && styles.shtypur]}
+              >
+                <Text style={styles.dytesorTeksti}>{t("lejet.zgjidhMeDore")}</Text>
+              </Pressable>
+            ) : null}
+          </>
         )}
-      </View>
+      </Animated.View>
     </View>
   );
 }
@@ -195,134 +236,93 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,
-    },
-    permbajtja: {
       paddingHorizontal: hapesira.xl,
-      paddingBottom: hapesira.xxl,
     },
-    shiriti: {
-      width: 64,
-      borderRadius: 3,
-      overflow: "hidden",
-      marginTop: hapesira.lg,
-      marginBottom: hapesira.md,
-    },
-    rreshtiMono: {
+    koka: {
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
-      paddingVertical: 6,
+      justifyContent: "space-between",
     },
-    mono: {
-      ...shkronjat.etikete,
-      color: ngjyrat.bronzi,
-      fontSize: 15,
-      marginTop: hapesira.xxl,
+    pikat: {
+      flexDirection: "row",
+      gap: 6,
+    },
+    pika: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: ngjyrat.siperfaqja2,
+    },
+    qendra: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: hapesira.md,
+      maxWidth: 440,
+      width: "100%",
+      alignSelf: "center",
+    },
+    disku: {
+      width: 124,
+      height: 124,
+      borderRadius: 62,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: hapesira.lg,
     },
     titulli: {
       ...shkronjat.titull,
       color: ngjyrat.teksti,
-      fontSize: 42,
-      lineHeight: 48,
-      letterSpacing: -0.8,
-      marginTop: 2,
+      fontSize: 34,
+      lineHeight: 40,
+      letterSpacing: -0.6,
+      textAlign: "center",
     },
-    nentitulli: {
-      ...shkronjat.kursive,
+    teksti: {
       color: ngjyrat.tekstiDyte,
       fontSize: 17,
       lineHeight: 24,
-      marginTop: hapesira.md,
-      marginBottom: hapesira.lg,
-    },
-    seksioni: {
-      backgroundColor: ngjyrat.siperfaqja,
-      borderRadius: rrezja.lg,
-      borderWidth: 1,
-      borderColor: ngjyrat.kufiri,
-      padding: hapesira.lg,
-      marginTop: hapesira.lg,
-      gap: hapesira.sm,
-    },
-    numri: {
-      ...shkronjat.etiketeBold,
-      color: ngjyrat.theksi,
-      fontSize: 13,
-      letterSpacing: 0.6,
-    },
-    vula: {
-      ...shkronjat.etiketeBold,
-      color: ngjyrat.tekstiDyte,
-      fontSize: 12,
-      borderWidth: 1,
-      borderColor: ngjyrat.tekstiDyte,
-      borderRadius: rrezja.plote,
-      paddingHorizontal: 10,
-      paddingVertical: 3,
-      overflow: "hidden",
-    },
-    vulaKuqe: {
-      color: ngjyrat.theksi,
-      borderColor: ngjyrat.theksi,
-    },
-    seksioniTitulli: {
-      ...shkronjat.titull,
-      color: ngjyrat.teksti,
-      fontSize: 28,
-      letterSpacing: -0.6,
-    },
-    seksioniTeksti: {
-      color: ngjyrat.tekstiDyte,
-      fontSize: 15,
-      lineHeight: 22,
-      marginBottom: hapesira.sm,
+      textAlign: "center",
     },
     shenimi: {
-      ...shkronjat.kursive,
-      color: ngjyrat.teksti,
-      fontSize: 15,
-      lineHeight: 21,
-      borderLeftWidth: 3,
-      borderLeftColor: ngjyrat.theksi,
-      paddingLeft: hapesira.md,
-      marginBottom: hapesira.sm,
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: hapesira.sm,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderRadius: rrezja.md,
+      borderCurve: "continuous",
+      padding: hapesira.md,
+      marginTop: hapesira.sm,
     },
-    lejuar: {
-      ...shkronjat.etiketeBold,
+    shenimiTeksti: {
+      flex: 1,
       color: ngjyrat.teksti,
-      fontSize: 12,
-      letterSpacing: 0.6,
-      textTransform: "uppercase",
-      paddingVertical: hapesira.sm,
-    },
-    privatesia: {
-      ...shkronjat.kursive,
-      color: ngjyrat.tekstiZbehte,
       fontSize: 14,
       lineHeight: 20,
-      marginTop: hapesira.xl,
     },
     fundi: {
-      paddingHorizontal: hapesira.xl,
-      paddingTop: hapesira.md,
-      borderTopWidth: 1,
-      borderTopColor: ngjyrat.vija,
       gap: hapesira.md,
-    },
-    meDore: {
+      maxWidth: 440,
+      width: "100%",
       alignSelf: "center",
-      paddingVertical: 4,
+    },
+    privatesia: {
+      color: ngjyrat.tekstiZbehte,
+      fontSize: 13,
+      lineHeight: 18,
+      textAlign: "center",
+    },
+    dytesor: {
+      alignSelf: "center",
+      paddingVertical: 6,
     },
     shtypur: {
       opacity: 0.6,
     },
-    meDoreTeksti: {
+    dytesorTeksti: {
       ...shkronjat.etikete,
       color: ngjyrat.tekstiDyte,
-      fontSize: 12,
-      letterSpacing: 0.8,
-      textTransform: "uppercase",
-      textDecorationLine: "underline",
+      fontSize: 15,
       textAlign: "center",
     },
   });
