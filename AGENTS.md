@@ -2,7 +2,7 @@ This is an Expo/React Native mobile application. Prioritize mobile-first pattern
 
 ## TrimTime
 
-TrimTime connects men's barbershops with their clients, starting in Kosovo. Built by Arianit and Albert.
+TrimTime connects men's barbershops with their clients, starting in Kosovo. Built by Arianit Xhafa.
 
 - **Client:** finds shops in the city they are in, books, cancels or reschedules, rates visits and earns loyalty rewards.
 - **Barber / shop:** manages the shop, services, hours, staff, calendar, clients (CRM), promotions and analytics.
