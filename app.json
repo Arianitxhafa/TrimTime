@@ -54,7 +54,7 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "Studio Burimi përdor vendndodhjen vetëm kur stafi vendos pikën e lokalit në hartë."
+          "locationWhenInUsePermission": "Studio Burimi përdor vendndodhjen për të të treguar rrugën dhe kohën deri te Studio."
         }
       ],
       [

@@ -16,14 +16,16 @@ export default function KlientLayout() {
   const { t } = useTranslation();
   const { ngjyrat } = useTema();
   const klienti = useQueryClient();
-  // Çdo tab ka ngjyrën e vet kur zgjidhet: Studio ar, Terminet blu, Profili vjollcë (ekranet që
-  // hapen sipër mbajnë ngjyrën e Studios).
+  // Çdo tab ka ngjyrën e vet kur zgjidhet: Studio ar, Harta portokalli, Terminet blu, Profili
+  // vjollcë (ekranet që hapen sipër mbajnë ngjyrën e Studios).
   const shtegu = usePathname();
-  const ngjyraETabit = shtegu.startsWith("/terminet-e-mia")
-    ? ngjyrat.blu
-    : shtegu.startsWith("/profili")
-      ? ngjyrat.vjollce
-      : ngjyrat.ari;
+  const ngjyraETabit = shtegu.startsWith("/harta")
+    ? ngjyrat.portokalli
+    : shtegu.startsWith("/terminet-e-mia")
+      ? ngjyrat.blu
+      : shtegu.startsWith("/profili")
+        ? ngjyrat.vjollce
+        : ngjyrat.ari;
 
   // Një dëgjues i vetëm për listën e pritjes, i hapur sa kohë klienti është brenda.
   const kurLirohet = useCallback(
@@ -50,6 +52,7 @@ export default function KlientLayout() {
       <TabetWeb
         tabet={[
           { emri: "studio", titulli: t("tabs.studio"), ikona: ikonat.gershere },
+          { emri: "harta", titulli: t("tabs.harta"), ikona: ikonat.harta },
           { emri: "terminet-e-mia", titulli: t("tabs.terminet"), ikona: ikonat.kalendar },
           { emri: "profili", titulli: t("tabs.profili"), ikona: ikonat.personi },
         ]}
@@ -70,6 +73,14 @@ export default function KlientLayout() {
       <NativeTabs.Trigger name="studio">
         <NativeTabs.Trigger.Icon sf="scissors" md={ikonat.gershere.android} selectedColor={ngjyrat.ari} />
         <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.studio")}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="harta">
+        <NativeTabs.Trigger.Icon
+          sf={{ default: "map", selected: "map.fill" }}
+          md={ikonat.harta.android}
+          selectedColor={ngjyrat.portokalli}
+        />
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.portokalli }}>{t("tabs.harta")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="terminet-e-mia">
         <NativeTabs.Trigger.Icon sf="calendar" md={ikonat.kalendar.android} selectedColor={ngjyrat.blu} />

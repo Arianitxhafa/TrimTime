@@ -10,14 +10,15 @@ import {
 import { ngarkoGjuhenERuajtur } from "../i18n";
 
 const CELESI_ONBOARDING = "trimtime.onboarding";
-// v2: ekrani i lejeve (njoftimet). Ekziston që nga versioni me shumë lokale; nuk pyetet sërish.
-const CELESI_LEJET = "trimtime.lejet.v2";
+// v3: vendndodhja e saktë është e detyrueshme për hartën e Studio Burimit; ekrani u shfaqet një herë
+// edhe përdoruesve që e kaluan versionin e mëparshëm.
+const CELESI_LEJET = "trimtime.lejet.v3";
 const CELESI_KYCJA = "trimtime.kycja";
 
 type VleraKontekstit = {
   onboardingIPare: boolean;
   perfundoOnboarding: () => void;
-  // Ekrani "Lejo njoftimet" shfaqet një herë pas hyrjes së parë.
+  // Ekrani i lejeve (njoftimet, vendndodhja) shfaqet një herë pas hyrjes së parë.
   lejetEPara: boolean;
   perfundoLejet: () => void;
   // Kyçja me Face ID / gjurmë gishti kur hapet aplikacioni.
