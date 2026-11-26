@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -10,21 +10,25 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
+import Animated, { FadeIn, useAnimatedStyle, useSharedValue, withRepeat, withTiming, ZoomIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { usePushimet, useTerminetEPeriudhes } from "../../api/biznesi";
 import { useLokaliIm } from "../../api/lokalet";
 import { useOrari } from "../../api/orari";
 import { useStafi } from "../../api/stafi";
-import { Drita } from "../../components/Marka";
+import KokaEBiznesit from "../../components/KokaEBiznesit";
 import Ikona, { ikonat } from "../../components/Ikona";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { dataISO, emriShkurterIDites, formatoDaten, ngaISO, shtoDite } from "../../lib/datat";
+import { formatoCmimin } from "../../lib/formatimi";
 import type { Pushimi, TerminiIKalendarit } from "../../lib/tipet";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 type Pamja = "dita" | "java";
 
 const PX_PER_MINUTE = 1.4;
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 const GJERESIA_E_ORES = 48;
 const GJERESIA_MIN_E_KOLONES = 140;
 
@@ -129,9 +133,22 @@ export default function Kalendari() {
   const tani = new Date();
   const minutatTani = tani.getHours() * 60 + tani.getMinutes();
 
+  // Shifrat e periudhës në kokë: terminet (pa të anuluarat), të ardhurat e pritshme dhe ato të
+  // mbledhura.
+  const teVlefshme = (terminet.data ?? []).filter((x) => x.statusi !== "anuluar" && x.statusi !== "nuk_erdhi");
+  const ePritshme = teVlefshme.reduce((shuma, x) => shuma + x.cmimi_centa, 0);
+  const eMbledhur = teVlefshme.filter((x) => x.statusi === "perfunduar").reduce((shuma, x) => shuma + x.cmimi_centa, 0);
+
   return (
     <View style={[styles.container, { paddingTop: insets.top + hapesira.md }]}>
-      <Drita lartesia={260} />
+      <KokaEBiznesit
+        titulli={t("tabs.kalendari")}
+        shifrat={[
+          { vlera: String(teVlefshme.length), etiketa: t("kalendari.termine") },
+          { vlera: formatoCmimin(ePritshme), etiketa: t("kalendari.tePritshme") },
+          { vlera: formatoCmimin(eMbledhur), etiketa: t("kalendari.teMbledhura") },
+        ]}
+      />
       <View style={styles.koka}>
         <View style={styles.pamjet}>
           {(["dita", "java"] as const).map((p) => (
@@ -190,7 +207,7 @@ export default function Kalendari() {
       )}
 
       <ScrollView style={styles.trupi} contentContainerStyle={{ paddingBottom: hapesira.xxl }}>
-        <View style={styles.rreshti}>
+        <Animated.View key={`${pamja}-${nga}-${berberiIJaves ?? ""}`} entering={FadeIn.duration(300)} style={styles.rreshti}>
           <View style={{ width: GJERESIA_E_ORES, paddingTop: 36 }}>
             {oret.map((o) => (
               <Text key={o} style={[styles.ora, { top: (o * 60 - fillimi) * PX_PER_MINUTE + 36 - 7 }]}>
@@ -239,37 +256,64 @@ export default function Kalendari() {
                       );
                     })}
 
-                    {terminetEKolones.map((x) => (
+                    {terminetEKolones.map((x, i) => (
                       <Blloku
                         key={x.id}
                         termini={x}
                         top={(x.minuta_e_dites - fillimi) * PX_PER_MINUTE}
                         kompakt={pamja === "java"}
+                        vonesa={Math.min(i, 10) * 40}
                       />
                     ))}
 
                     {eSotme && minutatTani >= fillimi && minutatTani <= fundi && (
-                      <View style={[styles.vijaETanishme, { top: (minutatTani - fillimi) * PX_PER_MINUTE }]} />
+                      <VijaETanishme top={(minutatTani - fillimi) * PX_PER_MINUTE} />
                     )}
                   </Pressable>
                 </View>
               );
             })}
           </ScrollView>
-        </View>
+        </Animated.View>
       </ScrollView>
     </View>
   );
 }
 
-function Blloku({ termini, top, kompakt }: { termini: TerminiIKalendarit; top: number; kompakt: boolean }) {
+// Vija e kuqe e "tani", me një pikë që pulson në fillim, si te Kalendari i Apple.
+function VijaETanishme({ top }: { top: number }) {
+  const styles = useStilet(krijoStilet);
+  const pulsi = useSharedValue(1);
+  useEffect(() => {
+    pulsi.set(withRepeat(withTiming(1.8, { duration: 900 }), -1, true));
+  }, [pulsi]);
+  const stili = useAnimatedStyle(() => ({ transform: [{ scale: pulsi.get() }], opacity: 2 - pulsi.get() }));
+  return (
+    <View pointerEvents="none" style={[styles.vijaETanishme, { top }]}>
+      <Animated.View style={[styles.pikaETanishme, stili]} />
+    </View>
+  );
+}
+
+function Blloku({
+  termini,
+  top,
+  kompakt,
+  vonesa,
+}: {
+  termini: TerminiIKalendarit;
+  top: number;
+  kompakt: boolean;
+  vonesa: number;
+}) {
   const { statusetMeta } = useTema();
   const styles = useStilet(krijoStilet);
   const meta = statusetMeta[termini.statusi];
   const lartesia = Math.max(termini.kohezgjatja_min * PX_PER_MINUTE, 24);
 
   return (
-    <Pressable
+    <AnimatedPressable
+      entering={ZoomIn.delay(vonesa).springify().damping(16)}
       accessibilityRole="button"
       accessibilityLabel={`${termini.klienti_emri}, ${termini.ora_lokale}`}
       onPress={() => router.push({ pathname: "/termini/[id]", params: { id: termini.id, data: termini.data_lokale } })}
@@ -294,7 +338,7 @@ function Blloku({ termini, top, kompakt }: { termini: TerminiIKalendarit; top: n
           )}
         </>
       )}
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -498,6 +542,15 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       left: 0,
       right: 0,
       height: 2,
-      backgroundColor: ngjyrat.rrezik,
+      backgroundColor: ngjyrat.theksi,
+      justifyContent: "center",
+    },
+    pikaETanishme: {
+      position: "absolute",
+      left: -4,
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      backgroundColor: ngjyrat.theksi,
     },
   });

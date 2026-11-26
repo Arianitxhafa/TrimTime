@@ -471,6 +471,9 @@ export const sq = {
     teGjithe: "Të gjithë",
     pushim: "Pushim",
     paStaf: "Shto berberë te Lokali → Stafi për të parë kalendarin.",
+    termine: "Termine",
+    tePritshme: "Të pritshme",
+    teMbledhura: "Të mbledhura",
   },
   zhvendos: {
     titulli: "Zhvendos terminin",
@@ -500,6 +503,8 @@ export const sq = {
     terminIRi: "Termin i ri",
     shenoVip: "Shëno si VIP",
     hiqVip: "Hiq VIP",
+    gjithsej: "Klientë",
+    meTermin: "Me termin",
   },
   analitika: {
     titulli: "Analitika",

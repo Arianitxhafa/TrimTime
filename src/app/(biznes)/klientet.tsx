@@ -17,7 +17,8 @@ import { useKlientet } from "../../api/biznesi";
 import { useLokaliIm } from "../../api/lokalet";
 import Avatar from "../../components/Avatar";
 import Butoni from "../../components/Butoni";
-import { Drita } from "../../components/Marka";
+import KokaEBiznesit from "../../components/KokaEBiznesit";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import Ikona, { ikonat } from "../../components/Ikona";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { dataISO, formatoDaten } from "../../lib/datat";
@@ -36,6 +37,7 @@ export default function Klientet() {
   const klientet = useKlientet(lokaliIm.data?.lokali.id);
   const [kerkimi, setKerkimi] = useState("");
   const [filtri, setFiltri] = useState<Filtri>("teGjithe");
+  const gjithsej = klientet.data ?? [];
 
   const teFiltruar = useMemo(() => {
     const k = kerkimi.trim().toLowerCase();
@@ -51,8 +53,14 @@ export default function Klientet() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top + hapesira.lg }]}>
-      <Drita lartesia={260} />
-      <Text style={styles.titulli}>{t("tabs.klientet")}</Text>
+      <KokaEBiznesit
+        titulli={t("tabs.klientet")}
+        shifrat={[
+          { vlera: String(gjithsej.length), etiketa: t("klientet.gjithsej") },
+          { vlera: String(gjithsej.filter((x) => x.vip).length), etiketa: t("klientet.vip") },
+          { vlera: String(gjithsej.filter((x) => x.termini_i_ardhshem).length), etiketa: t("klientet.meTermin") },
+        ]}
+      />
 
       <View style={styles.kerkimi}>
         <Ikona emri={ikonat.kerko} madhesia={18} ngjyra={ngjyrat.tekstiZbehte} />
@@ -95,7 +103,11 @@ export default function Klientet() {
         refreshControl={
           <RefreshControl refreshing={klientet.isRefetching} onRefresh={() => void klientet.refetch()} tintColor={ngjyrat.ari} />
         }
-        renderItem={({ item }) => <Rreshti klienti={item} />}
+        renderItem={({ item, index }) => (
+          <Animated.View entering={FadeInDown.delay(Math.min(index, 10) * 40).duration(360)}>
+            <Rreshti klienti={item} />
+          </Animated.View>
+        )}
         ListEmptyComponent={
           lokaliIm.isPending || klientet.isLoading ? (
             <ActivityIndicator color={ngjyrat.ari} style={styles.ngarkimi} />

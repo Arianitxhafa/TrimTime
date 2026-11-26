@@ -471,6 +471,9 @@ export const en: Perkthimet = {
     teGjithe: "Everyone",
     pushim: "Time off",
     paStaf: "Add barbers under Shop → Staff to see the calendar.",
+    termine: "Bookings",
+    tePritshme: "Expected",
+    teMbledhura: "Collected",
   },
   zhvendos: {
     titulli: "Move appointment",
@@ -500,6 +503,8 @@ export const en: Perkthimet = {
     terminIRi: "New appointment",
     shenoVip: "Mark as VIP",
     hiqVip: "Remove VIP",
+    gjithsej: "Clients",
+    meTermin: "Booked",
   },
   analitika: {
     titulli: "Analytics",
