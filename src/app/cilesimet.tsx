@@ -2,7 +2,12 @@ import { router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import Constants from "expo-constants";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import DialogKonfirmimi from "../components/DialogKonfirmimi";
+import LogoStudio from "../components/LogoStudio";
+import ShiritiIBerberit from "../components/ShiritiIBerberit";
+import { EMRI_I_STUDIOS } from "../lib/studio";
 import Ikona, { ikonat, type EmriIkones } from "../components/Ikona";
 import { GabimiIFormes } from "../components/KornizaAuth";
 import { useAuth } from "../context/AuthContext";
@@ -71,6 +76,7 @@ export default function Cilesimet() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.permbajtja}>
+      <Animated.View entering={FadeInDown.duration(380)}>
       <Text style={styles.seksioni}>{t("cilesimet.pamja")}</Text>
       <View accessibilityRole="radiogroup" style={styles.grupi}>
         {opsionetETemes.map((opsioni, i) => (
@@ -85,9 +91,10 @@ export default function Cilesimet() {
           />
         ))}
       </View>
+      </Animated.View>
 
       {Platform.OS !== "web" && (
-        <>
+        <Animated.View entering={FadeInDown.delay(70).duration(380)}>
           <Text style={[styles.seksioni, styles.seksioniTjeter]}>{t("biometria.titulli")}</Text>
           <View style={styles.grupi}>
             <View style={styles.rreshti}>
@@ -107,9 +114,10 @@ export default function Cilesimet() {
               />
             </View>
           </View>
-        </>
+        </Animated.View>
       )}
 
+      <Animated.View entering={FadeInDown.delay(140).duration(380)}>
       <Text style={[styles.seksioni, styles.seksioniTjeter]}>{t("cilesimet.gjuha")}</Text>
       <View accessibilityRole="radiogroup" style={styles.grupi}>
         {gjuhet.map((g, i) => (
@@ -123,7 +131,9 @@ export default function Cilesimet() {
           />
         ))}
       </View>
+      </Animated.View>
 
+      <Animated.View entering={FadeInDown.delay(210).duration(380)}>
       <Text style={[styles.seksioni, styles.seksioniTjeter]}>{t("cilesimet.llogaria")}</Text>
       <GabimiIFormes mesazhi={gabimiFshirjes} />
       <View style={styles.grupi}>
@@ -157,6 +167,17 @@ export default function Cilesimet() {
           </View>
         </Pressable>
       </View>
+      </Animated.View>
+
+      {/* Fundi: logoja, emri dhe versioni i aplikacionit. */}
+      <Animated.View entering={FadeInDown.delay(280).duration(380)} style={styles.fundi}>
+        <LogoStudio madhesia={56} />
+        <ShiritiIBerberit gjeresia={48} lartesia={5} />
+        <Text style={styles.fundiEmri}>{EMRI_I_STUDIOS}</Text>
+        <Text style={styles.fundiVersioni}>
+          {t("cilesimet.versioni", { versioni: Constants.expoConfig?.version ?? "1.0.0" })}
+        </Text>
+      </Animated.View>
 
       <DialogKonfirmimi
         iDukshem={dialogFshirja}
@@ -213,6 +234,21 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     permbajtja: {
       padding: hapesira.xl,
+      paddingBottom: hapesira.xxl * 2,
+    },
+    fundi: {
+      alignItems: "center",
+      gap: hapesira.sm,
+      marginTop: hapesira.xxl,
+    },
+    fundiEmri: {
+      ...shkronjat.titullBold,
+      color: ngjyrat.teksti,
+      fontSize: 15,
+    },
+    fundiVersioni: {
+      color: ngjyrat.tekstiZbehte,
+      fontSize: 12,
     },
     seksioni: {
       ...shkronjat.etiketeBold,

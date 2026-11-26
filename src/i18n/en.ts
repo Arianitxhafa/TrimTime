@@ -100,6 +100,12 @@ export const en: Perkthimet = {
     gabimTelefoni: "Enter a valid phone number.",
     ruaj: "Save",
     jeBerber: "Work at Studio Burimi? Join with a code",
+    vizita: "Visits",
+    shpenzuar: "Spent",
+    iRadhes: "Next appointment",
+    shikoStudion: "View the studio",
+    thirrStudion: "Call the studio",
+    udhezimet: "Directions to the studio",
   },
   cilesimet: {
     titulli: "Settings",
@@ -120,6 +126,7 @@ export const en: Perkthimet = {
     fshirjaKonfirmo: "Delete",
     fshirjaNeVazhdim: "Deleting…",
     fshirjaGabim: "Your account wasn't deleted. Check your connection and try again.",
+    versioni: "Version {{versioni}} · by Arianit Xhafa",
   },
   privatesia: {
     titulli: "Privacy",

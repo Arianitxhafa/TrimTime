@@ -99,6 +99,12 @@ export const sq = {
     gabimTelefoni: "Shkruaj një numër telefoni të vlefshëm.",
     ruaj: "Ruaj",
     jeBerber: "Punon te Studio Burimi? Bashkohu me kod",
+    vizita: "Vizita",
+    shpenzuar: "Shpenzuar",
+    iRadhes: "Termini i radhës",
+    shikoStudion: "Shiko Studion",
+    thirrStudion: "Thirr Studion",
+    udhezimet: "Rruga deri te Studio",
   },
   cilesimet: {
     titulli: "Cilësimet",
@@ -119,6 +125,7 @@ export const sq = {
     fshirjaKonfirmo: "Fshije",
     fshirjaNeVazhdim: "Duke fshirë…",
     fshirjaGabim: "Llogaria nuk u fshi. Kontrollo internetin dhe provo përsëri.",
+    versioni: "Versioni {{versioni}} · nga Arianit Xhafa",
   },
   privatesia: {
     titulli: "Privatësia",
