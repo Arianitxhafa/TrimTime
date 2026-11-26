@@ -783,6 +783,9 @@ export const en: Perkthimet = {
     uDergua: "The request left your phone. The appointment is yours once the barber confirms.",
     mbyll: "Close",
   },
+  studio: {
+    etiketa: "Men's barber",
+  },
   lejet: {
     hapi: "Step {{numri}} of 2",
     njoftimetTitulli: "Never miss an appointment",

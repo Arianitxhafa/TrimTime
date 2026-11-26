@@ -5,6 +5,7 @@ import { router, Stack } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
+import Animated, { FadeInDown, SlideInDown, useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokali } from "../api/lokalet";
 import { useOrari } from "../api/orari";
@@ -22,6 +23,7 @@ import GaleriaEPlote from "./GaleriaEPlote";
 import KartaEBesnikerise from "./KartaEBesnikerise";
 import KartaEVleresimit from "./KartaEVleresimit";
 import KopertinaELokalit from "./KopertinaELokalit";
+import KopertinaEStudios from "./KopertinaEStudios";
 import Xham from "./Xham";
 import { celesiIDites, RENDI_I_DITEVE } from "./RedaktoriIOrarit";
 import { useAuth } from "../context/AuthContext";
@@ -32,6 +34,7 @@ import { formatoCmimin, formatoKohezgjatjen } from "../lib/formatimi";
 import { pershkrimiIPromocionit, vlenSot } from "../lib/promocionet";
 import type { Lokali, Sherbimi } from "../lib/tipet";
 import { useHapUdhezimet } from "../api/udhezimet";
+import { FOTOT_E_STUDIOS, INSTAGRAMI, STUDIO_ID } from "../lib/studio";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 
 type Props = {
@@ -53,6 +56,10 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
   const stafi = useStafi(id);
   const modi = useModiAktiv();
   const hapUdhezimet = useHapUdhezimet();
+  const scrollY = useSharedValue(0);
+  const neScroll = useAnimatedScrollHandler((e) => {
+    scrollY.set(e.contentOffset.y);
+  });
 
   if (!lokali.data && !lokali.isSuccess) {
     return (
@@ -101,8 +108,21 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
       <Stack.Screen
         options={{ title: "", headerTransparent: true, headerStyle: { backgroundColor: "transparent" }, headerTintColor: "#FFFFFF" }}
       />
-      <ScrollView contentContainerStyle={{ paddingBottom: (mundTeRezervoje || meTelefon ? 120 : hapesira.xxl) + insets.bottom + mbiTabet }}>
-        {/* Fotoja e lokalit, ose tabela e gjeneruar e berberisë kur fotoja mungon. */}
+      <Animated.ScrollView
+        onScroll={neScroll}
+        scrollEventThrottle={16}
+        contentContainerStyle={{ paddingBottom: (mundTeRezervoje || meTelefon ? 120 : hapesira.xxl) + insets.bottom + mbiTabet }}
+      >
+        {l.id === STUDIO_ID ? (
+          <KopertinaEStudios scrollY={scrollY} lartesia={440 + insets.top}>
+            <Text style={[styles.rubrika, styles.mbiFoto]}>
+              {l.qyteti} · {t("studio.etiketa")}
+            </Text>
+            <Text style={[styles.emri, styles.mbiFoto, styles.emriIMadh]}>{l.emri}</Text>
+            <Statusi lokali={l} kaOrar={kaOrar} mbiFoto />
+          </KopertinaEStudios>
+        ) : (
+        /* Fotoja e lokalit, ose tabela e gjeneruar e berberisë kur fotoja mungon. */
         <View style={[styles.kopertina, { height: 320 + insets.top }]}>
           <KopertinaELokalit emri={l.emri} fotoUrl={l.kopertina_url} meHije style={StyleSheet.absoluteFill} />
           <LinearGradient colors={["rgba(10,22,16,0.55)", "rgba(10,22,16,0)"]} style={styles.hijaLart} />
@@ -112,8 +132,9 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
             <Statusi lokali={l} kaOrar={kaOrar} mbiFoto />
           </View>
         </View>
+        )}
 
-        <View style={styles.permbajtja}>
+        <Animated.View entering={FadeInDown.delay(260).duration(550)} style={styles.permbajtja}>
           <View style={styles.adresaRreshti}>
             <Ikona emri={ikonat.harta} madhesia={16} ngjyra={ngjyrat.tekstiDyte} />
             <Text style={styles.adresa}>
@@ -134,6 +155,9 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
               teksti={t("profiliLokalit.udhezimet")}
               onPress={udhezimet}
             />
+            {l.id === STUDIO_ID ? (
+              <Veprimi ikona={ikonat.kamera} teksti="Instagram" onPress={() => void Linking.openURL(INSTAGRAMI)} />
+            ) : null}
             <Veprimi
               ikona={ikonat.ndaj}
               teksti={t("profiliLokalit.ndaj")}
@@ -230,11 +254,12 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
               {l.burimi === "numrat" ? t("pergjithshme.atribuimiNumrat") : t("pergjithshme.atribuimiOsm")}
             </Text>
           )}
-        </View>
-      </ScrollView>
+        </Animated.View>
+      </Animated.ScrollView>
 
       {mundTeRezervoje && (
-        <Xham style={[styles.fundi, { bottom: insets.bottom + hapesira.sm + mbiTabet }]}>
+        <Animated.View entering={SlideInDown.springify().damping(18).delay(420)} style={[styles.fundiVendi, { bottom: insets.bottom + hapesira.sm + mbiTabet }]}>
+        <Xham style={styles.fundi}>
           <View style={styles.fundiTeksti}>
             {l.cmimi_min !== null && (
               <Text style={styles.fundiCmimi}>{t("lokali.ngaCmimi", { cmimi: formatoCmimin(l.cmimi_min) })}</Text>
@@ -247,10 +272,12 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
           </View>
           <Butoni titulli={t("profiliLokalit.rezervo")} ikona={ikonat.kalendar} onPress={() => hapRezervimin()} style={styles.rezervo} />
         </Xham>
+        </Animated.View>
       )}
 
       {meTelefon && (
-        <Xham style={[styles.fundi, { bottom: insets.bottom + hapesira.sm + mbiTabet }]}>
+        <Animated.View entering={SlideInDown.springify().damping(18).delay(420)} style={[styles.fundiVendi, { bottom: insets.bottom + hapesira.sm + mbiTabet }]}>
+        <Xham style={styles.fundi}>
           <View style={styles.fundiTeksti}>
             <Text style={styles.fundiCmimi}>{l.telefoni ? t("lokali.meTelefon") : t("lokali.paTermin")}</Text>
             <Text style={styles.fundiShenim}>
@@ -263,6 +290,7 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
             <Butoni titulli={t("profiliLokalit.udhezimet")} ikona={ikonat.harta} onPress={udhezimet} style={styles.rezervo} />
           )}
         </Xham>
+        </Animated.View>
       )}
     </View>
   );
@@ -364,7 +392,28 @@ function Punimet({ lokaliId }: { lokaliId: string }) {
   const [hapur, setHapur] = useState<number | null>(null);
   const fotot = portofoli.data ?? [];
 
-  if (fotot.length === 0) return null;
+  if (fotot.length === 0) {
+    if (lokaliId !== STUDIO_ID) return null;
+    return (
+      <>
+        <Text style={styles.seksioni}>{t("portofoli.punimet")}</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          snapToInterval={196}
+          decelerationRate="fast"
+          style={styles.punimetScroll}
+          contentContainerStyle={styles.punimet}
+        >
+          {FOTOT_E_STUDIOS.map((burimi, i) => (
+            <Animated.View key={i} entering={FadeInDown.delay(120 * i).duration(450)}>
+              <Image source={burimi} style={styles.punimiIMadh} contentFit="cover" transition={250} />
+            </Animated.View>
+          ))}
+        </ScrollView>
+      </>
+    );
+  }
 
   return (
     <>
@@ -496,7 +545,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     rubrika: {
       ...shkronjat.etiketeBold,
-      color: "#E3C690",
+      color: "#F4F1EA",
       fontSize: 12,
       letterSpacing: 0.6,
       textTransform: "uppercase",
@@ -510,6 +559,12 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       fontSize: 38,
       lineHeight: 44,
       letterSpacing: -0.6,
+    },
+    emriIMadh: {
+      fontSize: 46,
+      lineHeight: 50,
+      letterSpacing: -1.4,
+      fontWeight: "800",
     },
     statusiRreshti: {
       flexDirection: "row",
@@ -584,6 +639,13 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     punimet: {
       paddingHorizontal: hapesira.xl,
       gap: hapesira.sm,
+    },
+    punimiIMadh: {
+      width: 184,
+      height: 236,
+      borderRadius: rrezja.lg,
+      borderCurve: "continuous",
+      backgroundColor: ngjyrat.siperfaqja2,
     },
     punimi: {
       width: 132,
@@ -761,10 +823,12 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       letterSpacing: 0.5,
       marginTop: hapesira.xxl,
     },
-    fundi: {
+    fundiVendi: {
       position: "absolute",
       left: hapesira.md,
       right: hapesira.md,
+    },
+    fundi: {
       flexDirection: "row",
       alignItems: "center",
       gap: hapesira.md,

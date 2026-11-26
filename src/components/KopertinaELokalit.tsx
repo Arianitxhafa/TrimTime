@@ -33,7 +33,7 @@ function indeksiINgjyres(emri: string, numri: number): number {
   return Math.abs(h) % numri;
 }
 
-const ARI = "#D4B483";
+const ARI = "#F4F1EA";
 
 // Kopertina e lokalit: fotoja kur ka, përndryshe një kopertinë e errët me gradient të butë,
 // monogram ari dhe gërshërë, si kartat e një aplikacioni luksoz.

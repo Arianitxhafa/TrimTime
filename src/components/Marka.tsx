@@ -2,14 +2,14 @@ import { StyleSheet, Text, View } from "react-native";
 import { useTema } from "../context/TemaContext";
 import { EMRI_I_STUDIOS } from "../lib/studio";
 import { shkronjat } from "../theme";
-import Ikona, { ikonat } from "./Ikona";
+import LogoStudio from "./LogoStudio";
 
-// Emri i aplikacionit: gërshërë ari dhe "Studio Burimi" me SF Pro.
+// Logoja e Studio Burimit dhe emri me SF Pro.
 export default function Marka({ madhesia = 30 }: { madhesia?: number }) {
   const { ngjyrat } = useTema();
   return (
     <View style={styles.marka} accessibilityRole="header" accessibilityLabel={EMRI_I_STUDIOS}>
-      <Ikona emri={ikonat.gershere} madhesia={Math.round(madhesia * 0.62)} ngjyra={ngjyrat.bronzi} />
+      <LogoStudio madhesia={Math.round(madhesia * 1.5)} />
       <Text style={[styles.emri, { color: ngjyrat.teksti, fontSize: madhesia, lineHeight: madhesia * 1.2 }]}>
         {EMRI_I_STUDIOS}
       </Text>

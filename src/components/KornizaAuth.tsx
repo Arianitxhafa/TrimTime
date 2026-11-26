@@ -4,7 +4,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStilet, useTema } from "../context/TemaContext";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Ikona, { ikonat } from "./Ikona";
-import Marka, { Drita } from "./Marka";
+import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInDown } from "react-native-reanimated";
+import { FOTOT_E_STUDIOS } from "../lib/studio";
+import Marka from "./Marka";
 
 type Props = {
   titulli: string;
@@ -15,12 +19,17 @@ type Props = {
 
 // Pamja e përbashkët e ekraneve të hyrjes dhe regjistrimit.
 export default function KornizaAuth({ titulli, nentitulli, children, fundi }: Props) {
+  const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
   const insets = useSafeAreaInsets();
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-      <Drita />
+      {/* Një punim i Studios sipër, që zbehet te sfondi. */}
+      <View style={styles.foto} pointerEvents="none">
+        <Image source={FOTOT_E_STUDIOS[1]} style={StyleSheet.absoluteFill} contentFit="cover" />
+        <LinearGradient colors={["rgba(0,0,0,0.3)", "rgba(0,0,0,0.05)", ngjyrat.sfondi]} locations={[0, 0.3, 0.72]} style={StyleSheet.absoluteFill} />
+      </View>
       <ScrollView
         contentContainerStyle={[
           styles.permbajtja,
@@ -32,10 +41,14 @@ export default function KornizaAuth({ titulli, nentitulli, children, fundi }: Pr
           <Marka />
         </View>
 
-        <Text style={styles.titulli}>{titulli}</Text>
-        <Text style={styles.nentitulli}>{nentitulli}</Text>
+        <Animated.View entering={FadeInDown.duration(450)}>
+          <Text style={styles.titulli}>{titulli}</Text>
+          <Text style={styles.nentitulli}>{nentitulli}</Text>
+        </Animated.View>
 
-        <View style={styles.forma}>{children}</View>
+        <Animated.View entering={FadeInDown.delay(120).duration(450)} style={styles.forma}>
+          {children}
+        </Animated.View>
 
         {fundi ? <View style={styles.fundi}>{fundi}</View> : null}
       </ScrollView>
@@ -69,11 +82,19 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       maxWidth: 480,
       alignSelf: "center",
     },
+    foto: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      height: 340,
+    },
     marka: {
       flexDirection: "row",
       alignItems: "center",
       gap: hapesira.sm,
-      marginBottom: hapesira.xxl * 1.5,
+      marginTop: 120,
+      marginBottom: hapesira.xxl,
     },
     logo: {
       width: 40,

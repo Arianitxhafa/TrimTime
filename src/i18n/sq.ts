@@ -783,6 +783,9 @@ export const sq = {
     uDergua: "Kërkesa doli nga telefoni yt. Termini vlen sapo berberi të ta konfirmojë.",
     mbyll: "Mbyll",
   },
+  studio: {
+    etiketa: "Berber për meshkuj",
+  },
   lejet: {
     hapi: "Hapi {{numri}} nga 2",
     njoftimetTitulli: "Mos e humb terminin",
