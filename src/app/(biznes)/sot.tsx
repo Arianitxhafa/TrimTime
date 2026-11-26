@@ -12,12 +12,19 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInDown, FadeInUp } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokaliIm } from "../../api/lokalet";
 import { useTerminetELokalit } from "../../api/terminet";
 import Butoni from "../../components/Butoni";
 import Ikona, { ikonat } from "../../components/Ikona";
 import KartaTerminit from "../../components/KartaTerminit";
+import LogoStudio from "../../components/LogoStudio";
+import ShiritiIBerberit from "../../components/ShiritiIBerberit";
+import { useAuth } from "../../context/AuthContext";
+import { FOTO_E_LOKALIT } from "../../lib/studio";
 import ZgjedhesiIDites from "../../components/ZgjedhesiIDites";
 import { useStilet, useTema } from "../../context/TemaContext";
 import { dataISO, ditetEArdhshme, formatoDaten } from "../../lib/datat";
@@ -26,6 +33,11 @@ import { STATUSET, type StatusiTerminit } from "../../lib/tipet";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
 type Filtri = "te_gjitha" | StatusiTerminit;
+
+function pershendetja(): "sot.mirmengjes" | "sot.mirdita" | "sot.mirembrema" {
+  const ora = new Date().getHours();
+  return ora < 11 ? "sot.mirmengjes" : ora < 18 ? "sot.mirdita" : "sot.mirembrema";
+}
 
 function hapTerminin(id: string, data: string) {
   router.push({ pathname: "/termini/[id]", params: { id, data } });
@@ -38,6 +50,8 @@ export default function Sot() {
   const insets = useSafeAreaInsets();
   const lokaliIm = useLokaliIm();
   const lokali = lokaliIm.data?.lokali;
+  const { emriIShfaqur } = useAuth();
+  const emriIPare = emriIShfaqur.includes("@") ? "" : emriIShfaqur.split(" ")[0];
 
   const ditet = useMemo(() => ditetEArdhshme(14), []);
   const [data, setData] = useState(ditet[0]);
@@ -90,11 +104,15 @@ export default function Sot() {
 
   const koka = (
     <View>
-      <View style={styles.koka}>
+      <Animated.View entering={FadeInDown.duration(450)} style={styles.koka}>
+        <LogoStudio madhesia={52} />
         <View style={styles.kokaTeksti}>
-          <Text style={styles.data}>{formatoDaten(data, t)}</Text>
+          <Text style={styles.data}>
+            {formatoDaten(data, t)} · {lokali.emri}
+          </Text>
           <Text style={styles.titulli} numberOfLines={1}>
-            {lokali.emri}
+            {t(pershendetja())}
+            {emriIPare ? `, ${emriIPare}` : ""}
           </Text>
         </View>
         <View style={styles.kokaButonat}>
@@ -115,21 +133,28 @@ export default function Sot() {
             <Ikona emri={ikonat.shto} madhesia={22} ngjyra={ngjyrat.mbiAri} />
           </Pressable>
         </View>
-      </View>
+      </Animated.View>
+      <ShiritiIBerberit gjeresia={64} lartesia={6} style={styles.shtylla} />
 
       <View style={styles.ditet}>
         <ZgjedhesiIDites ditet={ditet} zgjedhur={data} onZgjidh={setData} />
       </View>
 
       {iRadhes ? (
+        <Animated.View entering={FadeInUp.delay(120).springify().damping(16)}>
         <Pressable
           accessibilityRole="button"
           onPress={() => hapTerminin(iRadhes.id, data)}
           style={({ pressed }) => [styles.iRadhes, pressed && styles.shtypur]}
         >
+          <Image source={FOTO_E_LOKALIT} style={StyleSheet.absoluteFill} contentFit="cover" />
+          <LinearGradient
+            colors={["rgba(0,0,0,0.35)", "rgba(0,0,0,0.85)"]}
+            style={StyleSheet.absoluteFill}
+          />
           <View style={styles.iRadhesKoka}>
             <Text style={styles.iRadhesEtiketa}>{t("sot.terminiIRadhes").toUpperCase()}</Text>
-            <Ikona emri={ikonat.djathtas} madhesia={18} ngjyra={ngjyrat.mbiAri} />
+            <Ikona emri={ikonat.djathtas} madhesia={18} ngjyra="#FFFFFF" />
           </View>
           <Text style={styles.iRadhesOra}>{iRadhes.ora_lokale}</Text>
           <Text style={styles.iRadhesKlienti}>{iRadhes.klienti_emri}</Text>
@@ -137,13 +162,14 @@ export default function Sot() {
             {iRadhes.sherbimi_emri} · {t(`statuset.${iRadhes.statusi}`)}
           </Text>
         </Pressable>
+        </Animated.View>
       ) : (
         <View style={[styles.iRadhes, styles.iRadhesBosh]}>
           <Text style={styles.iRadhesBoshTeksti}>{t("sot.asnjeIHapur")}</Text>
         </View>
       )}
 
-      <View style={styles.statistikat}>
+      <Animated.View entering={FadeInDown.delay(220).duration(450)} style={styles.statistikat}>
         <Statistika
           etiketa={t("statuset.ne_pritje")}
           vlera={String(numri("ne_pritje"))}
@@ -165,7 +191,7 @@ export default function Sot() {
           aktiv={filtri === "perfunduar"}
           onPress={() => setFiltri(filtri === "perfunduar" ? "te_gjitha" : "perfunduar")}
         />
-      </View>
+      </Animated.View>
 
       <View style={styles.kerkimi}>
         <Ikona emri={ikonat.kerko} madhesia={18} ngjyra={ngjyrat.tekstiZbehte} />
@@ -229,7 +255,11 @@ export default function Sot() {
       refreshControl={
         <RefreshControl refreshing={terminet.isRefetching} onRefresh={() => void terminet.refetch()} tintColor={ngjyrat.ari} />
       }
-      renderItem={({ item }) => <KartaTerminit termini={item} onPress={() => hapTerminin(item.id, data)} />}
+      renderItem={({ item, index }) => (
+        <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 50).duration(380)}>
+          <KartaTerminit termini={item} onPress={() => hapTerminin(item.id, data)} />
+        </Animated.View>
+      )}
       ListEmptyComponent={
         terminet.isPending ? (
           <ActivityIndicator color={ngjyrat.ari} style={styles.ngarkimi} />
@@ -318,6 +348,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       alignItems: "center",
       justifyContent: "space-between",
       gap: hapesira.md,
+      marginBottom: hapesira.md,
+    },
+    shtylla: {
       marginBottom: hapesira.lg,
     },
     kokaTeksti: {
@@ -332,8 +365,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     titulli: {
       ...shkronjat.titull,
       color: ngjyrat.teksti,
-      fontSize: 28,
-      letterSpacing: -0.5,
+      fontSize: 26,
+      letterSpacing: -0.6,
+      fontWeight: "800",
     },
     kokaButonat: {
       flexDirection: "row",
@@ -361,9 +395,12 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.lg,
     },
     iRadhes: {
-      backgroundColor: ngjyrat.ari,
+      backgroundColor: "#0A0A0A",
       borderRadius: rrezja.lg,
+      borderCurve: "continuous",
+      overflow: "hidden",
       padding: hapesira.xl,
+      paddingTop: hapesira.xxl * 2,
       marginBottom: hapesira.lg,
     },
     iRadhesKoka: {
@@ -373,7 +410,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       marginBottom: hapesira.sm,
     },
     iRadhesEtiketa: {
-      color: ngjyrat.mbiAri,
+      color: "#FFFFFF",
       fontSize: 12,
       fontWeight: "800",
       letterSpacing: 0.6,
@@ -381,19 +418,19 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     iRadhesOra: {
       ...shkronjat.etiketeBold,
-      color: ngjyrat.mbiAri,
+      color: "#FFFFFF",
       fontSize: 36,
       letterSpacing: -1,
       fontVariant: ["tabular-nums"],
     },
     iRadhesKlienti: {
       ...shkronjat.titullBold,
-      color: ngjyrat.mbiAri,
+      color: "#FFFFFF",
       fontSize: 18,
       marginTop: 2,
     },
     iRadhesSherbimi: {
-      color: ngjyrat.mbiAri,
+      color: "#FFFFFF",
       fontSize: 14,
       opacity: 0.75,
       marginTop: 2,

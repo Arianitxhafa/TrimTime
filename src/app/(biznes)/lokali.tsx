@@ -8,6 +8,8 @@ import { useOrari } from "../../api/orari";
 import { useSherbimet } from "../../api/sherbimet";
 import Butoni from "../../components/Butoni";
 import Ikona, { ikonat, type EmriIkones } from "../../components/Ikona";
+import LogoStudio from "../../components/LogoStudio";
+import { FOTO_E_LOKALIT, STUDIO_ID } from "../../lib/studio";
 import { GabimiIFormes } from "../../components/KornizaAuth";
 import { useAuth } from "../../context/AuthContext";
 import { useStilet, useTema } from "../../context/TemaContext";
@@ -84,6 +86,8 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
       <View style={[styles.kopertina, { paddingTop: insets.top }]}>
         {lokali.kopertina_url ? (
           <Image source={{ uri: lokali.kopertina_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
+        ) : lokali.id === STUDIO_ID ? (
+          <Image source={FOTO_E_LOKALIT} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
         ) : (
           <View style={[StyleSheet.absoluteFill, styles.kopertinaBosh]}>
             <Ikona emri={ikonat.gershere} madhesia={48} ngjyra={ngjyrat.ari} />
@@ -96,6 +100,8 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
           <View style={styles.logo}>
             {lokali.logo_url ? (
               <Image source={{ uri: lokali.logo_url }} style={StyleSheet.absoluteFill} contentFit="cover" />
+            ) : lokali.id === STUDIO_ID ? (
+              <LogoStudio madhesia={80} />
             ) : (
               <Text style={styles.logoShkronja}>{lokali.emri.charAt(0).toUpperCase()}</Text>
             )}
@@ -322,8 +328,8 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     logo: {
       width: 88,
       height: 88,
-      borderRadius: 24,
-      backgroundColor: ngjyrat.ari,
+      borderRadius: 44,
+      backgroundColor: "#0A0A0A",
       borderWidth: 4,
       borderColor: ngjyrat.sfondi,
       alignItems: "center",
