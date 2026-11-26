@@ -1,11 +1,13 @@
 This is an Expo/React Native mobile application. Prioritize mobile-first patterns, performance, and cross-platform compatibility.
 
-## TrimTime
+## Studio Burimi
 
-TrimTime connects men's barbershops with their clients, starting in Kosovo. Built by Arianit Xhafa.
+The app serves one barbershop only: **Studio Burimi**. (The repo and Expo slug are still called TrimTime; until 26.11.2026 it was a catalog of every barbershop in Kosovo.) Built by Arianit Xhafa.
 
-- **Client:** finds shops in the city they are in, books, cancels or reschedules, rates visits and earns loyalty rewards.
-- **Barber / shop:** manages the shop, services, hours, staff, calendar, clients (CRM), promotions and analytics.
+- The shop is one row in `lokalet`; its id is `STUDIO_ID` in `src/lib/studio.ts`. Don't add multi-shop features back (discovery, map of shops, shop creation).
+- **Client:** opens the Studio tab (services, prices, barbers, hours, reviews), books, cancels or reschedules, rates visits and earns loyalty rewards.
+- **Staff (owner / barber):** manages the shop, services, hours, staff, calendar, clients (CRM), promotions and analytics.
+- **Roles come from the database:** an account is staff when it is an active member of Studio Burimi in `anetaret_e_lokalit` (`useModiAktiv`). Everyone signs up as a client; barbers join the staff with the owner's invite code.
 - **Payment happens at the shop;** staff record it as cash or card. Online payments come later, because Stripe doesn't support businesses in Kosovo.
 
 ### Conventions
@@ -19,7 +21,6 @@ TrimTime connects men's barbershops with their clients, starting in Kosovo. Buil
 
 - Copy `.env.example` to `.env`. It holds only the project URL and the publishable (anon) key. Never put a `service_role`/secret key or the database password in the app, in the repo or in chat.
 - Schema changes go in a **new** file in `supabase/migrations/`. Never edit a migration that has already been run. Migrations are run by hand, in filename order, in Supabase → SQL Editor. Every new table needs RLS and explicit grants.
-- After the last migration, run `supabase/seed/lokalet_osm_kosove.sql` and then `supabase/seed/lokalet_numrat_kosove.sql` (barbers from the Numrat.com directory; `npm run importo:numrat` regenerates it) (cities and shops from OpenStreetMap). `npm run importo:osm` regenerates it. Keep the "© OpenStreetMap contributors" attribution wherever these shops appear.
 - Prices, booking times and discounts are calculated on the server, not in the app.
 
 ## Expo has changed — do not trust your training data

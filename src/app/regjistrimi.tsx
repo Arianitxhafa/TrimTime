@@ -6,8 +6,6 @@ import Butoni from "../components/Butoni";
 import FushaTekstit from "../components/FushaTekstit";
 import { ikonat } from "../components/Ikona";
 import KornizaAuth, { GabimiIFormes } from "../components/KornizaAuth";
-import RoliIZgjedhur from "../components/RoliIZgjedhur";
-import { usePreferencat } from "../context/PreferencatContext";
 import { useStilet } from "../context/TemaContext";
 import { gjuhaAktuale } from "../i18n";
 import { emailIVlefshem, mesazhiIGabimit } from "../lib/gabimetEAuth";
@@ -19,7 +17,6 @@ const GJATESIA_MIN_FJALEKALIMIT = 8;
 export default function Regjistrimi() {
   const { t } = useTranslation();
   const styles = useStilet(krijoStilet);
-  const { modi } = usePreferencat();
   const [emri, setEmri] = useState("");
   const [email, setEmail] = useState("");
   const [fjalekalimi, setFjalekalimi] = useState("");
@@ -43,8 +40,9 @@ export default function Regjistrimi() {
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password: fjalekalimi,
-      // Trigger-i krijo_profilin_e_ri në databazë e merr emrin nga këtu; roli mbetet në llogari.
-      options: { data: { emri: emri.trim(), gjuha: gjuhaAktuale(), roli: modi } },
+      // Trigger-i krijo_profilin_e_ri në databazë e merr emrin nga këtu. Çdo llogari e re është
+      // klient; stafi bashkohet më pas me kodin e ftesës.
+      options: { data: { emri: emri.trim(), gjuha: gjuhaAktuale() } },
     });
     setNgarkohet(false);
 
@@ -75,7 +73,6 @@ export default function Regjistrimi() {
         </>
       }
     >
-      <RoliIZgjedhur />
       <GabimiIFormes mesazhi={gabimi} />
       <FushaTekstit
         etiketa={t("auth.emri")}

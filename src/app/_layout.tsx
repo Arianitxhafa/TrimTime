@@ -5,6 +5,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { klientiIQuery } from "../api/klienti";
+import { useLokaliIm } from "../api/lokalet";
 import KycjaBiometrike from "../components/KycjaBiometrike";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { PreferencatProvider, usePreferencat } from "../context/PreferencatContext";
@@ -36,10 +37,14 @@ function Navigimi() {
   const { sesioni, ngarkohet } = useAuth();
   const { onboardingIPare, lejetEPara } = usePreferencat();
   const modi = useModiAktiv();
+  // Pas hyrjes duhet ditur nëse llogaria është staf i Studio Burimit, para se të zgjidhen tab-et.
+  const lokaliIm = useLokaliIm();
+  const pritetRoli = sesioni !== null && lokaliIm.isPending;
+  const gati = !ngarkohet && !pritetRoli;
 
   useEffect(() => {
-    if (!ngarkohet) SplashScreen.hideAsync().catch(() => {});
-  }, [ngarkohet]);
+    if (gati) SplashScreen.hideAsync().catch(() => {});
+  }, [gati]);
 
   // Njoftimet hapin ekranin e tyre vetëm pasi përdoruesi ka hyrë dhe ka kaluar lejet.
   useNjoftimetEPrekura(!ngarkohet && sesioni !== null && lejetEPara);
@@ -54,14 +59,14 @@ function Navigimi() {
     if (iMeParshmi !== undefined && iMeParshmi !== perdoruesiId) klientiIQuery.clear();
   }, [perdoruesiId]);
 
-  // Splash screen-i mbetet derisa të dihet nëse përdoruesi ka hyrë.
-  if (ngarkohet) return null;
+  // Splash screen-i mbetet derisa të dihet nëse përdoruesi ka hyrë dhe çfarë roli ka.
+  if (!gati) return null;
 
   const kaHyre = sesioni !== null;
 
   // Stack.Protected ridrejton nga ekranet që nuk lejohen. Që nga SDK 58, pa `redirectTo` Expo Router
-  // shkon te route-i i parë i lejuar; për ekranet e hyrjes ai duhet të jetë "/roli".
-  const hyrjaPerTeLejuarit = !onboardingIPare ? "/onboarding" : !kaHyre ? "/roli" : "/lejet";
+  // shkon te route-i i parë i lejuar; për ekranet e hyrjes ai duhet të jetë "/hyrja".
+  const hyrjaPerTeLejuarit = !onboardingIPare ? "/onboarding" : !kaHyre ? "/hyrja" : "/lejet";
   return (
     <KycjaBiometrike aktive={kaHyre}>
       <StatusBar style={eshteErret ? "light" : "dark"} />
@@ -77,20 +82,19 @@ function Navigimi() {
           contentStyle: { backgroundColor: ngjyrat.sfondi },
         }}
       >
-        <Stack.Protected guard={!onboardingIPare} redirectTo={kaHyre ? "/" : "/roli"}>
+        <Stack.Protected guard={!onboardingIPare} redirectTo={kaHyre ? "/" : "/hyrja"}>
           <Stack.Screen name="onboarding" options={{ headerShown: false, animation: "fade" }} />
         </Stack.Protected>
 
         <Stack.Protected guard={onboardingIPare && !kaHyre} redirectTo={onboardingIPare ? "/" : "/onboarding"}>
-          {/* Hyrja: roli → hyrja / regjistrimi → rivendos, në të njëjtin stack (mbrapa kthen te roli). */}
-          <Stack.Screen name="roli" options={{ headerShown: false, animation: "fade" }} />
+          {/* Hyrja → regjistrimi / verifikimi / rivendosja, në të njëjtin stack. */}
           <Stack.Screen name="hyrja" options={{ headerShown: false, animation: "fade" }} />
           <Stack.Screen name="regjistrimi" options={{ headerShown: false, animation: "fade" }} />
           <Stack.Screen name="verifiko" options={{ headerShown: false, animation: "fade" }} />
           <Stack.Screen name="rivendos" options={{ headerShown: false, animation: "fade" }} />
         </Stack.Protected>
 
-        {/* Pas hyrjes së parë: lejo njoftimet dhe vendndodhjen, një herë në këtë telefon. */}
+        {/* Pas hyrjes së parë: lejo njoftimet, një herë në këtë telefon. */}
         <Stack.Protected guard={onboardingIPare && kaHyre && !lejetEPara} redirectTo={hyrjaPerTeLejuarit === "/lejet" ? "/" : hyrjaPerTeLejuarit}>
           <Stack.Screen name="lejet" options={{ headerShown: false, animation: "fade" }} />
         </Stack.Protected>
@@ -101,30 +105,12 @@ function Navigimi() {
           <Stack.Protected guard={modi === "klient"} redirectTo="/sot">
             <Stack.Screen name="(klient)" options={{ headerShown: false, animation: "fade" }} />
             <Stack.Screen name="rezervo/[lokaliId]" options={{ title: t("rezervimi.titulli"), presentation: "modal" }} />
-            <Stack.Screen
-              name="kerko-termin/[lokaliId]"
-              options={{ title: t("kerkoTermin.titulli"), presentation: "modal" }}
-            />
             <Stack.Screen name="riplanifiko/[id]" options={{ title: t("terminetEMia.ndryshoTitulli") }} />
             <Stack.Screen name="vlereso/[terminiId]" options={{ title: "", presentation: "modal" }} />
             <Stack.Screen name="kartat" options={{ title: t("profili.kartat") }} />
-            <Stack.Screen name="asistenti" options={{ title: t("asistenti.titulli"), presentation: "modal" }} />
-            {/* Fleta mbi hartë, si te Apple Maps: gjysmë ekrani, harta mbetet e prekshme pas saj. */}
-            <Stack.Screen
-              name="harta-lokali/[id]"
-              options={{
-                headerShown: false,
-                presentation: "formSheet",
-                sheetAllowedDetents: [0.5, 0.92],
-                sheetGrabberVisible: true,
-                sheetCornerRadius: 24,
-                sheetLargestUndimmedDetentIndex: 0,
-                contentStyle: { backgroundColor: ngjyrat.sfondi },
-              }}
-            />
           </Stack.Protected>
 
-          <Stack.Protected guard={modi === "biznes"} redirectTo="/zbulo">
+          <Stack.Protected guard={modi === "biznes"} redirectTo="/studio">
             <Stack.Screen name="(biznes)" options={{ headerShown: false, animation: "fade" }} />
             <Stack.Screen name="termini/[id]" options={{ title: t("termini.titulli") }} />
             <Stack.Screen name="termini/zhvendos" options={{ title: t("zhvendos.titulli"), presentation: "modal" }} />
@@ -132,8 +118,6 @@ function Navigimi() {
             <Stack.Screen name="menaxho/analitika" options={{ title: t("analitika.titulli") }} />
             <Stack.Screen name="menaxho/berberi/[id]" options={{ title: t("berberi.orariIm") }} />
             <Stack.Screen name="shto" options={{ title: t("terminIRi.titulli"), presentation: "modal" }} />
-            <Stack.Screen name="lokali-i-ri" options={{ title: t("wizard.titulli"), presentation: "modal" }} />
-            <Stack.Screen name="bashkohu" options={{ title: "", presentation: "modal" }} />
             <Stack.Screen name="menaxho/info" options={{ title: t("info.titulli") }} />
             <Stack.Screen name="menaxho/orari" options={{ title: t("orari.titulli") }} />
             <Stack.Screen name="menaxho/sherbimet" options={{ title: t("sherbimet.titulli") }} />
@@ -147,6 +131,8 @@ function Navigimi() {
           </Stack.Protected>
 
           <Stack.Screen name="lokali/[id]" options={{ title: "" }} />
+          {/* Klienti që punon te Studio Burimi bashkohet me kodin e ftesës dhe kalon te pjesa e biznesit. */}
+          <Stack.Screen name="bashkohu" options={{ title: "", presentation: "modal" }} />
           <Stack.Screen name="vleresimet/[lokaliId]" options={{ title: t("vleresimet.titulli") }} />
           <Stack.Screen name="skano" options={{ headerShown: false, presentation: "fullScreenModal", animation: "fade" }} />
 

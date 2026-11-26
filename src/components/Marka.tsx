@@ -1,16 +1,17 @@
 import { StyleSheet, Text, View } from "react-native";
 import { useTema } from "../context/TemaContext";
+import { EMRI_I_STUDIOS } from "../lib/studio";
 import { shkronjat } from "../theme";
 import Ikona, { ikonat } from "./Ikona";
 
-// Emri i aplikacionit: gërshërë ari dhe "TrimTime" me SF Pro.
+// Emri i aplikacionit: gërshërë ari dhe "Studio Burimi" me SF Pro.
 export default function Marka({ madhesia = 30 }: { madhesia?: number }) {
   const { ngjyrat } = useTema();
   return (
-    <View style={styles.marka} accessibilityRole="header" accessibilityLabel="TrimTime">
+    <View style={styles.marka} accessibilityRole="header" accessibilityLabel={EMRI_I_STUDIOS}>
       <Ikona emri={ikonat.gershere} madhesia={Math.round(madhesia * 0.62)} ngjyra={ngjyrat.bronzi} />
       <Text style={[styles.emri, { color: ngjyrat.teksti, fontSize: madhesia, lineHeight: madhesia * 1.2 }]}>
-        TrimTime
+        {EMRI_I_STUDIOS}
       </Text>
     </View>
   );

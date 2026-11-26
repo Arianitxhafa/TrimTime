@@ -59,7 +59,7 @@ export default function Skano() {
       return;
     }
 
-    if (qr?.lloji === "ftesa" && modi === "biznes") {
+    if (qr?.lloji === "ftesa") {
       prekja.sukses();
       router.replace({ pathname: "/bashkohu", params: { kodi: qr.kodi } });
       return;

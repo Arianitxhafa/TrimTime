@@ -44,6 +44,9 @@ export default function EkraniProfilit({ meTitullNative = false }: { meTitullNat
           {modi === "klient" && (
             <Rreshti ikona={ikonat.dhurate} titulli={t("profili.kartat")} meKufi onPress={() => router.push("/kartat")} />
           )}
+          {modi === "klient" && (
+            <Rreshti ikona={ikonat.qr} titulli={t("profili.jeBerber")} meKufi onPress={() => router.push("/bashkohu")} />
+          )}
           <Rreshti
             ikona={ikonat.cilesimet}
             titulli={t("profili.cilesimet")}

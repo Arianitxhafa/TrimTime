@@ -5,7 +5,6 @@ import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import Butoni from "../components/Butoni";
 import KornizaAuth, { GabimiIFormes } from "../components/KornizaAuth";
-import { usePreferencat } from "../context/PreferencatContext";
 import { useStilet } from "../context/TemaContext";
 import { mesazhiIGabimit } from "../lib/gabimetEAuth";
 import { prekja } from "../lib/prekja";
@@ -21,7 +20,6 @@ const PRITJA_S = 60;
 export default function Verifiko() {
   const { t } = useTranslation();
   const styles = useStilet(krijoStilet);
-  const { modi } = usePreferencat();
   // dergo=1: vjen nga hyrja me llogari të pakonfirmuar, ndaj kodi i vjetër ka skaduar.
   const { email = "", dergo } = useLocalSearchParams<{ email?: string; dergo?: string }>();
   const fusha = useRef<ComponentRef<typeof TextInput>>(null);
@@ -66,7 +64,7 @@ export default function Verifiko() {
     if (kodiIPlote.length !== GJATESIA_E_KODIT || ngarkohet) return;
     setGabimi(null);
     setNgarkohet(true);
-    const { data, error } = await supabase.auth.verifyOtp({ email, token: kodiIPlote, type: "email" });
+    const { error } = await supabase.auth.verifyOtp({ email, token: kodiIPlote, type: "email" });
     if (error) {
       setNgarkohet(false);
       prekja.gabim();
@@ -80,10 +78,6 @@ export default function Verifiko() {
       return;
     }
     prekja.sukses();
-    // Llogaritë pa rol e marrin rolin e zgjedhur në këtë telefon (si te hyrja).
-    if (data.user && !data.user.user_metadata?.roli) {
-      await supabase.auth.updateUser({ data: { roli: modi } });
-    }
     // Sesioni u krijua: navigimi kalon vetë te lejet (shih _layout.tsx).
   }
 

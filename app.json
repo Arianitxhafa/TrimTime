@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "TrimTime",
+    "name": "Studio Burimi",
     "slug": "trimtime",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -54,14 +54,14 @@
       [
         "expo-location",
         {
-          "locationWhenInUsePermission": "TrimTime përdor vendndodhjen për të të treguar berberët pranë teje."
+          "locationWhenInUsePermission": "Studio Burimi përdor vendndodhjen vetëm kur stafi vendos pikën e lokalit në hartë."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "TrimTime përdor fotot për lokalin, portofolin e qethjeve dhe stilin që dëshiron.",
-          "cameraPermission": "TrimTime përdor kamerën për të fotografuar qethjet dhe stilin që dëshiron.",
+          "photosPermission": "Studio Burimi përdor fotot për lokalin, portofolin e qethjeve dhe stilin që dëshiron.",
+          "cameraPermission": "Studio Burimi përdor kamerën për të fotografuar qethjet dhe stilin që dëshiron.",
           "microphonePermission": false
         }
       ],
@@ -70,7 +70,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "TrimTime përdor kamerën për të fotografuar qethjet dhe për të skanuar kodet QR.",
+          "cameraPermission": "Studio Burimi përdor kamerën për të fotografuar qethjet dhe për të skanuar kodet QR.",
           "microphonePermission": false,
           "recordAudioAndroid": false
         }
@@ -78,14 +78,14 @@
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "TrimTime përdor Face ID për të hapur aplikacionin në mënyrë të sigurt."
+          "faceIDPermission": "Studio Burimi përdor Face ID për të hapur aplikacionin në mënyrë të sigurt."
         }
       ],
       [
         "expo-calendar",
         {
           "writeOnlyAccess": true,
-          "writeOnlyCalendarPermission": "TrimTime shton terminet e tua në kalendar, me kujtesë para orës."
+          "writeOnlyCalendarPermission": "Studio Burimi shton terminet e tua në kalendar, me kujtesë para orës."
         }
       ]
     ],

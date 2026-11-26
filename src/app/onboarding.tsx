@@ -19,9 +19,9 @@ import { useStilet, useTema } from "../context/TemaContext";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 
 const faqet = [
-  { ikona: ikonat.harta, titulli: "onboarding.titulli1", teksti: "onboarding.teksti1" },
+  { ikona: ikonat.gershere, titulli: "onboarding.titulli1", teksti: "onboarding.teksti1" },
   { ikona: ikonat.kalendar, titulli: "onboarding.titulli2", teksti: "onboarding.teksti2" },
-  { ikona: ikonat.lokali, titulli: "onboarding.titulli3", teksti: "onboarding.teksti3" },
+  { ikona: ikonat.dhurate, titulli: "onboarding.titulli3", teksti: "onboarding.teksti3" },
 ] as const satisfies readonly { ikona: EmriIkones; titulli: string; teksti: string }[];
 
 export default function Onboarding() {

@@ -121,7 +121,7 @@ export default function TerminetEMia() {
               {skeda === "teArdhshme" && (
                 <>
                   <Text style={styles.boshTeksti}>{t("terminetEMia.boshTeksti")}</Text>
-                  <Butoni titulli={t("terminetEMia.zbulo")} ikona={ikonat.zbulo} onPress={() => router.navigate("/zbulo")} />
+                  <Butoni titulli={t("profiliLokalit.rezervo")} ikona={ikonat.kalendar} onPress={() => router.navigate("/studio")} />
                 </>
               )}
             </View>

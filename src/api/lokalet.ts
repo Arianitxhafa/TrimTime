@@ -1,13 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { supabase } from "../lib/supabase";
+import { STUDIO_ID } from "../lib/studio";
 import type {
-  IntervaliIOrarit,
   Koordinata,
   Lokali,
-  LokaliPrane,
   RoliNeLokal,
-  SherbimiIRi,
   TeDhenatELokalit,
 } from "../lib/tipet";
 import { celesat } from "./klienti";
@@ -22,7 +20,7 @@ export function pikaEWKT({ lat, lng }: Koordinata): string {
 
 export type LokaliIm = { lokali: Lokali; roli: RoliNeLokal } | null;
 
-// Lokali ku punon përdoruesi (si pronar ose berber), ose null nëse nuk ka.
+// Studio Burimi, kur përdoruesi punon aty (si pronar ose berber); null për klientët.
 export function useLokaliIm() {
   const { sesioni } = useAuth();
   const perdoruesiId = sesioni?.user.id;
@@ -35,6 +33,7 @@ export function useLokaliIm() {
         .from("anetaret_e_lokalit")
         .select("lokali_id, roli")
         .eq("profili_id", perdoruesiId!)
+        .eq("lokali_id", STUDIO_ID)
         .eq("aktiv", true)
         .order("krijuar_me", { ascending: true })
         .limit(1)
@@ -66,135 +65,6 @@ export function useLokali(id: string | undefined) {
       if (error) throw error;
       return data;
     },
-  });
-}
-
-export type ParametratEKerkimit = {
-  pika: Koordinata;
-  rrezjaKm: number;
-  kerkimi: string;
-  vetemHapur: boolean;
-  cmimiMax: number | null;
-  renditja: "distanca" | "cmimi" | "vleresimi";
-  // Harta kërkon më shumë rezultate se lista (serveri lejon deri në 300).
-  limit?: number;
-  // Lista e Zbulo: lokalet e këtij qyteti + ato brenda rrezes. Harta nuk e përdor.
-  qytetiId?: number | null;
-  // Filtrat e Zbulo; harta nuk i përdor.
-  sherbimi?: string | null;
-  vleresimiMin?: number | null;
-  distancaMaxKm?: number | null;
-  vetemOnline?: boolean;
-  vetemOferta?: boolean;
-};
-
-export type Qyteti = { id: number; emri: string; lat: number; lng: number; nr_lokaleve: number };
-
-export function useQytetet(aktiv = true) {
-  return useQuery({
-    queryKey: ["qytetet"],
-    enabled: aktiv,
-    staleTime: 60 * 60_000,
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("qytetet_me_lokale");
-      if (error) throw error;
-      return (data ?? []) as Qyteti[];
-    },
-  });
-}
-
-// Qyteti ku ndodhet një pikë (për titullin "Lokalet në …" dhe filtrin e zonës).
-export function useQytetiPrane(pika: Koordinata, aktiv = true) {
-  return useQuery({
-    queryKey: ["qyteti-prane", Math.round(pika.lat * 100) / 100, Math.round(pika.lng * 100) / 100],
-    enabled: aktiv,
-    staleTime: 10 * 60_000,
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .rpc("qyteti_prane", { p_lat: pika.lat, p_lng: pika.lng })
-        .maybeSingle<{ id: number; emri: string; distanca_m: number }>();
-      if (error) throw error;
-      return data;
-    },
-  });
-}
-
-export function useLokaletPrane(p: ParametratEKerkimit, aktiv = true) {
-  return useQuery({
-    queryKey: celesat.lokaletPrane(p),
-    enabled: aktiv,
-    // Rezultatet e mëparshme mbeten në ekran derisa të vijnë të rejat (pa "dridhje").
-    placeholderData: (meParshme) => meParshme,
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("lokalet_prane", {
-        p_lat: p.pika.lat,
-        p_lng: p.pika.lng,
-        p_rrezja_km: p.rrezjaKm,
-        p_kerkimi: p.kerkimi.trim() || null,
-        p_vetem_hapur: p.vetemHapur,
-        p_cmimi_max: p.cmimiMax,
-        p_renditja: p.renditja,
-        p_limit: p.limit ?? 50,
-        p_qyteti_id: p.qytetiId ?? null,
-        p_sherbimi: p.sherbimi ?? null,
-        p_vleresimi_min: p.vleresimiMin ?? null,
-        p_distanca_max_km: p.distancaMaxKm ?? null,
-        p_vetem_online: p.vetemOnline ?? false,
-        p_vetem_oferta: p.vetemOferta ?? false,
-      });
-      if (error) throw error;
-      return (data ?? []) as LokaliPrane[];
-    },
-  });
-}
-
-type KrijimiILokalit = {
-  teDhenat: TeDhenatELokalit;
-  orari: IntervaliIOrarit[];
-  sherbimet: SherbimiIRi[];
-};
-
-// Krijon lokalin, orarin dhe shërbimet e para. Pronari bëhet anëtar nga trigger-i në databazë.
-export function useKrijoLokalin() {
-  const { sesioni } = useAuth();
-  const klienti = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ teDhenat, orari, sherbimet }: KrijimiILokalit) => {
-      const perdoruesiId = sesioni?.user.id;
-      if (!perdoruesiId) throw new Error("Pa sesion");
-
-      const { data, error } = await supabase
-        .from("lokalet")
-        .insert({
-          pronari_id: perdoruesiId,
-          emri: teDhenat.emri,
-          pershkrimi: teDhenat.pershkrimi,
-          adresa: teDhenat.adresa,
-          qyteti: teDhenat.qyteti,
-          telefoni: teDhenat.telefoni,
-          vendndodhja: pikaEWKT(teDhenat.vendndodhja),
-        })
-        .select("id")
-        .single<{ id: string }>();
-      if (error) throw error;
-
-      const { error: gabimiOrarit } = await supabase.rpc("ruaj_orarin", {
-        p_lokali_id: data.id,
-        p_oraret: orari,
-      });
-      if (gabimiOrarit) throw gabimiOrarit;
-
-      if (sherbimet.length > 0) {
-        const { error: gabimiSherbimeve } = await supabase
-          .from("sherbimet")
-          .insert(sherbimet.map((s, i) => ({ ...s, lokali_id: data.id, renditja: i })));
-        if (gabimiSherbimeve) throw gabimiSherbimeve;
-      }
-
-      return data.id;
-    },
-    onSuccess: () => klienti.invalidateQueries({ queryKey: ["lokali-im"] }),
   });
 }
 

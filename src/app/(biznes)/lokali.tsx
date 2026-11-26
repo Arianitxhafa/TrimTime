@@ -55,12 +55,7 @@ function PaLokal({ gabim = false, onRiprovo }: { gabim?: boolean; onRiprovo?: ()
         {gabim ? (
           <Butoni titulli={t("zbulo.provoPerseri")} ikona={ikonat.kthe} onPress={() => onRiprovo?.()} />
         ) : (
-          <>
-            <Butoni titulli={t("lokali.krijo")} ikona={ikonat.shto} onPress={() => router.push("/lokali-i-ri")} />
-            <Pressable accessibilityRole="button" onPress={() => router.push("/bashkohu")} hitSlop={8}>
-              <Text style={styles.lidhja}>{t("lokali.keKod")}</Text>
-            </Pressable>
-          </>
+          <Butoni titulli={t("lokali.keKod")} ikona={ikonat.qr} onPress={() => router.push("/bashkohu")} />
         )}
       </View>
     </View>
