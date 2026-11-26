@@ -1,4 +1,3 @@
-import { usePathname } from "expo-router";
 import { NativeTabs } from "expo-router/native-tabs";
 import { Platform } from "react-native";
 import TabetWeb from "../../components/TabetWeb";
@@ -12,18 +11,7 @@ import { dataISO } from "../../lib/datat";
 export default function BiznesLayout() {
   const { t } = useTranslation();
   const { ngjyrat } = useTema();
-  // Çdo tab ka ngjyrën e vet kur zgjidhet, si te klienti: Sot portokalli, Kalendari blu,
-  // Klientët jeshile, Lokali rozë, Profili vjollcë.
-  const shtegu = usePathname();
-  const ngjyraETabit = shtegu.startsWith("/kalendari")
-    ? ngjyrat.blu
-    : shtegu.startsWith("/klientet")
-      ? ngjyrat.jeshile
-      : shtegu.startsWith("/lokali")
-        ? ngjyrat.roze
-        : shtegu.startsWith("/llogaria")
-          ? ngjyrat.vjollce
-          : ngjyrat.portokalli;
+  // Të gjitha tab-et kanë të njëjtën ngjyrë, atë të Studios: e zezë në dritë, e bardhë kockë në errësirë.
 
   // Rezervimet e sotme që presin konfirmim shfaqen si numër mbi tab-in Sot, në kohë reale.
   const lokaliId = useLokaliIm().data?.lokali.id;
@@ -49,7 +37,7 @@ export default function BiznesLayout() {
   // tab-it edhe kur gishti zhvendoset mbi to; tintColor mbetet si rezervë.
   return (
     <NativeTabs
-      tintColor={ngjyraETabit}
+      tintColor={ngjyrat.ari}
       iconColor={ngjyrat.tekstiZbehte}
       minimizeBehavior="onScrollDown"
       backgroundColor={ngjyrat.siperfaqja}
@@ -59,38 +47,38 @@ export default function BiznesLayout() {
         <NativeTabs.Trigger.Icon
           sf={{ default: "sun.max", selected: "sun.max.fill" }}
           md={ikonat.sot.android}
-          selectedColor={ngjyrat.portokalli}
+          selectedColor={ngjyrat.ari}
         />
-        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.portokalli }}>{t("tabs.sot")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.sot")}</NativeTabs.Trigger.Label>
         {nePritje > 0 ? <NativeTabs.Trigger.Badge>{String(nePritje)}</NativeTabs.Trigger.Badge> : null}
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="kalendari">
-        <NativeTabs.Trigger.Icon sf="calendar" md={ikonat.kalendar.android} selectedColor={ngjyrat.blu} />
-        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.blu }}>{t("tabs.kalendari")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="calendar" md={ikonat.kalendar.android} selectedColor={ngjyrat.ari} />
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.kalendari")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="klientet">
         <NativeTabs.Trigger.Icon
           sf={{ default: "person.2", selected: "person.2.fill" }}
           md={ikonat.klientet.android}
-          selectedColor={ngjyrat.jeshile}
+          selectedColor={ngjyrat.ari}
         />
-        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.jeshile }}>{t("tabs.klientet")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.klientet")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="lokali">
         <NativeTabs.Trigger.Icon
           sf={{ default: "storefront", selected: "storefront.fill" }}
           md={ikonat.lokali.android}
-          selectedColor={ngjyrat.roze}
+          selectedColor={ngjyrat.ari}
         />
-        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.roze }}>{t("tabs.lokali")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.lokali")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="llogaria">
         <NativeTabs.Trigger.Icon
           sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }}
           md={ikonat.personi.android}
-          selectedColor={ngjyrat.vjollce}
+          selectedColor={ngjyrat.ari}
         />
-        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.vjollce }}>{t("tabs.profili")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.profili")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );

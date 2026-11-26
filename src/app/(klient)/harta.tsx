@@ -1,3 +1,4 @@
+import { Image } from "expo-image";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -13,7 +14,7 @@ import { useStilet, useTema } from "../../context/TemaContext";
 import { useVendndodhjaIme } from "../../hooks/useVendndodhjaIme";
 import { formatoDistancen, formatoKohezgjatjen } from "../../lib/formatimi";
 import { prekja } from "../../lib/prekja";
-import { STUDIO_ID } from "../../lib/studio";
+import { FOTO_E_LOKALIT, STUDIO_ID } from "../../lib/studio";
 import { lidhjaEUdhezimeve } from "../../lib/vendndodhja";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
 
@@ -94,6 +95,19 @@ export default function Harta() {
             lineDashPattern={menyra === "kembe" ? [2, 10] : undefined}
           />
         ) : null}
+        {/* Rruga mbaron te rruga më e afërt me makinë; si te Google Maps, pikat e çojnë deri te dera. */}
+        {rruga.data && rruga.data.koordinatat.length > 0 ? (
+          <Polyline
+            coordinates={[
+              rruga.data.koordinatat[rruga.data.koordinatat.length - 1],
+              { latitude: studio.lat, longitude: studio.lng },
+            ]}
+            strokeColor={ngjyrat.portokalli}
+            strokeWidth={4}
+            lineCap="round"
+            lineDashPattern={[2, 8]}
+          />
+        ) : null}
         <Marker coordinate={{ latitude: studio.lat, longitude: studio.lng }} anchor={{ x: 0.5, y: 0.5 }} tracksViewChanges={false}>
           <View style={styles.shenjuesi}>
             <View style={styles.shenjuesiHapesira} />
@@ -113,9 +127,7 @@ export default function Harta() {
       <View style={[styles.siper, { top: insets.top + hapesira.sm }]} pointerEvents="box-none">
         <Xham style={styles.karta}>
           <View style={styles.kartaKoka}>
-            <View style={styles.ikonaStudios}>
-              <Ikona emri={ikonat.gershere} madhesia={16} ngjyra="#FFFFFF" />
-            </View>
+            <Image source={FOTO_E_LOKALIT} style={styles.fotoStudios} contentFit="cover" />
             <View style={styles.kartaTeksti}>
               <Text style={styles.emri} numberOfLines={1}>
                 {studio.emri}
@@ -256,13 +268,11 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       alignItems: "center",
       gap: hapesira.sm,
     },
-    ikonaStudios: {
-      width: 30,
-      height: 30,
-      borderRadius: 15,
-      backgroundColor: ngjyrat.portokalli,
-      alignItems: "center",
-      justifyContent: "center",
+    fotoStudios: {
+      width: 48,
+      height: 48,
+      borderRadius: 14,
+      borderCurve: "continuous",
     },
     kartaTeksti: {
       flex: 1,

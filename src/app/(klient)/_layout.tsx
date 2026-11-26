@@ -1,5 +1,4 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { usePathname } from "expo-router";
 import { NativeTabs } from "expo-router/native-tabs";
 import { Platform } from "react-native";
 import TabetWeb from "../../components/TabetWeb";
@@ -16,16 +15,7 @@ export default function KlientLayout() {
   const { t } = useTranslation();
   const { ngjyrat } = useTema();
   const klienti = useQueryClient();
-  // Çdo tab ka ngjyrën e vet kur zgjidhet: Studio ar, Harta portokalli, Terminet blu, Profili
-  // vjollcë (ekranet që hapen sipër mbajnë ngjyrën e Studios).
-  const shtegu = usePathname();
-  const ngjyraETabit = shtegu.startsWith("/harta")
-    ? ngjyrat.portokalli
-    : shtegu.startsWith("/terminet-e-mia")
-      ? ngjyrat.blu
-      : shtegu.startsWith("/profili")
-        ? ngjyrat.vjollce
-        : ngjyrat.ari;
+  // Të gjitha tab-et kanë të njëjtën ngjyrë, atë të Studios: e zezë në dritë, e bardhë kockë në errësirë.
 
   // Një dëgjues i vetëm për listën e pritjes, i hapur sa kohë klienti është brenda.
   const kurLirohet = useCallback(
@@ -65,7 +55,7 @@ export default function KlientLayout() {
     // Ngjyra vendoset te çdo tab (ikona + etiketa), që thjerrëza e Liquid Glass ta tregojë ngjyrën e
     // tab-it edhe kur gishti mbahet e zhvendoset mbi to; tintColor mbetet si rezervë.
     <NativeTabs
-      tintColor={ngjyraETabit}
+      tintColor={ngjyrat.ari}
       iconColor={ngjyrat.tekstiZbehte}
       minimizeBehavior="onScrollDown"
       backgroundColor={ngjyrat.siperfaqja}
@@ -78,21 +68,21 @@ export default function KlientLayout() {
         <NativeTabs.Trigger.Icon
           sf={{ default: "map", selected: "map.fill" }}
           md={ikonat.harta.android}
-          selectedColor={ngjyrat.portokalli}
+          selectedColor={ngjyrat.ari}
         />
-        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.portokalli }}>{t("tabs.harta")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.harta")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="terminet-e-mia">
-        <NativeTabs.Trigger.Icon sf="calendar" md={ikonat.kalendar.android} selectedColor={ngjyrat.blu} />
-        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.blu }}>{t("tabs.terminet")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="calendar" md={ikonat.kalendar.android} selectedColor={ngjyrat.ari} />
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.terminet")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profili">
         <NativeTabs.Trigger.Icon
           sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }}
           md={ikonat.personi.android}
-          selectedColor={ngjyrat.vjollce}
+          selectedColor={ngjyrat.ari}
         />
-        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.vjollce }}>{t("tabs.profili")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.profili")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );

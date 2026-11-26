@@ -24,7 +24,6 @@ import KartaEBesnikerise from "./KartaEBesnikerise";
 import KartaEVleresimit from "./KartaEVleresimit";
 import KopertinaELokalit from "./KopertinaELokalit";
 import KopertinaEStudios from "./KopertinaEStudios";
-import Xham from "./Xham";
 import { celesiIDites, RENDI_I_DITEVE } from "./RedaktoriIOrarit";
 import { useAuth } from "../context/AuthContext";
 import { useStilet, useTema } from "../context/TemaContext";
@@ -34,7 +33,7 @@ import { formatoCmimin, formatoKohezgjatjen } from "../lib/formatimi";
 import { pershkrimiIPromocionit, vlenSot } from "../lib/promocionet";
 import type { Lokali, Sherbimi } from "../lib/tipet";
 import { useHapUdhezimet } from "../api/udhezimet";
-import { FOTOT_E_STUDIOS, INSTAGRAMI, STUDIO_ID } from "../lib/studio";
+import { FOTO_E_LOKALIT, FOTOT_E_STUDIOS, INSTAGRAMI, STUDIO_ID } from "../lib/studio";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 
 type Props = {
@@ -259,7 +258,8 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
 
       {mundTeRezervoje && (
         <Animated.View entering={SlideInDown.springify().damping(18).delay(420)} style={[styles.fundiVendi, { bottom: insets.bottom + hapesira.sm + mbiTabet }]}>
-        <Xham style={styles.fundi}>
+        <View style={styles.fundi}>
+          {l.id === STUDIO_ID ? <Image source={FOTO_E_LOKALIT} style={styles.fundiFoto} contentFit="cover" /> : null}
           <View style={styles.fundiTeksti}>
             {l.cmimi_min !== null && (
               <Text style={styles.fundiCmimi}>{t("lokali.ngaCmimi", { cmimi: formatoCmimin(l.cmimi_min) })}</Text>
@@ -271,13 +271,13 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
             </Text>
           </View>
           <Butoni titulli={t("profiliLokalit.rezervo")} ikona={ikonat.kalendar} onPress={() => hapRezervimin()} style={styles.rezervo} />
-        </Xham>
+        </View>
         </Animated.View>
       )}
 
       {meTelefon && (
         <Animated.View entering={SlideInDown.springify().damping(18).delay(420)} style={[styles.fundiVendi, { bottom: insets.bottom + hapesira.sm + mbiTabet }]}>
-        <Xham style={styles.fundi}>
+        <View style={styles.fundi}>
           <View style={styles.fundiTeksti}>
             <Text style={styles.fundiCmimi}>{l.telefoni ? t("lokali.meTelefon") : t("lokali.paTermin")}</Text>
             <Text style={styles.fundiShenim}>
@@ -289,7 +289,7 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
           ) : (
             <Butoni titulli={t("profiliLokalit.udhezimet")} ikona={ikonat.harta} onPress={udhezimet} style={styles.rezervo} />
           )}
-        </Xham>
+        </View>
         </Animated.View>
       )}
     </View>
@@ -405,7 +405,7 @@ function Punimet({ lokaliId }: { lokaliId: string }) {
           style={styles.punimetScroll}
           contentContainerStyle={styles.punimet}
         >
-          {FOTOT_E_STUDIOS.map((burimi, i) => (
+          {FOTOT_E_STUDIOS.slice(1).map((burimi, i) => (
             <Animated.View key={i} entering={FadeInDown.delay(120 * i).duration(450)}>
               <Image source={burimi} style={styles.punimiIMadh} contentFit="cover" transition={250} />
             </Animated.View>
@@ -828,14 +828,29 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       left: hapesira.md,
       right: hapesira.md,
     },
+    // Shirit i plotë, jo xham: përmbajtja që kalon poshtë tij nuk duhet të lexohet përmes tij.
     fundi: {
       flexDirection: "row",
       alignItems: "center",
       gap: hapesira.md,
-      paddingLeft: hapesira.xl,
-      paddingRight: hapesira.md,
-      paddingVertical: hapesira.md,
-      borderRadius: 30,
+      padding: hapesira.sm,
+      paddingRight: hapesira.sm,
+      borderRadius: 26,
+      borderCurve: "continuous",
+      backgroundColor: ngjyrat.siperfaqja,
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: ngjyrat.kufiri,
+      shadowColor: "#000",
+      shadowOpacity: 0.18,
+      shadowRadius: 18,
+      shadowOffset: { width: 0, height: 8 },
+      elevation: 8,
+    },
+    fundiFoto: {
+      width: 52,
+      height: 52,
+      borderRadius: 18,
+      borderCurve: "continuous",
     },
     fundiTeksti: {
       flex: 1,
