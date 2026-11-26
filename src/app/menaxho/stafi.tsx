@@ -13,6 +13,7 @@ import { qrIFteses } from "../../lib/qr";
 import { useAuth } from "../../context/AuthContext";
 import { useStilet } from "../../context/TemaContext";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
+import HyrjaMeRadhe from "../../components/HyrjaMeRadhe";
 
 export default function MenaxhoStafin() {
   const { t } = useTranslation();
@@ -31,6 +32,7 @@ export default function MenaxhoStafin() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.permbajtja}>
+      <HyrjaMeRadhe>
       <GabimiIFormes
         mesazhi={fto.isError || ndrysho.isError ? t("pergjithshme.gabimPapritur") : null}
       />
@@ -93,6 +95,7 @@ export default function MenaxhoStafin() {
           )}
         </View>
       )}
+      </HyrjaMeRadhe>
     </ScrollView>
   );
 }

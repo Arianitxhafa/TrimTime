@@ -19,6 +19,7 @@ import { ditetEArdhshme, formatoDaten } from "../../lib/datat";
 import { planifikoKujtesat } from "../../lib/kujtesat";
 import type { OraELire, TerminiIKlientit } from "../../lib/tipet";
 import { hapesira, type Ngjyrat } from "../../theme";
+import HyrjaMeRadhe from "../../components/HyrjaMeRadhe";
 
 export default function Riplanifiko() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -66,6 +67,7 @@ function Zgjedhja({ termini }: { termini: TerminiIKlientit }) {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.permbajtja}>
+        <HyrjaMeRadhe>
         <Text style={styles.teksti}>
           {t("terminetEMia.ndryshoTeksti", {
             berberi: termini.berberi_emri.split(" ")[0],
@@ -94,6 +96,7 @@ function Zgjedhja({ termini }: { termini: TerminiIKlientit }) {
         </View>
 
         {riplanifiko.isError && <GabimiIFormes mesazhi={mesazhiIGabimitTeRezervimit(riplanifiko.error, t)} />}
+        </HyrjaMeRadhe>
       </ScrollView>
 
       <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>

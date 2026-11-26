@@ -27,6 +27,7 @@ import { ditetEArdhshme } from "../lib/datat";
 import { formatoCmimin, formatoKohezgjatjen } from "../lib/formatimi";
 import type { OraELire } from "../lib/tipet";
 import { hapesira, rrezja, type Ngjyrat } from "../theme";
+import HyrjaMeRadhe from "../components/HyrjaMeRadhe";
 
 function kthehu() {
   if (router.canGoBack()) router.back();
@@ -91,6 +92,7 @@ export default function ShtoTermin() {
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <ScrollView contentContainerStyle={styles.permbajtja} keyboardShouldPersistTaps="handled">
+        <HyrjaMeRadhe>
         {shto.isError && <GabimiIFormes mesazhi={mesazhiIGabimitTeRezervimit(shto.error, t)} />}
 
         <FushaTekstit
@@ -197,6 +199,7 @@ export default function ShtoTermin() {
             maxLength={500}
           />
         </View>
+        </HyrjaMeRadhe>
       </ScrollView>
 
       <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>

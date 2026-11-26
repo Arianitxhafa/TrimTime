@@ -24,6 +24,7 @@ import { useStilet, useTema } from "../../context/TemaContext";
 import { formatoKohezgjatjen, lexoCmimin } from "../../lib/formatimi";
 import type { Sherbimi } from "../../lib/tipet";
 import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import HyrjaMeRadhe from "../../components/HyrjaMeRadhe";
 
 const KOHEZGJATJET = [10, 15, 20, 25, 30, 40, 45, 50, 60, 75, 90, 120];
 
@@ -93,6 +94,7 @@ function Forma({ lokaliId, sherbimi, renditjaERe }: FormaProps) {
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <Stack.Screen options={{ title: t(sherbimi ? "sherbimet.ndrysho" : "sherbimet.iRi") }} />
       <ScrollView contentContainerStyle={styles.permbajtja} keyboardShouldPersistTaps="handled">
+        <HyrjaMeRadhe>
         <GabimiIFormes mesazhi={ruaj.isError ? t("pergjithshme.gabimPapritur") : gabimiFshirjes} />
         <FushaTekstit
           etiketa={t("sherbimet.emri")}
@@ -159,6 +161,7 @@ function Forma({ lokaliId, sherbimi, renditjaERe }: FormaProps) {
             onPress={() => setDialogu(true)}
           />
         )}
+        </HyrjaMeRadhe>
       </ScrollView>
 
       <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>

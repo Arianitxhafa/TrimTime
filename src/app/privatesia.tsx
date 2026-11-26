@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useStilet } from "../context/TemaContext";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
+import HyrjaMeRadhe from "../components/HyrjaMeRadhe";
 
 const SEKSIONET = [
   ["privatesia.cfareTitulli", "privatesia.cfareTeksti"],
@@ -18,6 +19,7 @@ export default function Privatesia() {
   const styles = useStilet(krijoStilet);
   return (
     <ScrollView style={styles.container} contentInsetAdjustmentBehavior="automatic" contentContainerStyle={styles.permbajtja}>
+      <HyrjaMeRadhe>
       <Text style={styles.data}>{t("privatesia.perditesuar")}</Text>
       <Text style={styles.hyrja}>{t("privatesia.hyrja")}</Text>
       {SEKSIONET.map(([titulli, teksti]) => (
@@ -26,6 +28,7 @@ export default function Privatesia() {
           <Text style={styles.teksti}>{t(teksti)}</Text>
         </View>
       ))}
+      </HyrjaMeRadhe>
     </ScrollView>
   );
 }

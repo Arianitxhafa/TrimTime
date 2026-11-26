@@ -8,6 +8,7 @@ import FushaTekstit from "../components/FushaTekstit";
 import { ikonat } from "../components/Ikona";
 import { useStilet } from "../context/TemaContext";
 import { hapesira, shkronjat, type Ngjyrat } from "../theme";
+import HyrjaMeRadhe from "../components/HyrjaMeRadhe";
 
 export default function Bashkohu() {
   const { t } = useTranslation();
@@ -22,6 +23,7 @@ export default function Bashkohu() {
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <ScrollView contentContainerStyle={styles.permbajtja} keyboardShouldPersistTaps="handled">
+        <HyrjaMeRadhe>
         <Text style={styles.titulli}>{t("stafi.bashkohuTitulli")}</Text>
         <Text style={styles.teksti}>{t("stafi.bashkohuTeksti")}</Text>
         <FushaTekstit
@@ -43,6 +45,7 @@ export default function Bashkohu() {
         />
         <Text style={styles.ose}>{t("qr.ftesaQr")}</Text>
         <Butoni titulli={t("qr.skano")} varianti="dytesor" ikona={ikonat.skano} onPress={() => router.push("/skano")} />
+        </HyrjaMeRadhe>
       </ScrollView>
     </KeyboardAvoidingView>
   );

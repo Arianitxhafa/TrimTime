@@ -12,6 +12,7 @@ import RedaktoriIOrarit, { orariEshteIVlefshem } from "../../components/Redaktor
 import { useStilet } from "../../context/TemaContext";
 import type { IntervaliIOrarit } from "../../lib/tipet";
 import { hapesira, type Ngjyrat } from "../../theme";
+import HyrjaMeRadhe from "../../components/HyrjaMeRadhe";
 
 export default function MenaxhoOrarin() {
   const lokaliIm = useLokaliIm();
@@ -36,8 +37,10 @@ function Redaktori({ lokaliId, fillestar }: { lokaliId: string; fillestar: Inter
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.permbajtja}>
+        <HyrjaMeRadhe>
         {ruaj.isError && <GabimiIFormes mesazhi={t("pergjithshme.gabimPapritur")} />}
         <RedaktoriIOrarit oraret={oraret} onNdrysho={setOraret} />
+        </HyrjaMeRadhe>
       </ScrollView>
       <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>
         <Butoni

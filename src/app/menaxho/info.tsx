@@ -25,6 +25,7 @@ import ZgjedhesiVendndodhjes from "../../components/ZgjedhesiVendndodhjes";
 import { useStilet, useTema } from "../../context/TemaContext";
 import type { Koordinata, Lokali } from "../../lib/tipet";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
+import HyrjaMeRadhe from "../../components/HyrjaMeRadhe";
 
 export default function MenaxhoInfon() {
   const lokaliIm = useLokaliIm();
@@ -101,6 +102,7 @@ function Forma({ lokali }: { lokali: Lokali }) {
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <ScrollView contentContainerStyle={styles.permbajtja} keyboardShouldPersistTaps="handled">
+        <HyrjaMeRadhe>
         <GabimiIFormes mesazhi={gabimiFotos ?? (perditeso.isError ? t("pergjithshme.gabimPapritur") : null)} />
 
         <Text style={styles.etiketa}>{t("info.kopertina")}</Text>
@@ -195,6 +197,7 @@ function Forma({ lokali }: { lokali: Lokali }) {
         />
 
         <RregullatERezervimit lokali={lokali} />
+        </HyrjaMeRadhe>
       </ScrollView>
 
       <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>

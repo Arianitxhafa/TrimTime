@@ -21,6 +21,7 @@ import { GabimiIFormes } from "../../components/KornizaAuth";
 import { useStilet, useTema } from "../../context/TemaContext";
 import type { Lokali } from "../../lib/tipet";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
+import HyrjaMeRadhe from "../../components/HyrjaMeRadhe";
 
 const VIZITAT = [5, 6, 8, 10, 12, 15];
 
@@ -59,6 +60,7 @@ function Forma({ lokali }: { lokali: Lokali }) {
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <ScrollView contentContainerStyle={styles.permbajtja} keyboardShouldPersistTaps="handled">
+        <HyrjaMeRadhe>
         <View style={styles.parapamja}>
           <View style={styles.parapamjaIkona}>
             <Ikona emri={ikonat.dhurate} madhesia={26} ngjyra={ngjyrat.mbiAri} />
@@ -116,6 +118,7 @@ function Forma({ lokali }: { lokali: Lokali }) {
           maxLength={80}
           gabimi={provuar ? gabimi : null}
         />
+        </HyrjaMeRadhe>
       </ScrollView>
 
       <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>

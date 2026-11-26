@@ -16,6 +16,7 @@ import { useStilet } from "../../context/TemaContext";
 import { ditetEArdhshme } from "../../lib/datat";
 import type { AnetariIStafit, OraELire, TerminiILokalit } from "../../lib/tipet";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
+import HyrjaMeRadhe from "../../components/HyrjaMeRadhe";
 
 export default function ZhvendosTerminin() {
   const { id, data } = useLocalSearchParams<{ id: string; data: string }>();
@@ -69,6 +70,7 @@ function Zgjedhja({ lokaliId, termini, berberet, dataEMeParshme }: Props) {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.permbajtja}>
+        <HyrjaMeRadhe>
         <Text style={styles.teksti}>{t("zhvendos.teksti", { klienti: termini.klienti_emri })}</Text>
 
         <Text style={styles.etiketa}>{t("rezervimi.berberi")}</Text>
@@ -110,6 +112,7 @@ function Zgjedhja({ lokaliId, termini, berberet, dataEMeParshme }: Props) {
             <GabimiIFormes mesazhi={mesazhiIGabimitTeRezervimit(zhvendos.error, t)} />
           </View>
         )}
+        </HyrjaMeRadhe>
       </ScrollView>
 
       <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>

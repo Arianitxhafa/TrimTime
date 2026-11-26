@@ -25,6 +25,7 @@ import { useStilet, useTema } from "../../context/TemaContext";
 import { dataISO } from "../../lib/datat";
 import type { Promocioni, Sherbimi } from "../../lib/tipet";
 import { hapesira, rrezja, type Ngjyrat } from "../../theme";
+import HyrjaMeRadhe from "../../components/HyrjaMeRadhe";
 
 const PERQINDJET = [5, 10, 15, 20, 25, 30, 40, 50];
 const ORA = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -110,6 +111,7 @@ function Forma({ lokaliId, promocioni, sherbimet }: FormaProps) {
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <Stack.Screen options={{ title: t(promocioni ? "promocionet.ndrysho" : "promocionet.ri") }} />
       <ScrollView contentContainerStyle={styles.permbajtja} keyboardShouldPersistTaps="handled">
+        <HyrjaMeRadhe>
         <GabimiIFormes mesazhi={ruaj.isError || fshi.isError ? t("pergjithshme.gabimPapritur") : null} />
 
         <FushaTekstit
@@ -227,6 +229,7 @@ function Forma({ lokaliId, promocioni, sherbimet }: FormaProps) {
         {promocioni && (
           <Butoni titulli={t("promocionet.fshi")} varianti="rrezik" ngarkohet={fshi.isPending} onPress={() => setDialogu(true)} />
         )}
+        </HyrjaMeRadhe>
       </ScrollView>
 
       <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>

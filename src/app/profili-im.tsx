@@ -10,6 +10,7 @@ import { useAuth } from "../context/AuthContext";
 import { useStilet } from "../context/TemaContext";
 import { prekja } from "../lib/prekja";
 import { hapesira, shkronjat, type Ngjyrat } from "../theme";
+import HyrjaMeRadhe from "../components/HyrjaMeRadhe";
 
 // Emri dhe telefoni i përdoruesit: telefoni i duhet lokalit për ta kontaktuar për terminin.
 export default function ProfiliIm() {
@@ -46,6 +47,7 @@ export default function ProfiliIm() {
   return (
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <ScrollView contentContainerStyle={styles.permbajtja} keyboardShouldPersistTaps="handled">
+        <HyrjaMeRadhe>
         <Text style={styles.email}>{sesioni?.user.email}</Text>
         <GabimiIFormes mesazhi={gabimi} />
         <FushaTekstit
@@ -72,6 +74,7 @@ export default function ProfiliIm() {
         />
         <Text style={styles.shenim}>{t("profili.telefoniTeksti")}</Text>
         <Butoni titulli={t("profili.ruaj")} onPress={ruaj} ngarkohet={ngarkohet} />
+        </HyrjaMeRadhe>
       </ScrollView>
     </KeyboardAvoidingView>
   );

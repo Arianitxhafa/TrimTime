@@ -8,6 +8,7 @@ import KartaQr from "../../components/KartaQr";
 import { useStilet } from "../../context/TemaContext";
 import { qrILokalit } from "../../lib/qr";
 import { hapesira, type Ngjyrat } from "../../theme";
+import HyrjaMeRadhe from "../../components/HyrjaMeRadhe";
 
 // QR-ja e lokalit për t'u printuar: klientët e skanojnë për profilin dhe për check-in.
 export default function QrILokalit() {
@@ -24,13 +25,15 @@ export default function QrILokalit() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.permbajtja}>
-      <KartaQr vlera={lidhja} titulli={lokali.emri} nentitulli="TRIMTIME" />
+      <HyrjaMeRadhe>
+      <KartaQr vlera={lidhja} titulli={lokali.emri} nentitulli="STUDIO BURIMI" />
       <Text style={styles.teksti}>{t("qr.teksti")}</Text>
       <Butoni
         titulli={t("qr.ndaj")}
         ikona={ikonat.ndaj}
         onPress={() => Share.share({ message: `${lokali.emri}\n${lidhja}` })}
       />
+      </HyrjaMeRadhe>
     </ScrollView>
   );
 }

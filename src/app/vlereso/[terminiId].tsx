@@ -15,6 +15,7 @@ import { useStilet, useTema } from "../../context/TemaContext";
 import { formatoDaten } from "../../lib/datat";
 import type { TerminiIKlientit } from "../../lib/tipet";
 import { hapesira, shkronjat, type Ngjyrat } from "../../theme";
+import HyrjaMeRadhe from "../../components/HyrjaMeRadhe";
 
 export default function Vlereso() {
   const { terminiId } = useLocalSearchParams<{ terminiId: string }>();
@@ -57,6 +58,7 @@ function Forma({ termini }: { termini: TerminiIKlientit }) {
         contentContainerStyle={[styles.permbajtja, { paddingBottom: insets.bottom + hapesira.xxl }]}
         keyboardShouldPersistTaps="handled"
       >
+        <HyrjaMeRadhe>
         <Text style={styles.titulli}>{t("vleresimet.vleresoTitulli")}</Text>
         <Text style={styles.nentitulli}>
           {t("vleresimet.vleresoTeksti", { sherbimi: termini.sherbimi_emri, lokali: termini.lokali_emri })}
@@ -87,6 +89,7 @@ function Forma({ termini }: { termini: TerminiIKlientit }) {
           ngarkohet={vlereso.isPending}
           onPress={() => vlereso.mutate({ terminiId: termini.id, yjet, komenti })}
         />
+        </HyrjaMeRadhe>
       </ScrollView>
     </KeyboardAvoidingView>
   );
