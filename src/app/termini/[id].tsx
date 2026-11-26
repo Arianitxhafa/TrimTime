@@ -3,6 +3,8 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, { FadeInDown, LinearTransition, ZoomIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokaliIm } from "../../api/lokalet";
 import { useFotoEStilit } from "../../api/stili";
@@ -25,7 +27,8 @@ import { useStilet, useTema } from "../../context/TemaContext";
 import { dataISO, formatoDaten } from "../../lib/datat";
 import { formatoCmimin, formatoKohezgjatjen } from "../../lib/formatimi";
 import type { StatusiTerminit, TerminiILokalit } from "../../lib/tipet";
-import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
+import { FOTO_E_LOKALIT } from "../../lib/studio";
+import { hapesira, rrezja, shkronjat, statusetMetaErrta, type Ngjyrat } from "../../theme";
 
 function kthehu() {
   if (router.canGoBack()) router.back();
@@ -68,24 +71,47 @@ export default function DetajetTerminit() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={[styles.permbajtja, { paddingBottom: insets.bottom + hapesira.xxl }]}>
-        <View style={styles.hero}>
-          <Avatar emri={termini.klienti_emri} madhesia={76} />
-          <Text style={styles.emri}>{termini.klienti_emri}</Text>
-          <BadgeStatusi statusi={statusi} />
+        <Animated.View entering={FadeInDown.springify().damping(16)} style={styles.hero}>
+          <Image source={FOTO_E_LOKALIT} style={StyleSheet.absoluteFill} contentFit="cover" />
+          <LinearGradient colors={["rgba(0,0,0,0.3)", "rgba(0,0,0,0.9)"]} style={StyleSheet.absoluteFill} />
+          <View style={styles.heroKoka}>
+            <View>
+              <Text style={styles.heroOra}>{termini.ora_lokale}</Text>
+              <Text style={styles.heroData}>
+                {formatoDaten(data, t)} · {formatoKohezgjatjen(termini.kohezgjatja_min)}
+              </Text>
+            </View>
+            {/* `key` e rinis animacionin sa herë ndryshon statusi. */}
+            <Animated.View key={statusi} entering={ZoomIn.springify().damping(12)}>
+              <BadgeStatusi statusi={statusi} />
+            </Animated.View>
+          </View>
+          <View style={styles.heroKlienti}>
+            <Avatar emri={termini.klienti_emri} madhesia={48} />
+            <View style={styles.heroKlientiTeksti}>
+              <Text style={styles.emri} numberOfLines={1}>
+                {termini.klienti_emri}
+              </Text>
+              <Text style={styles.heroSherbimi} numberOfLines={1}>
+                {termini.sherbimi_emri} · {termini.berberi_emri.split(" ")[0]}
+              </Text>
+            </View>
+          </View>
+          <Rrugetimi statusi={statusi} />
           {termini.arriti_me && (statusi === "ne_pritje" || statusi === "konfirmuar") ? (
             <View style={styles.arriti}>
-              <Ikona emri={ikonat.skano} madhesia={14} ngjyra={ngjyrat.mbiAri} />
+              <Ikona emri={ikonat.skano} madhesia={14} ngjyra="#0A0A0A" />
               <Text style={styles.arritiTeksti}>
                 {t("qr.arriti")} ·{" "}
                 {new Date(termini.arriti_me).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
               </Text>
             </View>
           ) : null}
-        </View>
+        </Animated.View>
 
         {ndrysho.isError && <GabimiIFormes mesazhi={mesazhiIGabimitTeRezervimit(ndrysho.error, t)} />}
 
-        <View style={styles.rrjeta}>
+        <Animated.View entering={FadeInDown.delay(120).duration(420)} style={styles.rrjeta}>
           <Info ikona={ikonat.kalendar} etiketa={formatoDaten(data, t)} vlera={termini.ora_lokale} />
           <Info
             ikona={ikonat.kohezgjatja}
@@ -105,7 +131,7 @@ export default function DetajetTerminit() {
             vlera={termini.klienti_telefoni ?? t("termini.paNumer")}
             gjere
           />
-        </View>
+        </Animated.View>
 
         {termini.foto_stili ? <FotoEStilit shtegu={termini.foto_stili} /> : null}
 
@@ -119,10 +145,15 @@ export default function DetajetTerminit() {
           </View>
         ) : null}
 
-        {statusi !== "anuluar" && statusi !== "nuk_erdhi" && <Pagesa termini={termini} />}
+        {statusi !== "anuluar" && statusi !== "nuk_erdhi" && (
+          <Animated.View entering={FadeInDown.delay(200).duration(420)}>
+            <Pagesa termini={termini} />
+          </Animated.View>
+        )}
 
+        <Animated.View entering={FadeInDown.delay(260).duration(420)}>
         <Text style={styles.seksioni}>{t("termini.veprimet")}</Text>
-        <View style={styles.veprimet}>
+        <Animated.View layout={LinearTransition.springify().damping(18)} style={styles.veprimet}>
           {statusi === "ne_pritje" && (
             <Butoni
               titulli={t("termini.konfirmo")}
@@ -185,7 +216,8 @@ export default function DetajetTerminit() {
               onPress={() => setDialogu(true)}
             />
           )}
-        </View>
+        </Animated.View>
+        </Animated.View>
       </ScrollView>
 
       <DialogKonfirmimi
@@ -205,6 +237,43 @@ export default function DetajetTerminit() {
 }
 
 // Fotoja që klienti bashkëngjiti gjatë rezervimit (nga bucket-i privat, me lidhje të përkohshme).
+const HAPAT: StatusiTerminit[] = ["ne_pritje", "konfirmuar", "perfunduar"];
+
+// Rrugëtimi i terminit: Në pritje → Konfirmuar → Përfunduar. Vijat mbushen me sustë kur ndryshon
+// statusi; një termin i anuluar ose pa ardhje e mbush gjithë vijën me të kuqe.
+function Rrugetimi({ statusi }: { statusi: StatusiTerminit }) {
+  const { t } = useTranslation();
+  // Karta është gjithmonë e errët (mbi foto), ndaj ngjyrat e statuseve janë ato të errësirës.
+  const statusetMeta = statusetMetaErrta;
+  const styles = useStilet(krijoStilet);
+  const iMbyllur = statusi === "anuluar" || statusi === "nuk_erdhi";
+  const indeksi = iMbyllur ? HAPAT.length - 1 : HAPAT.indexOf(statusi);
+
+  return (
+    <View style={styles.rrugetimi}>
+      {HAPAT.map((h, i) => (
+        <View key={h} style={styles.rrugetimiHapi}>
+          <View style={styles.rrugetimiVija}>
+            <Animated.View
+              layout={LinearTransition.springify().damping(18)}
+              style={[
+                styles.rrugetimiMbushja,
+                {
+                  width: i <= indeksi ? "100%" : "0%",
+                  backgroundColor: iMbyllur ? statusetMeta[statusi].ngjyra : statusetMeta[h].ngjyra,
+                },
+              ]}
+            />
+          </View>
+          <Text style={[styles.rrugetimiTeksti, i <= indeksi && styles.rrugetimiTekstiAktiv]} numberOfLines={1}>
+            {iMbyllur && i === HAPAT.length - 1 ? t(`statuset.${statusi}`) : t(`statuset.${h}`)}
+          </Text>
+        </View>
+      ))}
+    </View>
+  );
+}
+
 function FotoEStilit({ shtegu }: { shtegu: string }) {
   const { t } = useTranslation();
   const { ngjyrat } = useTema();
@@ -390,16 +459,78 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       padding: hapesira.xl,
     },
     hero: {
+      borderRadius: rrezja.lg,
+      borderCurve: "continuous",
+      overflow: "hidden",
+      padding: hapesira.lg,
+      gap: hapesira.lg,
+      marginBottom: hapesira.lg,
+      backgroundColor: "#0A0A0A",
+    },
+    heroKoka: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      justifyContent: "space-between",
+      paddingTop: hapesira.xl,
+    },
+    heroOra: {
+      ...shkronjat.titull,
+      color: "#FFFFFF",
+      fontSize: 52,
+      lineHeight: 56,
+      letterSpacing: -1.8,
+      fontWeight: "800",
+      fontVariant: ["tabular-nums"],
+    },
+    heroData: {
+      ...shkronjat.etiketeBold,
+      color: "rgba(255,255,255,0.8)",
+      fontSize: 15,
+    },
+    heroKlienti: {
+      flexDirection: "row",
       alignItems: "center",
       gap: hapesira.md,
-      paddingVertical: hapesira.xl,
+    },
+    heroKlientiTeksti: {
+      flex: 1,
+    },
+    heroSherbimi: {
+      color: "rgba(255,255,255,0.75)",
+      fontSize: 14,
+      marginTop: 2,
     },
     emri: {
       ...shkronjat.titull,
-      color: ngjyrat.teksti,
-      fontSize: 26,
+      color: "#FFFFFF",
+      fontSize: 22,
       letterSpacing: -0.3,
-      textAlign: "center",
+    },
+    rrugetimi: {
+      flexDirection: "row",
+      gap: hapesira.sm,
+    },
+    rrugetimiHapi: {
+      flex: 1,
+      gap: 6,
+    },
+    rrugetimiVija: {
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: "rgba(255,255,255,0.22)",
+      overflow: "hidden",
+    },
+    rrugetimiMbushja: {
+      height: 4,
+      borderRadius: 2,
+    },
+    rrugetimiTeksti: {
+      ...shkronjat.etiketeBold,
+      color: "rgba(255,255,255,0.5)",
+      fontSize: 12,
+    },
+    rrugetimiTekstiAktiv: {
+      color: "#FFFFFF",
     },
     rrjeta: {
       flexDirection: "row",
@@ -478,14 +609,15 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     arriti: {
       flexDirection: "row",
       alignItems: "center",
+      alignSelf: "flex-start",
       gap: 6,
       paddingHorizontal: 12,
       height: 30,
       borderRadius: rrezja.plote,
-      backgroundColor: ngjyrat.ari,
+      backgroundColor: "#F4F1EA",
     },
     arritiTeksti: {
-      color: ngjyrat.mbiAri,
+      color: "#0A0A0A",
       fontSize: 13,
       fontWeight: "800",
     },
