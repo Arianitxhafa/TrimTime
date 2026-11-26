@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import Animated, { withDelay, withSpring, withTiming } from "react-native-reanimated";
+
 import { useAnalitika } from "../../api/biznesi";
 import { useLokaliIm } from "../../api/lokalet";
 import Butoni from "../../components/Butoni";
@@ -11,6 +13,20 @@ import { dataISO, ngaISO, shtoDite } from "../../lib/datat";
 import { formatoCmimin } from "../../lib/formatimi";
 import type { Analitika } from "../../lib/tipet";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
+
+// Shtylla e grafikut rritet nga poshtë, njëra pas tjetrës.
+function rritet(vonesa: number) {
+  return () => {
+    "worklet";
+    return {
+      initialValues: { opacity: 0, transform: [{ scaleY: 0 }] },
+      animations: {
+        opacity: withDelay(vonesa, withTiming(1, { duration: 250 })),
+        transform: [{ scaleY: withDelay(vonesa, withSpring(1, { damping: 14 })) }],
+      },
+    };
+  };
+}
 
 type Periudha = "d7" | "d30" | "muaji";
 
@@ -116,12 +132,13 @@ function Permbajtja({ a, nga, deri }: { a: Analitika; nga: string; deri: string 
 
       <Text style={styles.seksioni}>{t("analitika.sipasDites")}</Text>
       <View style={styles.grafiku}>
-        {ditet.map((d) => (
+        {ditet.map((d, i) => (
           <View key={d.data} style={styles.kolonaEGrafikut}>
-            <View
+            <Animated.View
+              entering={rritet(Math.min(i, 30) * 25)}
               style={[
                 styles.shtylla,
-                { height: `${Math.max(2, (d.te_ardhura / maxDite) * 100)}%`, opacity: d.te_ardhura ? 1 : 0.25 },
+                { height: `${Math.max(2, (d.te_ardhura / maxDite) * 100)}%`, opacity: d.te_ardhura ? 1 : 0.25, transformOrigin: "bottom" },
               ]}
             />
             {ditet.length <= 7 && <Text style={styles.etiketaEShtylles}>{ngaISO(d.data).getDate()}</Text>}

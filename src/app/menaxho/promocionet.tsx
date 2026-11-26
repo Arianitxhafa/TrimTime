@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { useLokaliIm } from "../../api/lokalet";
 import { usePromocionet } from "../../api/promocionet";
 import { useSherbimet } from "../../api/sherbimet";
@@ -37,8 +38,8 @@ export default function Promocionet() {
       ) : (
         <View style={styles.grupi}>
           {promocionet.data.map((p, i) => (
+            <Animated.View key={p.id} entering={FadeInDown.delay(Math.min(i, 10) * 50).duration(380)}>
             <Pressable
-              key={p.id}
               accessibilityRole="button"
               onPress={() => router.push({ pathname: "/menaxho/promocioni", params: { id: p.id } })}
               style={({ pressed }) => [styles.rreshti, i > 0 && styles.meKufi, pressed && styles.shtypur]}
@@ -57,6 +58,7 @@ export default function Promocionet() {
               </View>
               <Ikona emri={ikonat.djathtas} madhesia={16} ngjyra={ngjyrat.tekstiZbehte} />
             </Pressable>
+            </Animated.View>
           ))}
         </View>
       )}

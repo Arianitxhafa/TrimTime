@@ -1,8 +1,19 @@
 import { Image } from "expo-image";
 import { router, type Href } from "expo-router";
 import { useTranslation } from "react-i18next";
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet, Switch, Text, View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import Animated, {
+  Extrapolation,
+  FadeInDown,
+  interpolate,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  ZoomIn,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useShtypja } from "../../hooks/useShtypja";
 import { useLokaliIm, usePerditesoLokalin } from "../../api/lokalet";
 import { useOrari } from "../../api/orari";
 import { useSherbimet } from "../../api/sherbimet";
@@ -74,16 +85,34 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
   const perditeso = usePerditesoLokalin(lokali.id);
   const perdoruesiId = useAuth().sesioni?.user.id;
 
+  const scrollY = useSharedValue(0);
+  const neScroll = useAnimatedScrollHandler((e) => {
+    scrollY.set(e.contentOffset.y);
+  });
+  // Kopertina ngrihet më ngadalë se lista dhe zmadhohet kur tërhiqet poshtë.
+  const stiliIKopertines = useAnimatedStyle(() => {
+    const y = scrollY.get();
+    return {
+      transform: [
+        { translateY: y > 0 ? y * 0.45 : y / 2 },
+        { scale: interpolate(y, [-200, 0], [1.4, 1], Extrapolation.CLAMP) },
+      ],
+    };
+  });
+
   const kaSherbime = (sherbimet.data ?? []).some((s) => s.aktiv);
   const kaOrar = (orari.data ?? []).length > 0;
   const mundTePublikohet = kaSherbime && kaOrar;
 
   return (
-    <ScrollView
+    <Animated.ScrollView
       style={styles.container}
-      contentContainerStyle={{ paddingBottom: hapesira.xxl }}
+      onScroll={neScroll}
+      scrollEventThrottle={16}
+      contentContainerStyle={{ paddingBottom: insets.bottom + 96 }}
     >
-      <View style={[styles.kopertina, { paddingTop: insets.top }]}>
+      <View style={[styles.kopertina, { height: 240 + insets.top }]}>
+        <Animated.View style={[StyleSheet.absoluteFill, stiliIKopertines]}>
         {lokali.kopertina_url ? (
           <Image source={{ uri: lokali.kopertina_url }} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
         ) : lokali.id === STUDIO_ID ? (
@@ -93,11 +122,17 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
             <Ikona emri={ikonat.gershere} madhesia={48} ngjyra={ngjyrat.ari} />
           </View>
         )}
+        </Animated.View>
+        <LinearGradient
+          colors={["rgba(0,0,0,0.35)", "rgba(0,0,0,0)", ngjyrat.sfondi]}
+          locations={[0, 0.4, 1]}
+          style={StyleSheet.absoluteFill}
+        />
       </View>
 
       <View style={styles.permbajtja}>
         <View style={styles.koka}>
-          <View style={styles.logo}>
+          <Animated.View entering={ZoomIn.springify().damping(13)} style={styles.logo}>
             {lokali.logo_url ? (
               <Image source={{ uri: lokali.logo_url }} style={StyleSheet.absoluteFill} contentFit="cover" />
             ) : lokali.id === STUDIO_ID ? (
@@ -105,7 +140,7 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
             ) : (
               <Text style={styles.logoShkronja}>{lokali.emri.charAt(0).toUpperCase()}</Text>
             )}
-          </View>
+          </Animated.View>
           <Text style={styles.emri}>{lokali.emri}</Text>
           <Text style={styles.adresa}>
             {lokali.adresa}, {lokali.qyteti}
@@ -113,7 +148,7 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
         </View>
 
         {eshtePronar ? (
-          <View style={styles.karta}>
+          <Animated.View entering={FadeInDown.delay(120).duration(420)} style={styles.karta}>
             <View style={styles.publikimi}>
               <View style={[styles.pika, { backgroundColor: lokali.i_publikuar ? "#3DD68C" : ngjyrat.tekstiZbehte }]} />
               <View style={styles.publikimiTeksti}>
@@ -142,7 +177,7 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
                 <Kushti iPlotesuar={Boolean(lokali.kopertina_url)} teksti={t("lokali.kushtiFoto")} />
               </View>
             )}
-          </View>
+          </Animated.View>
         ) : (
           <View style={styles.karta}>
             <Text style={styles.kartaTitulli}>{t("lokali.jeBerber")}</Text>
@@ -151,64 +186,64 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
         )}
 
         <Text style={styles.seksioni}>{t("lokali.menaxho")}</Text>
-        <View style={styles.grupi}>
-          {eshtePronar && (
-            <>
-              <Rreshti ikona={ikonat.lokali} titulli={t("lokali.info")} href="/menaxho/info" />
-              <Rreshti ikona={ikonat.ora} titulli={t("lokali.orari")} href="/menaxho/orari" meKufi />
-              <Rreshti
-                ikona={ikonat.gershere}
-                titulli={t("lokali.sherbimet")}
-                vlera={sherbimet.data ? String(sherbimet.data.length) : undefined}
-                href="/menaxho/sherbimet"
-                meKufi
-              />
-            </>
-          )}
-          <Rreshti ikona={ikonat.klientet} titulli={t("lokali.stafi")} href="/menaxho/stafi" meKufi={eshtePronar} />
-          {perdoruesiId && (
-            <Rreshti
-              ikona={ikonat.ora}
-              titulli={t("berberi.orariIm")}
-              href={{ pathname: "/menaxho/berberi/[id]", params: { id: perdoruesiId } }}
-              meKufi
-            />
-          )}
-          <Rreshti ikona={ikonat.kamera} titulli={t("portofoli.titulli")} href="/menaxho/portofoli" meKufi />
-          <Rreshti ikona={ikonat.qr} titulli={t("qr.titulli")} href="/menaxho/qr" meKufi />
-          <Rreshti
-            ikona={ikonat.yll}
-            titulli={t("lokali.vleresimet")}
-            vlera={
-              lokali.vleresimi_mesatar != null && lokali.nr_vleresimeve > 0
-                ? `★ ${Number(lokali.vleresimi_mesatar).toFixed(1)} · ${lokali.nr_vleresimeve}`
-                : undefined
-            }
-            href={{ pathname: "/vleresimet/[lokaliId]", params: { lokaliId: lokali.id } }}
-            meKufi
-          />
-          {eshtePronar && (
-            <>
-              <Rreshti ikona={ikonat.etiketa} titulli={t("lokali.promocionet")} href="/menaxho/promocionet" meKufi />
-              <Rreshti
-                ikona={ikonat.dhurate}
-                titulli={t("lokali.besnikeria")}
-                vlera={lokali.besnikeria_aktive ? `${lokali.besnikeria_vizita}+1` : undefined}
-                href="/menaxho/besnikeria"
-                meKufi
-              />
-              <Rreshti ikona={ikonat.grafik} titulli={t("analitika.titulli")} href="/menaxho/analitika" meKufi />
-            </>
-          )}
-          <Rreshti
-            ikona={ikonat.zbulo}
-            titulli={t("lokali.shikoPublik")}
-            href={{ pathname: "/lokali/[id]", params: { id: lokali.id } }}
-            meKufi
-          />
+        <View style={styles.pllakat}>
+          {[
+            ...(eshtePronar
+              ? [
+                  { ikona: ikonat.lokali, titulli: t("lokali.info"), href: "/menaxho/info" as Href },
+                  { ikona: ikonat.ora, titulli: t("lokali.orari"), href: "/menaxho/orari" as Href },
+                  {
+                    ikona: ikonat.gershere,
+                    titulli: t("lokali.sherbimet"),
+                    vlera: sherbimet.data ? String(sherbimet.data.length) : undefined,
+                    href: "/menaxho/sherbimet" as Href,
+                  },
+                ]
+              : []),
+            { ikona: ikonat.klientet, titulli: t("lokali.stafi"), href: "/menaxho/stafi" as Href },
+            ...(perdoruesiId
+              ? [
+                  {
+                    ikona: ikonat.kalendar,
+                    titulli: t("berberi.orariIm"),
+                    href: { pathname: "/menaxho/berberi/[id]", params: { id: perdoruesiId } } as Href,
+                  },
+                ]
+              : []),
+            { ikona: ikonat.kamera, titulli: t("portofoli.titulli"), href: "/menaxho/portofoli" as Href },
+            { ikona: ikonat.qr, titulli: t("qr.titulli"), href: "/menaxho/qr" as Href },
+            {
+              ikona: ikonat.yll,
+              titulli: t("lokali.vleresimet"),
+              vlera:
+                lokali.vleresimi_mesatar != null && lokali.nr_vleresimeve > 0
+                  ? `★ ${Number(lokali.vleresimi_mesatar).toFixed(1)}`
+                  : undefined,
+              href: { pathname: "/vleresimet/[lokaliId]", params: { lokaliId: lokali.id } } as Href,
+            },
+            ...(eshtePronar
+              ? [
+                  { ikona: ikonat.etiketa, titulli: t("lokali.promocionet"), href: "/menaxho/promocionet" as Href },
+                  {
+                    ikona: ikonat.dhurate,
+                    titulli: t("lokali.besnikeria"),
+                    vlera: lokali.besnikeria_aktive ? `${lokali.besnikeria_vizita}+1` : undefined,
+                    href: "/menaxho/besnikeria" as Href,
+                  },
+                  { ikona: ikonat.grafik, titulli: t("analitika.titulli"), href: "/menaxho/analitika" as Href },
+                ]
+              : []),
+            {
+              ikona: ikonat.zbulo,
+              titulli: t("lokali.shikoPublik"),
+              href: { pathname: "/lokali/[id]", params: { id: lokali.id } } as Href,
+            },
+          ].map((a, i) => (
+            <Pllaka key={a.titulli} {...a} vonesa={180 + i * 45} />
+          ))}
         </View>
       </View>
-    </ScrollView>
+    </Animated.ScrollView>
   );
 }
 
@@ -227,30 +262,42 @@ function Kushti({ iPlotesuar, teksti }: { iPlotesuar: boolean; teksti: string })
   );
 }
 
-type RreshtiProps = {
+type PllakaProps = {
   ikona: EmriIkones;
   titulli: string;
   href: Href;
   vlera?: string;
-  meKufi?: boolean;
+  vonesa: number;
 };
 
-function Rreshti({ ikona, titulli, href, vlera, meKufi = false }: RreshtiProps) {
+// Pllakë e menysë: ikona në rreth, titulli dhe një vlerë e shkurtër; zvogëlohet pak nën gisht.
+function Pllaka({ ikona, titulli, href, vlera, vonesa }: PllakaProps) {
   const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
+  const shtypja = useShtypja(0.95);
   return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={() => router.push(href)}
-      style={({ pressed }) => [styles.rreshti, meKufi && styles.rreshtiMeKufi, pressed && styles.shtypur]}
-    >
-      <View style={styles.rreshtiIkona}>
-        <Ikona emri={ikona} madhesia={18} ngjyra={ngjyrat.ari} />
-      </View>
-      <Text style={styles.rreshtiTitulli}>{titulli}</Text>
-      {vlera ? <Text style={styles.rreshtiVlera}>{vlera}</Text> : null}
-      <Ikona emri={ikonat.djathtas} madhesia={16} ngjyra={ngjyrat.tekstiZbehte} />
-    </Pressable>
+    <Animated.View entering={FadeInDown.delay(vonesa).duration(400)} style={styles.pllakaVendi}>
+      <Animated.View style={shtypja.stili}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={vlera ? `${titulli}, ${vlera}` : titulli}
+          onPressIn={shtypja.onPressIn}
+          onPressOut={shtypja.onPressOut}
+          onPress={() => router.push(href)}
+          style={styles.pllaka}
+        >
+          <View style={styles.pllakaKoka}>
+            <View style={styles.rreshtiIkona}>
+              <Ikona emri={ikona} madhesia={18} ngjyra={ngjyrat.ari} />
+            </View>
+            {vlera ? <Text style={styles.rreshtiVlera}>{vlera}</Text> : null}
+          </View>
+          <Text style={styles.pllakaTitulli} numberOfLines={2}>
+            {titulli}
+          </Text>
+        </Pressable>
+      </Animated.View>
+    </Animated.View>
   );
 }
 
@@ -309,8 +356,38 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       textAlign: "center",
     },
     kopertina: {
-      height: 190,
-      backgroundColor: ngjyrat.siperfaqja2,
+      overflow: "hidden",
+      backgroundColor: "#0A0A0A",
+    },
+    pllakat: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "space-between",
+      rowGap: hapesira.sm,
+    },
+    pllakaVendi: {
+      width: "48.5%",
+    },
+    pllaka: {
+      minHeight: 104,
+      backgroundColor: ngjyrat.siperfaqja,
+      borderRadius: rrezja.lg,
+      borderCurve: "continuous",
+      borderWidth: StyleSheet.hairlineWidth,
+      borderColor: ngjyrat.kufiri,
+      padding: hapesira.md,
+      justifyContent: "space-between",
+      gap: hapesira.md,
+    },
+    pllakaKoka: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    pllakaTitulli: {
+      ...shkronjat.titullBold,
+      color: ngjyrat.teksti,
+      fontSize: 15,
     },
     kopertinaBosh: {
       alignItems: "center",

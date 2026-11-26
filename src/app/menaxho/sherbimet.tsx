@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokaliIm } from "../../api/lokalet";
 import { useSherbimet } from "../../api/sherbimet";
@@ -36,7 +37,8 @@ export default function MenaxhoSherbimet() {
             <Text style={styles.boshTeksti}>{t("sherbimet.boshTeksti")}</Text>
           </View>
         }
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
+          <Animated.View entering={FadeInDown.delay(Math.min(index, 10) * 45).duration(380)}>
           <Pressable
             accessibilityRole="button"
             onPress={() => router.push({ pathname: "/menaxho/sherbimi", params: { id: item.id } })}
@@ -52,6 +54,7 @@ export default function MenaxhoSherbimet() {
             <Text style={styles.cmimi}>{formatoCmimin(item.cmimi_centa)}</Text>
             <Ikona emri={ikonat.djathtas} madhesia={16} ngjyra={ngjyrat.tekstiZbehte} />
           </Pressable>
+          </Animated.View>
         )}
       />
       <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>

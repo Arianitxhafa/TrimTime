@@ -14,6 +14,7 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import Animated, { ZoomIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokaliIm } from "../../api/lokalet";
 import { useFshiNgaPortofoli, usePortofoli, useShtoNePortofol } from "../../api/portofoli";
@@ -109,6 +110,7 @@ export default function Portofoli() {
           </View>
         }
         renderItem={({ item, index }) => (
+          <Animated.View entering={ZoomIn.delay(Math.min(index, 12) * 40).springify().damping(16)}>
           <Pressable
             accessibilityRole="imagebutton"
             accessibilityLabel={item.pershkrimi ?? t("portofoli.titulli")}
@@ -116,6 +118,7 @@ export default function Portofoli() {
           >
             <Image source={{ uri: item.foto_url }} style={[styles.foto, { width: madhesia, height: madhesia * 1.25 }]} contentFit="cover" transition={200} />
           </Pressable>
+          </Animated.View>
         )}
         ListEmptyComponent={
           portofoli.isError || lokaliIm.isError || lokaliIm.data === null ? (
