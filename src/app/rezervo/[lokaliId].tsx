@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import { router, Stack, useLocalSearchParams } from "expo-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   ActivityIndicator,
@@ -12,7 +12,16 @@ import {
   Text,
   View,
 } from "react-native";
-import Animated, { FadeInDown, ZoomIn } from "react-native-reanimated";
+import Animated, {
+  FadeInDown,
+  SlideInDown,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+  ZoomIn,
+} from "react-native-reanimated";
+import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokali } from "../../api/lokalet";
 import { useSherbimet } from "../../api/sherbimet";
@@ -32,6 +41,9 @@ import Avatar from "../../components/Avatar";
 import Butoni from "../../components/Butoni";
 import EkraniINgarkimit from "../../components/EkraniINgarkimit";
 import FushaTekstit from "../../components/FushaTekstit";
+import KokaERezervimit from "../../components/KokaERezervimit";
+import ShiritiIBerberit from "../../components/ShiritiIBerberit";
+import { FOTO_E_LOKALIT } from "../../lib/studio";
 import Ikona, { ikonat } from "../../components/Ikona";
 import { GabimiIFormes } from "../../components/KornizaAuth";
 import RrjetaEOrareve from "../../components/RrjetaEOrareve";
@@ -179,9 +191,12 @@ export default function Rezervo() {
     return (
       <View style={[styles.container, styles.qendra, styles.suksesi]}>
         <Stack.Screen options={{ title: "", headerBackVisible: false, gestureEnabled: false }} />
-        <Animated.View entering={ZoomIn.springify().damping(12)} style={styles.suksesiRrethi}>
-          <Ikona emri={ikonat.konfirmo} madhesia={46} ngjyra={ngjyrat.mbiAri} />
-        </Animated.View>
+        <View style={styles.suksesiQendra}>
+          <Unaza />
+          <Animated.View entering={ZoomIn.springify().damping(12)} style={styles.suksesiRrethi}>
+            <Ikona emri={ikonat.konfirmo} madhesia={46} ngjyra={ngjyrat.mbiAri} />
+          </Animated.View>
+        </View>
         <Animated.View entering={FadeInDown.delay(150)} style={styles.suksesiTeksti}>
           <Text style={styles.suksesiTitulli}>{t("rezervimi.suksesTitulli")}</Text>
           <Text style={styles.suksesiPershkrimi}>
@@ -189,9 +204,16 @@ export default function Rezervo() {
               ? t("rezervimi.suksesKonfirmuar", { data: dataTekst, ora: suksesi.ora })
               : t("rezervimi.suksesPritje", { data: dataTekst, ora: suksesi.ora })}
           </Text>
-          <Text style={styles.suksesiLokali}>
-            {lokali.data.emri} · {sherbimi?.emri}
-          </Text>
+          <Animated.View entering={FadeInDown.delay(260).springify().damping(16)} style={styles.bileta}>
+            <Image source={FOTO_E_LOKALIT} style={StyleSheet.absoluteFill} contentFit="cover" />
+            <LinearGradient colors={["rgba(0,0,0,0.15)", "rgba(0,0,0,0.85)"]} style={StyleSheet.absoluteFill} />
+            <Text style={styles.biletaOra}>{suksesi.ora}</Text>
+            <Text style={styles.biletaData}>{formatoDaten(suksesi.data, t)}</Text>
+            <Text style={styles.biletaLokali} numberOfLines={1}>
+              {lokali.data.emri} · {sherbimi?.emri}
+            </Text>
+            <ShiritiIBerberit gjeresia={56} lartesia={6} style={styles.biletaShtylla} />
+          </Animated.View>
           {fotoNgarkohet ? <ActivityIndicator color={ngjyrat.ari} /> : null}
           {gabimiFotos ? <Text style={styles.suksesiGabim}>{t("stili.gabimNgarkimi")}</Text> : null}
         </Animated.View>
@@ -230,13 +252,18 @@ export default function Rezervo() {
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <Stack.Screen options={{ title: lokali.data.emri }} />
       <ScrollView contentContainerStyle={styles.permbajtja} keyboardShouldPersistTaps="handled">
+        <KokaERezervimit
+          emri={lokali.data.emri}
+          adresa={`${lokali.data.adresa}, ${lokali.data.qyteti}`}
+          hapi={!sherbimi ? 0 : !ora ? 1 : 2}
+        />
         <Text style={styles.seksioni}>{t("rezervimi.sherbimi")}</Text>
         <View style={styles.grupi}>
           {sherbimetAktive.map((s, i) => {
             const aktiv = s.id === sherbimiId;
             return (
+              <Animated.View key={s.id} entering={FadeInDown.delay(80 + i * 45).duration(380)}>
               <Pressable
-                key={s.id}
                 accessibilityRole="radio"
                 accessibilityState={{ selected: aktiv }}
                 onPress={() => zgjidhSherbimin(s.id)}
@@ -251,6 +278,7 @@ export default function Rezervo() {
                 </View>
                 <Text style={styles.sherbimiCmimi}>{formatoCmimin(s.cmimi_centa)}</Text>
               </Pressable>
+              </Animated.View>
             );
           })}
         </View>
@@ -358,7 +386,10 @@ export default function Rezervo() {
         )}
       </ScrollView>
 
-      <View style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}>
+      <Animated.View
+        entering={SlideInDown.springify().damping(18).delay(250)}
+        style={[styles.fundi, { paddingBottom: insets.bottom + hapesira.md }]}
+      >
         <View style={styles.fundiTeksti}>
           <Text style={styles.fundiEtiketa}>
             {cmimi.data?.promocioni_titulli
@@ -369,9 +400,18 @@ export default function Rezervo() {
             {cmimi.data && cmimi.data.zbritja_centa > 0 && (
               <Text style={styles.fundiCmimiIVjeter}>{formatoCmimin(cmimi.data.cmimi_baze_centa)}</Text>
             )}
-            <Text style={styles.fundiCmimi}>
-              {cmimi.data ? formatoCmimin(cmimi.data.cmimi_centa) : sherbimi ? formatoCmimin(sherbimi.cmimi_centa) : "—"}
-            </Text>
+            {(() => {
+              const teksti = cmimi.data
+                ? formatoCmimin(cmimi.data.cmimi_centa)
+                : sherbimi
+                  ? formatoCmimin(sherbimi.cmimi_centa)
+                  : "—";
+              return (
+                <Animated.Text key={teksti} entering={ZoomIn.springify().damping(14)} style={styles.fundiCmimi}>
+                  {teksti}
+                </Animated.Text>
+              );
+            })()}
           </View>
           {ora ? (
             <Text style={styles.fundiKoha}>
@@ -386,10 +426,34 @@ export default function Rezervo() {
           onPress={konfirmo}
           style={styles.butoni}
         />
-      </View>
+      </Animated.View>
     </KeyboardAvoidingView>
   );
 }
+
+// Valë që zgjerohet pa fund pas shenjës së suksesit.
+function Unaza() {
+  const { ngjyrat } = useTema();
+  const vala = useSharedValue(0);
+  useEffect(() => {
+    vala.set(withRepeat(withTiming(1, { duration: 1600 }), -1, false));
+  }, [vala]);
+  const stili = useAnimatedStyle(() => ({
+    opacity: 0.45 * (1 - vala.get()),
+    transform: [{ scale: 1 + vala.get() * 0.9 }],
+  }));
+  return <Animated.View pointerEvents="none" style={[unaza.rrethi, { borderColor: ngjyrat.ari }, stili]} />;
+}
+
+const unaza = StyleSheet.create({
+  rrethi: {
+    position: "absolute",
+    width: 104,
+    height: 104,
+    borderRadius: 52,
+    borderWidth: 3,
+  },
+});
 
 type ListaEPritjesProps = { lokaliId: string; sherbimiId: string; data: string; berberiId: string | null };
 
@@ -725,6 +789,11 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     suksesi: {
       paddingHorizontal: hapesira.xxl,
     },
+    suksesiQendra: {
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: hapesira.xl,
+    },
     suksesiRrethi: {
       width: 104,
       height: 104,
@@ -732,7 +801,38 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       backgroundColor: ngjyrat.ari,
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: hapesira.xl,
+    },
+    bileta: {
+      alignSelf: "stretch",
+      borderRadius: rrezja.lg,
+      borderCurve: "continuous",
+      overflow: "hidden",
+      padding: hapesira.lg,
+      paddingTop: hapesira.xxl * 2,
+      marginTop: hapesira.lg,
+      backgroundColor: "#0A0A0A",
+    },
+    biletaOra: {
+      ...shkronjat.titull,
+      color: "#FFFFFF",
+      fontSize: 44,
+      lineHeight: 48,
+      letterSpacing: -1.4,
+      fontWeight: "800",
+      fontVariant: ["tabular-nums"],
+    },
+    biletaData: {
+      ...shkronjat.etiketeBold,
+      color: "#FFFFFF",
+      fontSize: 17,
+    },
+    biletaLokali: {
+      color: "rgba(255,255,255,0.78)",
+      fontSize: 15,
+      marginTop: 2,
+    },
+    biletaShtylla: {
+      marginTop: hapesira.md,
     },
     suksesiTeksti: {
       alignItems: "center",

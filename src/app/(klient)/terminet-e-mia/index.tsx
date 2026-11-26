@@ -18,7 +18,9 @@ import Butoni from "../../../components/Butoni";
 import DialogKonfirmimi from "../../../components/DialogKonfirmimi";
 import Ikona, { ikonat, type EmriIkones } from "../../../components/Ikona";
 import { GabimiIFormes } from "../../../components/KornizaAuth";
+import TerminiIRadhes from "../../../components/TerminiIRadhes";
 import Yjet from "../../../components/Yjet";
+import Animated, { FadeInDown } from "react-native-reanimated";
 import { useStilet, useTema } from "../../../context/TemaContext";
 import { formatoDaten } from "../../../lib/datat";
 import { formatoCmimin } from "../../../lib/formatimi";
@@ -73,6 +75,11 @@ export default function TerminetEMia() {
         }
         ListHeaderComponent={
           <>
+      {skeda === "teArdhshme" && teArdhshme[0] ? (
+        <View style={styles.iRadhes}>
+          <TerminiIRadhes termini={teArdhshme[0]} />
+        </View>
+      ) : null}
       <View style={styles.skedat}>
         {(["teArdhshme", "teKaluara"] as const).map((s) => (
           <Pressable
@@ -98,8 +105,10 @@ export default function TerminetEMia() {
             {skeda === "teArdhshme" ? <ListaEPritjes /> : null}
           </>
         }
-        renderItem={({ item }) => (
-          <KartaETerminit termini={item} iArdhshem={skeda === "teArdhshme"} onAnulo={() => setPerTeAnuluar(item)} />
+        renderItem={({ item, index }) => (
+          <Animated.View entering={FadeInDown.delay(Math.min(index, 8) * 50).duration(380)}>
+            <KartaETerminit termini={item} iArdhshem={skeda === "teArdhshme"} onAnulo={() => setPerTeAnuluar(item)} />
+          </Animated.View>
         )}
         ListEmptyComponent={
           terminet.isPending ? (
@@ -383,6 +392,9 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       letterSpacing: -0.6,
       paddingHorizontal: hapesira.xl,
       marginBottom: hapesira.lg,
+    },
+    iRadhes: {
+      marginHorizontal: hapesira.xl,
     },
     skedat: {
       flexDirection: "row",
