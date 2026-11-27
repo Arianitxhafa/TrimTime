@@ -61,17 +61,19 @@ export default function EkraniProfilit(_props: { meTitullNative?: boolean }) {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 96 }}>
-        {/* Baneri: brendësia e Studios, që zbehet te sfondi. */}
-        <View style={[styles.baneri, { height: LARTESIA_E_BANERIT + insets.top }]}>
-          <Image source={FOTO_E_LOKALIT} style={StyleSheet.absoluteFill} contentFit="cover" />
-          <LinearGradient
-            colors={["rgba(0,0,0,0.35)", "rgba(0,0,0,0.1)", ngjyrat.sfondi]}
-            locations={[0, 0.45, 1]}
-            style={StyleSheet.absoluteFill}
-          />
-        </View>
+        {/* Baneri me brendësinë e Studios vetëm te stafi; klienti e sheh profilin pa foto sipër. */}
+        {eshteKlient ? null : (
+          <View style={[styles.baneri, { height: LARTESIA_E_BANERIT + insets.top }]}>
+            <Image source={FOTO_E_LOKALIT} style={StyleSheet.absoluteFill} contentFit="cover" />
+            <LinearGradient
+              colors={["rgba(0,0,0,0.35)", "rgba(0,0,0,0.1)", ngjyrat.sfondi]}
+              locations={[0, 0.45, 1]}
+              style={StyleSheet.absoluteFill}
+            />
+          </View>
+        )}
 
-        <View style={styles.koka}>
+        <View style={[styles.koka, eshteKlient && { marginTop: insets.top + hapesira.xl }]}>
           <Animated.View entering={ZoomIn.springify().damping(13)} style={styles.avatari}>
             <Avatar emri={emri} madhesia={96} />
           </Animated.View>
