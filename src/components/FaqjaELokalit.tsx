@@ -5,7 +5,6 @@ import { router, Stack } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
-import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokali } from "../api/lokalet";
 import { useOrari } from "../api/orari";
@@ -55,10 +54,6 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
   const stafi = useStafi(id);
   const modi = useModiAktiv();
   const hapUdhezimet = useHapUdhezimet();
-  const scrollY = useSharedValue(0);
-  const neScroll = useAnimatedScrollHandler((e) => {
-    scrollY.set(e.contentOffset.y);
-  });
 
   if (!lokali.data && !lokali.isSuccess) {
     return (
@@ -109,13 +104,11 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
       <Stack.Screen
         options={{ title: "", headerTransparent: true, headerStyle: { backgroundColor: "transparent" }, headerTintColor: "#FFFFFF" }}
       />
-      <Animated.ScrollView
-        onScroll={neScroll}
-        scrollEventThrottle={16}
+      <ScrollView
         contentContainerStyle={{ paddingBottom: hapesira.xxl + insets.bottom + mbiTabet }}
       >
         {l.id === STUDIO_ID ? (
-          <KopertinaEStudios scrollY={scrollY} lartesia={440 + insets.top}>
+          <KopertinaEStudios lartesia={440 + insets.top}>
             <Text style={[styles.rubrika, styles.mbiFoto]}>
               {l.qyteti} · {t("studio.etiketa")}
             </Text>
@@ -288,7 +281,7 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
             </Text>
           )}
         </View>
-      </Animated.ScrollView>
+      </ScrollView>
 
     </View>
   );

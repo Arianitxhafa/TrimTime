@@ -7,7 +7,7 @@ import Ikona, { ikonat } from "./Ikona";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { FOTOT_E_STUDIOS } from "../lib/studio";
+import { FOTO_E_LOKALIT } from "../lib/studio";
 import Marka from "./Marka";
 
 type Props = {
@@ -27,7 +27,7 @@ export default function KornizaAuth({ titulli, nentitulli, children, fundi }: Pr
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       {/* Një punim i Studios sipër, që zbehet te sfondi. */}
       <View style={styles.foto} pointerEvents="none">
-        <Image source={FOTOT_E_STUDIOS[1]} style={StyleSheet.absoluteFill} contentFit="cover" />
+        <Image source={FOTO_E_LOKALIT} style={StyleSheet.absoluteFill} contentFit="cover" />
         <LinearGradient colors={["rgba(0,0,0,0.3)", "rgba(0,0,0,0.05)", ngjyrat.sfondi]} locations={[0, 0.3, 0.72]} style={StyleSheet.absoluteFill} />
       </View>
       <ScrollView
