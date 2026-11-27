@@ -5,7 +5,7 @@ import { router, Stack } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Linking, Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
-import Animated, { FadeInDown, SlideInDown, useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
+import Animated, { useAnimatedScrollHandler, useSharedValue } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useLokali } from "../api/lokalet";
 import { useOrari } from "../api/orari";
@@ -38,7 +38,7 @@ import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 
 type Props = {
   id: string;
-  // Brenda tab-it Studio: shiriti i rezervimit ngrihet mbi shiritin e tab-eve.
+  // Brenda një tab-i: përmbajtja lë vend për shiritin e tab-eve poshtë.
   neTab?: boolean;
 };
 
@@ -112,7 +112,7 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
       <Animated.ScrollView
         onScroll={neScroll}
         scrollEventThrottle={16}
-        contentContainerStyle={{ paddingBottom: (mundTeRezervoje || meTelefon ? 120 : hapesira.xxl) + insets.bottom + mbiTabet }}
+        contentContainerStyle={{ paddingBottom: hapesira.xxl + insets.bottom + mbiTabet }}
       >
         {l.id === STUDIO_ID ? (
           <KopertinaEStudios scrollY={scrollY} lartesia={440 + insets.top}>
@@ -135,7 +135,7 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
         </View>
         )}
 
-        <Animated.View entering={FadeInDown.delay(260).duration(550)} style={styles.permbajtja}>
+        <View style={styles.permbajtja}>
           <View style={styles.adresaRreshti}>
             <Ikona emri={ikonat.harta} madhesia={16} ngjyra={ngjyrat.tekstiDyte} />
             <Text style={styles.adresa}>
@@ -165,6 +165,38 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
               onPress={() => Share.share({ message: `${l.emri} · ${l.adresa}, ${l.qyteti}\n${LidhjetExpo.createURL(`/lokali/${l.id}`)}` })}
             />
           </View>
+
+          {/* Rezervimi: kartë e palëvizshme nën butonat, jo shirit që noton mbi shërbimet. */}
+          {mundTeRezervoje && (
+            <View style={styles.fundi}>
+              {l.id === STUDIO_ID ? <Image source={FOTO_E_LOKALIT} style={styles.fundiFoto} contentFit="cover" /> : null}
+              <View style={styles.fundiTeksti}>
+                {l.cmimi_min !== null && (
+                  <Text style={styles.fundiCmimi}>{t("lokali.ngaCmimi", { cmimi: formatoCmimin(l.cmimi_min) })}</Text>
+                )}
+                <Text style={styles.fundiShenim}>
+                  {l.anulimi_deri_ore > 0
+                    ? t("rezervimi.anulimiInfo", { ore: l.anulimi_deri_ore })
+                    : t("rezervimi.anulimiKurdo")}
+                </Text>
+              </View>
+              <Butoni titulli={t("profiliLokalit.rezervo")} ikona={ikonat.kalendar} onPress={() => hapRezervimin()} style={styles.rezervo} />
+            </View>
+          )}
+
+          {meTelefon && (
+            <View style={styles.fundi}>
+              <View style={styles.fundiTeksti}>
+                <Text style={styles.fundiCmimi}>{l.telefoni ? t("lokali.meTelefon") : t("lokali.paTermin")}</Text>
+                <Text style={styles.fundiShenim}>{t("rezervimi.gabimLokali")}</Text>
+              </View>
+              {l.telefoni ? (
+                <Butoni titulli={t("profiliLokalit.thirr")} ikona={ikonat.telefoni} onPress={thirr} style={styles.rezervo} />
+              ) : (
+                <Butoni titulli={t("profiliLokalit.udhezimet")} ikona={ikonat.harta} onPress={udhezimet} style={styles.rezervo} />
+              )}
+            </View>
+          )}
 
           {!ngaOsm && <Text style={styles.seksioni}>{t("profiliLokalit.sherbimet")}</Text>}
           {ngaOsm ? null : sherbimetAktive.length === 0 ? (
@@ -255,45 +287,9 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
               {l.burimi === "numrat" ? t("pergjithshme.atribuimiNumrat") : t("pergjithshme.atribuimiOsm")}
             </Text>
           )}
-        </Animated.View>
+        </View>
       </Animated.ScrollView>
 
-      {mundTeRezervoje && (
-        <Animated.View entering={SlideInDown.springify().damping(18).delay(420)} style={[styles.fundiVendi, { bottom: insets.bottom + hapesira.sm + mbiTabet }]}>
-        <View style={styles.fundi}>
-          {l.id === STUDIO_ID ? <Image source={FOTO_E_LOKALIT} style={styles.fundiFoto} contentFit="cover" /> : null}
-          <View style={styles.fundiTeksti}>
-            {l.cmimi_min !== null && (
-              <Text style={styles.fundiCmimi}>{t("lokali.ngaCmimi", { cmimi: formatoCmimin(l.cmimi_min) })}</Text>
-            )}
-            <Text style={styles.fundiShenim}>
-              {l.anulimi_deri_ore > 0
-                ? t("rezervimi.anulimiInfo", { ore: l.anulimi_deri_ore })
-                : t("rezervimi.anulimiKurdo")}
-            </Text>
-          </View>
-          <Butoni titulli={t("profiliLokalit.rezervo")} ikona={ikonat.kalendar} onPress={() => hapRezervimin()} style={styles.rezervo} />
-        </View>
-        </Animated.View>
-      )}
-
-      {meTelefon && (
-        <Animated.View entering={SlideInDown.springify().damping(18).delay(420)} style={[styles.fundiVendi, { bottom: insets.bottom + hapesira.sm + mbiTabet }]}>
-        <View style={styles.fundi}>
-          <View style={styles.fundiTeksti}>
-            <Text style={styles.fundiCmimi}>{l.telefoni ? t("lokali.meTelefon") : t("lokali.paTermin")}</Text>
-            <Text style={styles.fundiShenim}>
-              {t("rezervimi.gabimLokali")}
-            </Text>
-          </View>
-          {l.telefoni ? (
-            <Butoni titulli={t("profiliLokalit.thirr")} ikona={ikonat.telefoni} onPress={thirr} style={styles.rezervo} />
-          ) : (
-            <Butoni titulli={t("profiliLokalit.udhezimet")} ikona={ikonat.harta} onPress={udhezimet} style={styles.rezervo} />
-          )}
-        </View>
-        </Animated.View>
-      )}
     </View>
   );
 }
@@ -408,9 +404,7 @@ function Punimet({ lokaliId }: { lokaliId: string }) {
           contentContainerStyle={styles.punimet}
         >
           {FOTOT_E_STUDIOS.slice(1).map((burimi, i) => (
-            <Animated.View key={i} entering={FadeInDown.delay(120 * i).duration(450)}>
-              <Image source={burimi} style={styles.punimiIMadh} contentFit="cover" transition={250} />
-            </Animated.View>
+            <Image key={i} source={burimi} style={styles.punimiIMadh} contentFit="cover" />
           ))}
         </ScrollView>
       </>
@@ -825,12 +819,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       letterSpacing: 0.5,
       marginTop: hapesira.xxl,
     },
-    fundiVendi: {
-      position: "absolute",
-      left: hapesira.md,
-      right: hapesira.md,
-    },
-    // Shirit i plotë, jo xham: përmbajtja që kalon poshtë tij nuk duhet të lexohet përmes tij.
     fundi: {
       flexDirection: "row",
       alignItems: "center",
@@ -842,11 +830,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       backgroundColor: ngjyrat.siperfaqja,
       borderWidth: StyleSheet.hairlineWidth,
       borderColor: ngjyrat.kufiri,
-      shadowColor: "#000",
-      shadowOpacity: 0.18,
-      shadowRadius: 18,
-      shadowOffset: { width: 0, height: 8 },
-      elevation: 8,
+      marginTop: hapesira.lg,
     },
     fundiFoto: {
       width: 52,
