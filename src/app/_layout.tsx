@@ -37,7 +37,7 @@ export default function RootLayout() {
 function Navigimi() {
   const { t } = useTranslation();
   const { ngjyrat, eshteErret } = useTema();
-  const { sesioni, ngarkohet, profili, profiliNgarkohet } = useAuth();
+  const { sesioni, ngarkohet, profiliNgarkohet } = useAuth();
   const { onboardingIPare, lejetEPara } = usePreferencat();
   const modi = useModiAktiv();
   // Pas hyrjes duhet ditur nëse llogaria është staf i Studio Burimit, para se të zgjidhen tab-et.
@@ -66,12 +66,10 @@ function Navigimi() {
   if (!gati) return null;
 
   const kaHyre = sesioni !== null;
-  // Klienti i ri pret aprovimin e Studios; stafi dhe llogaritë para migrimit (statusi null) jo.
-  const nePritje = kaHyre && modi === "klient" && (profili?.statusi === "ne_pritje" || profili?.statusi === "refuzuar");
 
   // Stack.Protected ridrejton nga ekranet që nuk lejohen. Që nga SDK 58, pa `redirectTo` Expo Router
   // shkon te route-i i parë i lejuar; për ekranet e hyrjes ai duhet të jetë "/hyrja".
-  const hyrjaPerTeLejuarit = !onboardingIPare ? "/onboarding" : !kaHyre ? "/hyrja" : nePritje ? "/ne-pritje" : "/lejet";
+  const hyrjaPerTeLejuarit = !onboardingIPare ? "/onboarding" : !kaHyre ? "/hyrja" : "/lejet";
   return (
     <KycjaBiometrike aktive={kaHyre}>
       <StatusBar style={eshteErret ? "light" : "dark"} />
@@ -100,17 +98,12 @@ function Navigimi() {
           <Stack.Screen name="rivendos-me-kod" options={{ headerShown: false, animation: "fade" }} />
         </Stack.Protected>
 
-        {/* Llogaria e re: "Llogaria juaj po kontrollohet" derisa Studio ta aprovojë. */}
-        <Stack.Protected guard={onboardingIPare && nePritje} redirectTo={hyrjaPerTeLejuarit === "/ne-pritje" ? "/" : hyrjaPerTeLejuarit}>
-          <Stack.Screen name="ne-pritje" options={{ headerShown: false, animation: "fade" }} />
-        </Stack.Protected>
-
         {/* Pas hyrjes së parë: lejo njoftimet, një herë në këtë telefon. */}
-        <Stack.Protected guard={onboardingIPare && kaHyre && !nePritje && !lejetEPara} redirectTo={hyrjaPerTeLejuarit === "/lejet" ? "/" : hyrjaPerTeLejuarit}>
+        <Stack.Protected guard={onboardingIPare && kaHyre && !lejetEPara} redirectTo={hyrjaPerTeLejuarit === "/lejet" ? "/" : hyrjaPerTeLejuarit}>
           <Stack.Screen name="lejet" options={{ headerShown: false, animation: "fade" }} />
         </Stack.Protected>
 
-        <Stack.Protected guard={onboardingIPare && kaHyre && !nePritje && lejetEPara} redirectTo={hyrjaPerTeLejuarit}>
+        <Stack.Protected guard={onboardingIPare && kaHyre && lejetEPara} redirectTo={hyrjaPerTeLejuarit}>
           <Stack.Screen name="index" options={{ headerShown: false }} />
 
           <Stack.Protected guard={modi === "klient"} redirectTo="/sot">
@@ -149,7 +142,6 @@ function Navigimi() {
             <Stack.Screen name="menaxho/produktet" options={{ title: t("dyqani.produktet") }} />
             <Stack.Screen name="menaxho/produkti" options={{ title: "", presentation: "modal" }} />
             <Stack.Screen name="menaxho/porosite" options={{ title: t("dyqani.porosite") }} />
-            <Stack.Screen name="menaxho/kodi" options={{ title: t("rivendosja.stafiTitulli"), presentation: "modal" }} />
           </Stack.Protected>
 
           <Stack.Screen name="lokali/[id]" options={{ title: "" }} />

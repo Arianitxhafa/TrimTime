@@ -1,21 +1,27 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { StyleSheet, Text } from "react-native";
+import { kerkoKodin, rivendosMeKod } from "../api/rivendosja";
 import Butoni from "../components/Butoni";
 import FushaETelefonit from "../components/FushaETelefonit";
 import FushaTekstit from "../components/FushaTekstit";
 import { ikonat } from "../components/Ikona";
 import KornizaAuth, { GabimiIFormes } from "../components/KornizaAuth";
-import { rivendosMeKod } from "../api/rivendosja";
+import { useStilet } from "../context/TemaContext";
+import { gjuhaAktuale } from "../i18n";
 import { mesazhiIGabimit } from "../lib/gabimetEAuth";
 import { supabase } from "../lib/supabase";
 import { emailNgaTelefoni, numriNderkombetar, PREFIKSET, type Prefiksi } from "../lib/telefoni";
+import { type Ngjyrat } from "../theme";
 
 const GJATESIA_MIN_FJALEKALIMIT = 8;
 
-// Fjalëkalim i ri për llogarinë me telefon: klienti merr një kod 6-shifror nga Studio, pastaj
-// zgjedh fjalëkalimin e ri dhe hyn menjëherë.
+// Fjalëkalimi i harruar te llogaria me telefon: (1) numri → kodi 6-shifror vjen te email-i i
+// rikuperimit; (2) kodi + fjalëkalimi i ri → klienti hyn menjëherë.
 export default function RivendosMeKod() {
   const { t } = useTranslation();
+  const styles = useStilet(krijoStilet);
+  const [hapi, setHapi] = useState<"numri" | "kodi">("numri");
   const [prefiksi, setPrefiksi] = useState<Prefiksi>(PREFIKSET[0]);
   const [numri, setNumri] = useState("");
   const [kodi, setKodi] = useState("");
@@ -33,10 +39,26 @@ export default function RivendosMeKod() {
     konfirmimi: konfirmimi === fjalekalimi ? null : t("rivendosja.nukPerputhen"),
   };
 
+  async function dergoKodin() {
+    setProvuar(true);
+    setGabimi(null);
+    if (!telefoni) return;
+    setNgarkohet(true);
+    try {
+      await kerkoKodin(telefoni, gjuhaAktuale());
+      setProvuar(false);
+      setHapi("kodi");
+    } catch {
+      setGabimi(t("rivendosja.gabimDergimi"));
+    } finally {
+      setNgarkohet(false);
+    }
+  }
+
   async function ruaj() {
     setProvuar(true);
     setGabimi(null);
-    if (gabimet.telefoni || gabimet.kodi || gabimet.fjalekalimi || gabimet.konfirmimi || !telefoni) return;
+    if (gabimet.kodi || gabimet.fjalekalimi || gabimet.konfirmimi || !telefoni) return;
     setNgarkohet(true);
     try {
       const pergjigja = await rivendosMeKod(telefoni, kodi.trim(), fjalekalimi);
@@ -54,19 +76,30 @@ export default function RivendosMeKod() {
     }
   }
 
+  if (hapi === "numri") {
+    return (
+      <KornizaAuth titulli={t("rivendosja.titulli")} nentitulli={t("rivendosja.nentitulliNumri")}>
+        <GabimiIFormes mesazhi={gabimi} />
+        <FushaETelefonit
+          prefiksi={prefiksi}
+          onPrefiksi={setPrefiksi}
+          numri={numri}
+          onNumri={setNumri}
+          gabimi={provuar ? gabimet.telefoni : null}
+          onSubmitEditing={() => void dergoKodin()}
+        />
+        <Butoni titulli={t("rivendosja.dergoKodin")} ikona={ikonat.email} onPress={() => void dergoKodin()} ngarkohet={ngarkohet} />
+        <Text style={styles.shenimi}>{t("rivendosja.paEmail")}</Text>
+      </KornizaAuth>
+    );
+  }
+
   return (
-    <KornizaAuth titulli={t("rivendosja.titulli")} nentitulli={t("rivendosja.nentitulli")}>
+    <KornizaAuth titulli={t("rivendosja.titulli")} nentitulli={t("rivendosja.nentitulliKodi")}>
       <GabimiIFormes mesazhi={gabimi} />
-      <FushaETelefonit
-        prefiksi={prefiksi}
-        onPrefiksi={setPrefiksi}
-        numri={numri}
-        onNumri={setNumri}
-        gabimi={provuar ? gabimet.telefoni : null}
-      />
       <FushaTekstit
         etiketa={t("rivendosja.kodi")}
-        ikona={ikonat.dryni}
+        ikona={ikonat.email}
         value={kodi}
         onChangeText={(v) => setKodi(v.replace(/\D/g, "").slice(0, 6))}
         placeholder="123456"
@@ -102,6 +135,26 @@ export default function RivendosMeKod() {
         gabimi={provuar ? gabimet.konfirmimi : null}
       />
       <Butoni titulli={t("rivendosja.ruaj")} onPress={() => void ruaj()} ngarkohet={ngarkohet} />
+      <Butoni
+        titulli={t("rivendosja.dergoSerish")}
+        varianti="dytesor"
+        onPress={() => {
+          setHapi("numri");
+          setKodi("");
+          setGabimi(null);
+        }}
+      />
     </KornizaAuth>
   );
 }
+
+const krijoStilet = (ngjyrat: Ngjyrat) =>
+  StyleSheet.create({
+    shenimi: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 13,
+      lineHeight: 18,
+      marginTop: 16,
+      textAlign: "center",
+    },
+  });

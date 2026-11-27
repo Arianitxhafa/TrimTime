@@ -11,14 +11,27 @@ import { useStilet } from "../context/TemaContext";
 import { prekja } from "../lib/prekja";
 import { hapesira, shkronjat, type Ngjyrat } from "../theme";
 import HyrjaMeRadhe from "../components/HyrjaMeRadhe";
+import EkraniINgarkimit from "../components/EkraniINgarkimit";
+import { useEmailIRikuperimit, useRuajEmailinERikuperimit } from "../api/rivendosja";
+import { emailIVlefshem } from "../lib/gabimetEAuth";
+import { eshteEmailITelefonit, telefoniNgaEmaili } from "../lib/telefoni";
 
-// Emri dhe telefoni i përdoruesit: telefoni i duhet lokalit për ta kontaktuar për terminin.
+// Emri, telefoni dhe email-i i rikuperimit (për fjalëkalimin e harruar te llogaritë me telefon).
 export default function ProfiliIm() {
+  const rikuperimi = useEmailIRikuperimit();
+  if (rikuperimi.isPending) return <EkraniINgarkimit pyetjet={[rikuperimi]} />;
+  return <Forma emailIRikuperimit={rikuperimi.data ?? ""} />;
+}
+
+function Forma({ emailIRikuperimit }: { emailIRikuperimit: string }) {
   const { t } = useTranslation();
   const styles = useStilet(krijoStilet);
   const { profili, emriIShfaqur, sesioni, ruajProfilin } = useAuth();
   const [emri, setEmri] = useState(profili?.emri || (emriIShfaqur.includes("@") ? "" : emriIShfaqur));
   const [telefoni, setTelefoni] = useState(profili?.telefoni ?? "");
+  const [email, setEmail] = useState(emailIRikuperimit);
+  const ruajEmailin = useRuajEmailinERikuperimit();
+  const meTelefon = eshteEmailITelefonit(sesioni?.user.email);
   const [provuar, setProvuar] = useState(false);
   const [ngarkohet, setNgarkohet] = useState(false);
   const [gabimi, setGabimi] = useState<string | null>(null);
@@ -26,15 +39,17 @@ export default function ProfiliIm() {
   const gabimet = {
     emri: emri.trim().length >= 2 ? null : t("auth.gabimEmri"),
     telefoni: telefoni.trim() === "" || /^\+?[\d\s()-]{6,20}$/.test(telefoni.trim()) ? null : t("profili.gabimTelefoni"),
+    email: email.trim() === "" || emailIVlefshem(email) ? null : t("auth.gabimEmail"),
   };
 
   async function ruaj() {
     setProvuar(true);
     setGabimi(null);
-    if (gabimet.emri || gabimet.telefoni) return;
+    if (gabimet.emri || gabimet.telefoni || gabimet.email) return;
     setNgarkohet(true);
     try {
       await ruajProfilin({ emri: emri.trim(), telefoni: telefoni.trim() || null });
+      if (meTelefon && email.trim() !== emailIRikuperimit) await ruajEmailin.mutateAsync(email.trim() || null);
       prekja.sukses();
       router.back();
     } catch {
@@ -48,7 +63,9 @@ export default function ProfiliIm() {
     <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : undefined}>
       <ScrollView contentContainerStyle={styles.permbajtja} keyboardShouldPersistTaps="handled">
         <HyrjaMeRadhe>
-        <Text style={styles.email}>{sesioni?.user.email}</Text>
+        <Text style={styles.email}>
+          {meTelefon && sesioni?.user.email ? telefoniNgaEmaili(sesioni.user.email) : sesioni?.user.email}
+        </Text>
         <GabimiIFormes mesazhi={gabimi} />
         <FushaTekstit
           etiketa={t("auth.emri")}
@@ -73,6 +90,23 @@ export default function ProfiliIm() {
           gabimi={provuar ? gabimet.telefoni : null}
         />
         <Text style={styles.shenim}>{t("profili.telefoniTeksti")}</Text>
+        {meTelefon ? (
+          <>
+            <FushaTekstit
+              etiketa={t("rivendosja.emailOpsional")}
+              ikona={ikonat.email}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="emri@shembull.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="email"
+              textContentType="emailAddress"
+              gabimi={provuar ? gabimet.email : null}
+            />
+            <Text style={styles.shenim}>{t("rivendosja.emailShenim")}</Text>
+          </>
+        ) : null}
         <Butoni titulli={t("profili.ruaj")} onPress={ruaj} ngarkohet={ngarkohet} />
         </HyrjaMeRadhe>
       </ScrollView>

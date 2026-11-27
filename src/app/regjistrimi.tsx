@@ -9,21 +9,23 @@ import { ikonat } from "../components/Ikona";
 import KornizaAuth, { GabimiIFormes } from "../components/KornizaAuth";
 import { useStilet } from "../context/TemaContext";
 import { gjuhaAktuale } from "../i18n";
-import { mesazhiIGabimit } from "../lib/gabimetEAuth";
+import { emailIVlefshem, mesazhiIGabimit } from "../lib/gabimetEAuth";
 import { supabase } from "../lib/supabase";
+import { ruajEmailinERikuperimit } from "../api/rivendosja";
 import { emailNgaTelefoni, numriNderkombetar, PREFIKSET, type Prefiksi } from "../lib/telefoni";
 import { type Ngjyrat } from "../theme";
 
 const GJATESIA_MIN_FJALEKALIMIT = 8;
 
-// Regjistrimi me emër, telefon dhe fjalëkalim (dy herë). Llogaria e re pret aprovimin e Studios:
-// pas regjistrimit hapet vetë ekrani "Llogaria juaj po kontrollohet" (shih _layout.tsx).
+// Regjistrimi me emër, telefon, email rikuperimi (opsional) dhe fjalëkalim (dy herë). Llogaria e re
+// është aktive menjëherë: pas regjistrimit hapet vetë Studio (shih _layout.tsx).
 export default function Regjistrimi() {
   const { t } = useTranslation();
   const styles = useStilet(krijoStilet);
   const [emri, setEmri] = useState("");
   const [prefiksi, setPrefiksi] = useState<Prefiksi>(PREFIKSET[0]);
   const [numri, setNumri] = useState("");
+  const [email, setEmail] = useState("");
   const [fjalekalimi, setFjalekalimi] = useState("");
   const [perseritja, setPerseritja] = useState("");
   const [provuar, setProvuar] = useState(false);
@@ -34,6 +36,7 @@ export default function Regjistrimi() {
   const gabimet = {
     emri: emri.trim().length >= 2 ? null : t("auth.gabimEmri"),
     telefoni: telefoni ? null : t("auth.gabimTelefoni"),
+    email: email.trim() === "" || emailIVlefshem(email) ? null : t("auth.gabimEmail"),
     fjalekalimi: fjalekalimi.length >= GJATESIA_MIN_FJALEKALIMIT ? null : t("auth.gabimFjalekalimi"),
     perseritja: perseritja === fjalekalimi ? null : t("auth.gabimNukPerputhen"),
   };
@@ -41,19 +44,19 @@ export default function Regjistrimi() {
   async function regjistrohu() {
     setProvuar(true);
     setGabimi(null);
-    if (gabimet.emri || gabimet.telefoni || gabimet.fjalekalimi || gabimet.perseritja) return;
+    if (gabimet.emri || gabimet.telefoni || gabimet.email || gabimet.fjalekalimi || gabimet.perseritja) return;
 
     setNgarkohet(true);
     const { data, error } = await supabase.auth.signUp({
       email: emailNgaTelefoni(telefoni!),
       password: fjalekalimi,
       // Trigger-i krijo_profilin_e_ri e merr emrin dhe telefonin nga këtu. Çdo llogari e re është
-      // klient në pritje të aprovimit; stafi bashkohet më pas me kodin e ftesës.
+      // klient; stafi bashkohet më pas me kodin e ftesës.
       options: { data: { emri: emri.trim(), telefoni: telefoni!, gjuha: gjuhaAktuale() } },
     });
-    setNgarkohet(false);
 
     if (error) {
+      setNgarkohet(false);
       setGabimi(
         error.code === "user_already_exists" || error.code === "email_exists"
           ? t("auth.gabimTelefoniEkziston")
@@ -63,11 +66,19 @@ export default function Regjistrimi() {
     }
     // Numri ekziston: Supabase nuk kthen gabim, por përdoruesi i kthyer s'ka asnjë identitet.
     if (data.user && data.user.identities?.length === 0) {
+      setNgarkohet(false);
       setGabimi(t("auth.gabimTelefoniEkziston"));
       return;
     }
     // Pa sesion: "Confirm email" është i ndezur në Supabase, që me telefon s'mund të punojë.
-    if (!data.session) setGabimi(t("auth.gabimKonfirmimi"));
+    if (!data.session) {
+      setNgarkohet(false);
+      setGabimi(t("auth.gabimKonfirmimi"));
+      return;
+    }
+    // Email-i i rikuperimit (për fjalëkalimin e harruar). Nëse dështon, shtohet më vonë te Profili.
+    if (email.trim()) await ruajEmailinERikuperimit(data.session.user.id, email.trim()).catch(() => {});
+    setNgarkohet(false);
   }
 
   return (
@@ -104,6 +115,20 @@ export default function Regjistrimi() {
         gabimi={provuar ? gabimet.telefoni : null}
       />
       <FushaTekstit
+        etiketa={t("rivendosja.emailOpsional")}
+        ikona={ikonat.email}
+        value={email}
+        onChangeText={setEmail}
+        placeholder="emri@shembull.com"
+        keyboardType="email-address"
+        autoCapitalize="none"
+        autoComplete="email"
+        textContentType="emailAddress"
+        returnKeyType="next"
+        gabimi={provuar ? gabimet.email : null}
+      />
+      <Text style={styles.shenimi}>{t("rivendosja.emailShenim")}</Text>
+      <FushaTekstit
         etiketa={t("auth.fjalekalimi")}
         ikona={ikonat.dryni}
         value={fjalekalimi}
@@ -139,6 +164,13 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
   StyleSheet.create({
     butoni: {
       marginTop: 8,
+    },
+    shenimi: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 13,
+      lineHeight: 18,
+      marginTop: -6,
+      marginBottom: 16,
     },
     tekstiFundit: {
       color: ngjyrat.tekstiDyte,

@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../lib/supabase";
 
 // Sa klientë të aprovuar ka Studio (distinktivi "klientë" te Ballina). Null kur funksioni mungon
@@ -16,39 +16,3 @@ export function useNumriIKlienteve() {
   });
 }
 
-export type LlogariNePritje = {
-  id: string;
-  emri: string;
-  telefoni: string | null;
-  statusi: "ne_pritje" | "refuzuar";
-  krijuar_me: string;
-};
-
-// Llogaritë që presin aprovimin (dhe të refuzuarat), vetëm për pronarin e Studios.
-export function useLlogaritePerAprovim(aktiv: boolean) {
-  return useQuery({
-    queryKey: ["llogarite-per-aprovim"],
-    enabled: aktiv,
-    refetchInterval: 60_000,
-    retry: false,
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("llogarite_per_aprovim");
-      if (error) throw error;
-      return (data ?? []) as LlogariNePritje[];
-    },
-  });
-}
-
-export function useNdryshoStatusinELlogarise() {
-  const klienti = useQueryClient();
-  return useMutation({
-    mutationFn: async ({ id, statusi }: { id: string; statusi: "aprovuar" | "refuzuar" }) => {
-      const { error } = await supabase.rpc("ndrysho_statusin_e_llogarise", { p_profili_id: id, p_statusi: statusi });
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      klienti.invalidateQueries({ queryKey: ["llogarite-per-aprovim"] });
-      klienti.invalidateQueries({ queryKey: ["numri-i-klienteve"] });
-    },
-  });
-}

@@ -1,7 +1,7 @@
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 import Butoni from "../components/Butoni";
 import FushaETelefonit from "../components/FushaETelefonit";
 import FushaTekstit from "../components/FushaTekstit";
@@ -117,12 +117,9 @@ export default function Hyrja() {
           {t("auth.harrove")}
         </Link>
       ) : (
-        <View style={styles.harroveTelefoni}>
-          <Text style={styles.harroveTeksti}>{t("auth.harroveTelefoni")}</Text>
-          <Link href="/rivendos-me-kod" style={[styles.harrove, styles.paHapesire]}>
-            {t("auth.kamKod")}
-          </Link>
-        </View>
+        <Link href="/rivendos-me-kod" style={styles.harrove}>
+          {t("auth.harrove")}
+        </Link>
       )}
       <Butoni titulli={t("auth.hyr")} onPress={hyr} ngarkohet={ngarkohet} style={styles.butoni} />
       <Pressable
@@ -153,20 +150,6 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       textDecorationLine: "underline",
       marginTop: -6,
       marginBottom: 16,
-    },
-    paHapesire: {
-      marginTop: 0,
-      marginBottom: 0,
-    },
-    harroveTelefoni: {
-      marginTop: -6,
-      marginBottom: 16,
-      gap: 6,
-    },
-    harroveTeksti: {
-      color: ngjyrat.tekstiDyte,
-      fontSize: 13,
-      lineHeight: 18,
     },
     ndryshoMenyren: {
       alignSelf: "center",
