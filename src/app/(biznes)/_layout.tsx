@@ -2,6 +2,7 @@ import { NativeTabs } from "expo-router/native-tabs";
 import { Platform } from "react-native";
 import TabetWeb from "../../components/TabetWeb";
 import { useTranslation } from "react-i18next";
+import { useLlogaritePerAprovim } from "../../api/klientet";
 import { useLokaliIm } from "../../api/lokalet";
 import { useTerminetELokalit, useTerminetLiveILokalit } from "../../api/terminet";
 import { ikonat } from "../../components/Ikona";
@@ -14,7 +15,12 @@ export default function BiznesLayout() {
   // Të gjitha tab-et kanë të njëjtën ngjyrë, atë të Studios: e zezë në dritë, e bardhë kockë në errësirë.
 
   // Rezervimet e sotme që presin konfirmim shfaqen si numër mbi tab-in Sot, në kohë reale.
-  const lokaliId = useLokaliIm().data?.lokali.id;
+  const lokaliIm = useLokaliIm();
+  const lokaliId = lokaliIm.data?.lokali.id;
+  // Llogaritë e reja që presin aprovimin, si numër mbi tab-in Klientët (vetëm për pronarin).
+  const perAprovim = (useLlogaritePerAprovim(lokaliIm.data?.roli === "pronar").data ?? []).filter(
+    (l) => l.statusi === "ne_pritje",
+  ).length;
   const terminetESotme = useTerminetELokalit(lokaliId, dataISO(new Date()));
   useTerminetLiveILokalit(lokaliId);
   const nePritje = (terminetESotme.data ?? []).filter((x) => x.statusi === "ne_pritje").length;
@@ -25,7 +31,7 @@ export default function BiznesLayout() {
         tabet={[
           { emri: "sot", titulli: t("tabs.sot"), ikona: ikonat.sot, numri: nePritje },
           { emri: "kalendari", titulli: t("tabs.kalendari"), ikona: ikonat.kalendar },
-          { emri: "klientet", titulli: t("tabs.klientet"), ikona: ikonat.klientet },
+          { emri: "klientet", titulli: t("tabs.klientet"), ikona: ikonat.klientet, numri: perAprovim },
           { emri: "lokali", titulli: t("tabs.lokali"), ikona: ikonat.lokali },
           { emri: "llogaria", titulli: t("tabs.profili"), ikona: ikonat.personi },
         ]}
@@ -63,6 +69,7 @@ export default function BiznesLayout() {
           selectedColor={ngjyrat.ari}
         />
         <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.klientet")}</NativeTabs.Trigger.Label>
+        {perAprovim > 0 ? <NativeTabs.Trigger.Badge>{String(perAprovim)}</NativeTabs.Trigger.Badge> : null}
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="lokali">
         <NativeTabs.Trigger.Icon

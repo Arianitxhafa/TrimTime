@@ -77,6 +77,7 @@ export const ikonat = {
   skano: { ios: "qrcode.viewfinder", android: "qr_code_scanner" },
   biometria: { ios: "faceid", android: "fingerprint" },
   vendi: { ios: "location.fill", android: "my_location" },
+  shtepia: { ios: "house.fill", android: "home" },
   mesazh: { ios: "message.fill", android: "chat" },
   sms: { ios: "text.bubble.fill", android: "sms" },
 } satisfies Record<string, EmriIkones>;

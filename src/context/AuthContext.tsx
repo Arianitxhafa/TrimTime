@@ -10,12 +10,15 @@ import {
   type ReactNode,
 } from "react";
 import { supabase } from "../lib/supabase";
+import { eshteEmailITelefonit, telefoniNgaEmaili } from "../lib/telefoni";
 
 export type Profili = {
   id: string;
   emri: string;
   telefoni: string | null;
   foto_url: string | null;
+  // 'ne_pritje' derisa Studio ta aprovojë llogarinë; null para migrimit të aprovimit.
+  statusi: "ne_pritje" | "aprovuar" | "refuzuar" | null;
 };
 
 type VleraKontekstit = {
@@ -24,6 +27,9 @@ type VleraKontekstit = {
   // Emri për t'u shfaqur: nga profili, nga regjistrimi ose nga email-i.
   emriIShfaqur: string;
   ngarkohet: boolean;
+  // true derisa të vijë profili i përdoruesit që ka hyrë (statusi i aprovimit).
+  profiliNgarkohet: boolean;
+  rifreskoProfilin: () => Promise<void>;
   dil: () => Promise<void>;
   // Fshin përgjithmonë llogarinë dhe të dhënat e saj (Apple dhe Google e kërkojnë brenda aplikacionit).
   fshijLlogarine: () => Promise<void>;
@@ -37,6 +43,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [sesioni, setSesioni] = useState<Session | null>(null);
   const [ngarkohet, setNgarkohet] = useState(true);
   const [profili, setProfili] = useState<Profili | null>(null);
+  const [rifreskimi, setRifreskimi] = useState(0);
+  const [profiliIdINgarkuar, setProfiliIdINgarkuar] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth
@@ -56,18 +64,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!perdoruesiId) return;
     let aktiv = true;
-    supabase
-      .from("profilet")
-      .select("id, emri, telefoni, foto_url")
-      .eq("id", perdoruesiId)
-      .maybeSingle<Profili>()
-      .then(({ data }) => {
-        if (aktiv && data) setProfili(data);
-      });
+    void (async () => {
+      // "*": para migrimit të aprovimit kolona "statusi" mungon dhe del null.
+      const pergjigja = await supabase.from("profilet").select("*").eq("id", perdoruesiId).maybeSingle<Profili>();
+      if (!aktiv) return;
+      if (pergjigja.data) setProfili({ ...pergjigja.data, statusi: pergjigja.data.statusi ?? null });
+      setProfiliIdINgarkuar(perdoruesiId);
+    })();
     return () => {
       aktiv = false;
     };
-  }, [perdoruesiId]);
+  }, [perdoruesiId, rifreskimi]);
 
   // Profili i një përdoruesi të mëparshëm nuk shfaqet pas daljes ose ndërrimit të llogarisë.
   const profiliAktual = profili?.id === perdoruesiId ? profili : null;
@@ -80,9 +87,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       emriIShfaqur:
         profiliAktual?.emri ||
         (typeof emriNgaRegjistrimi === "string" ? emriNgaRegjistrimi : "") ||
-        sesioni?.user.email ||
+        (eshteEmailITelefonit(sesioni?.user.email) ? telefoniNgaEmaili(sesioni!.user.email!) : sesioni?.user.email) ||
         "",
       ngarkohet,
+      profiliNgarkohet: Boolean(perdoruesiId) && profiliIdINgarkuar !== perdoruesiId,
+      rifreskoProfilin: async () => {
+        setRifreskimi((n) => n + 1);
+      },
       dil: async () => {
         await supabase.auth.signOut();
       },
@@ -106,13 +117,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .from("profilet")
           .update({ emri, telefoni })
           .eq("id", sesioni.user.id)
-          .select("id, emri, telefoni, foto_url")
+          .select("*")
           .single<Profili>();
         if (error) throw error;
         setProfili(data);
       },
     };
-  }, [sesioni, profiliAktual, ngarkohet]);
+  }, [sesioni, profiliAktual, ngarkohet, perdoruesiId, profiliIdINgarkuar]);
 
   return <AuthContext.Provider value={vlera}>{children}</AuthContext.Provider>;
 }

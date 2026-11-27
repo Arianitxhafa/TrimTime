@@ -41,10 +41,11 @@ export default function KlientLayout() {
     return (
       <TabetWeb
         tabet={[
-          { emri: "studio", titulli: t("tabs.studio"), ikona: ikonat.gershere },
+          { emri: "ballina", titulli: t("tabs.ballina"), ikona: ikonat.shtepia },
+          { emri: "studio", titulli: t("tabs.rezervo"), ikona: ikonat.kalendar },
           { emri: "harta", titulli: t("tabs.harta"), ikona: ikonat.harta },
           { emri: "terminet-e-mia", titulli: t("tabs.terminet"), ikona: ikonat.kalendar },
-          { emri: "profili", titulli: t("tabs.profili"), ikona: ikonat.personi },
+          { emri: "profili", titulli: t("tabs.cilesimet"), ikona: ikonat.cilesimet },
         ]}
       />
     );
@@ -60,9 +61,13 @@ export default function KlientLayout() {
       minimizeBehavior="onScrollDown"
       backgroundColor={ngjyrat.siperfaqja}
     >
+      <NativeTabs.Trigger name="ballina">
+        <NativeTabs.Trigger.Icon sf={{ default: "house", selected: "house.fill" }} md={ikonat.shtepia.android} selectedColor={ngjyrat.ari} />
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.ballina")}</NativeTabs.Trigger.Label>
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="studio">
-        <NativeTabs.Trigger.Icon sf="scissors" md={ikonat.gershere.android} selectedColor={ngjyrat.ari} />
-        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.studio")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="calendar.badge.plus" md={ikonat.kalendar.android} selectedColor={ngjyrat.ari} />
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.rezervo")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="harta">
         <NativeTabs.Trigger.Icon
@@ -73,16 +78,12 @@ export default function KlientLayout() {
         <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.harta")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="terminet-e-mia">
-        <NativeTabs.Trigger.Icon sf="calendar" md={ikonat.kalendar.android} selectedColor={ngjyrat.ari} />
+        <NativeTabs.Trigger.Icon sf="clock.arrow.circlepath" md={ikonat.ora.android} selectedColor={ngjyrat.ari} />
         <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.terminet")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="profili">
-        <NativeTabs.Trigger.Icon
-          sf={{ default: "person.crop.circle", selected: "person.crop.circle.fill" }}
-          md={ikonat.personi.android}
-          selectedColor={ngjyrat.ari}
-        />
-        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.profili")}</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: "gearshape", selected: "gearshape.fill" }} md={ikonat.cilesimet.android} selectedColor={ngjyrat.ari} />
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.cilesimet")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
     </NativeTabs>
   );

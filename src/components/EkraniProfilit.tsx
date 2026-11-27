@@ -15,6 +15,7 @@ import { useStilet, useTema } from "../context/TemaContext";
 import { useModiAktiv } from "../hooks/useModiAktiv";
 import { formatoDaten } from "../lib/datat";
 import { formatoCmimin } from "../lib/formatimi";
+import { eshteEmailITelefonit, telefoniNgaEmaili } from "../lib/telefoni";
 import { EMRI_I_STUDIOS, FOTO_E_LOKALIT, INSTAGRAMI, STUDIO_ID } from "../lib/studio";
 import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 import Avatar from "./Avatar";
@@ -33,7 +34,7 @@ export default function EkraniProfilit(_props: { meTitullNative?: boolean }) {
   const { ngjyrat } = useTema();
   const styles = useStilet(krijoStilet);
   const insets = useSafeAreaInsets();
-  const { sesioni, emriIShfaqur, dil } = useAuth();
+  const { sesioni, emriIShfaqur, dil, profili } = useAuth();
   const modi = useModiAktiv();
   const eshteKlient = modi === "klient";
   const [dialogu, setDialogu] = useState(false);
@@ -77,7 +78,13 @@ export default function EkraniProfilit(_props: { meTitullNative?: boolean }) {
           <Animated.Text entering={FadeInDown.delay(120).duration(420)} style={styles.emri}>
             {emri}
           </Animated.Text>
-          {sesioni?.user.email ? <Text style={styles.email}>{sesioni.user.email}</Text> : null}
+          {sesioni?.user.email ? (
+            <Text style={styles.email}>
+              {eshteEmailITelefonit(sesioni.user.email)
+                ? (profili?.telefoni ?? telefoniNgaEmaili(sesioni.user.email))
+                : sesioni.user.email}
+            </Text>
+          ) : null}
           <Animated.View entering={FadeInDown.delay(180).duration(420)} style={styles.roli}>
             <Ikona emri={eshteKlient ? ikonat.gershere : ikonat.lokali} madhesia={13} ngjyra={ngjyrat.ari} />
             <Text style={styles.roliTeksti}>

@@ -18,6 +18,7 @@ import { useLokaliIm } from "../../api/lokalet";
 import Avatar from "../../components/Avatar";
 import Butoni from "../../components/Butoni";
 import KokaEBiznesit from "../../components/KokaEBiznesit";
+import LlogariteERe from "../../components/LlogariteERe";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import Ikona, { ikonat } from "../../components/Ikona";
 import { useStilet, useTema } from "../../context/TemaContext";
@@ -61,6 +62,8 @@ export default function Klientet() {
           { vlera: String(gjithsej.filter((x) => x.termini_i_ardhshem).length), etiketa: t("klientet.meTermin") },
         ]}
       />
+
+      <LlogariteERe aktiv={lokaliIm.data?.roli === "pronar"} />
 
       <View style={styles.kerkimi}>
         <Ikona emri={ikonat.kerko} madhesia={18} ngjyra={ngjyrat.tekstiZbehte} />

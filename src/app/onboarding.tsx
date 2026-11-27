@@ -218,7 +218,7 @@ const krijoStilet = (_ngjyrat: Ngjyrat) =>
     },
     numri: {
       ...shkronjat.etiketeBold,
-      color: "#E5484D",
+      color: "#D4A833",
       fontSize: 14,
       letterSpacing: 2,
       marginBottom: hapesira.sm,

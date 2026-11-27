@@ -1,51 +1,64 @@
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 import Butoni from "../components/Butoni";
+import FushaETelefonit from "../components/FushaETelefonit";
 import FushaTekstit from "../components/FushaTekstit";
 import { ikonat } from "../components/Ikona";
 import KornizaAuth, { GabimiIFormes } from "../components/KornizaAuth";
 import { useStilet } from "../context/TemaContext";
 import { emailIVlefshem, mesazhiIGabimit } from "../lib/gabimetEAuth";
 import { supabase } from "../lib/supabase";
+import { emailNgaTelefoni, numriNderkombetar, PREFIKSET, type Prefiksi } from "../lib/telefoni";
 import { type Ngjyrat } from "../theme";
 
+// Hyrja: klientët me telefon + fjalëkalim. Stafi dhe llogaritë e vjetra (të krijuara me email)
+// kalojnë te "Hyr me email".
 export default function Hyrja() {
   const { t } = useTranslation();
   const styles = useStilet(krijoStilet);
+  const [meEmail, setMeEmail] = useState(false);
+  const [prefiksi, setPrefiksi] = useState<Prefiksi>(PREFIKSET[0]);
+  const [numri, setNumri] = useState("");
   const [email, setEmail] = useState("");
   const [fjalekalimi, setFjalekalimi] = useState("");
   const [provuar, setProvuar] = useState(false);
   const [ngarkohet, setNgarkohet] = useState(false);
   const [gabimi, setGabimi] = useState<string | null>(null);
 
+  const telefoni = numriNderkombetar(prefiksi.prefiksi, numri);
   const gabimet = {
-    email: emailIVlefshem(email) ? null : t("auth.gabimEmail"),
+    identiteti: meEmail
+      ? emailIVlefshem(email)
+        ? null
+        : t("auth.gabimEmail")
+      : telefoni
+        ? null
+        : t("auth.gabimTelefoni"),
     fjalekalimi: fjalekalimi.length > 0 ? null : t("auth.gabimFjalekalimiBosh"),
   };
 
   async function hyr() {
     setProvuar(true);
     setGabimi(null);
-    if (gabimet.email || gabimet.fjalekalimi) return;
+    if (gabimet.identiteti || gabimet.fjalekalimi) return;
 
     setNgarkohet(true);
     const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
+      email: meEmail ? email.trim() : emailNgaTelefoni(telefoni!),
       password: fjalekalimi,
     });
     setNgarkohet(false);
     if (error) {
-      // Llogari e krijuar por e pakonfirmuar: dërgohet kod i ri dhe hapet ekrani i verifikimit.
-      if (error.code === "email_not_confirmed") {
+      // Llogari me email e krijuar por e pakonfirmuar: dërgohet kod i ri dhe hapet verifikimi.
+      if (meEmail && error.code === "email_not_confirmed") {
         router.push({ pathname: "/verifiko", params: { email: email.trim(), dergo: "1" } });
         return;
       }
-      setGabimi(mesazhiIGabimit(error, t));
-      return;
+      setGabimi(error.code === "invalid_credentials" && !meEmail ? t("auth.gabimTelefoniFjalekalimi") : mesazhiIGabimit(error, t));
     }
-    // Pas hyrjes, navigimi kalon vetë te tab-et (shih _layout.tsx).
+    // Pas hyrjes, navigimi kalon vetë te Studio, ose te "Llogaria po kontrollohet" (shih _layout.tsx).
   }
 
   return (
@@ -62,19 +75,29 @@ export default function Hyrja() {
       }
     >
       <GabimiIFormes mesazhi={gabimi} />
-      <FushaTekstit
-        etiketa={t("auth.email")}
-        ikona={ikonat.email}
-        value={email}
-        onChangeText={setEmail}
-        placeholder="emri@shembull.com"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        autoComplete="email"
-        textContentType="emailAddress"
-        returnKeyType="next"
-        gabimi={provuar ? gabimet.email : null}
-      />
+      {meEmail ? (
+        <FushaTekstit
+          etiketa={t("auth.email")}
+          ikona={ikonat.email}
+          value={email}
+          onChangeText={setEmail}
+          placeholder="emri@shembull.com"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoComplete="email"
+          textContentType="emailAddress"
+          returnKeyType="next"
+          gabimi={provuar ? gabimet.identiteti : null}
+        />
+      ) : (
+        <FushaETelefonit
+          prefiksi={prefiksi}
+          onPrefiksi={setPrefiksi}
+          numri={numri}
+          onNumri={setNumri}
+          gabimi={provuar ? gabimet.identiteti : null}
+        />
+      )}
       <FushaTekstit
         etiketa={t("auth.fjalekalimi")}
         ikona={ikonat.dryni}
@@ -89,10 +112,26 @@ export default function Hyrja() {
         onSubmitEditing={hyr}
         gabimi={provuar ? gabimet.fjalekalimi : null}
       />
-      <Link href={{ pathname: "/rivendos", params: { email: email.trim() } }} style={styles.harrove}>
-        {t("auth.harrove")}
-      </Link>
+      {meEmail ? (
+        <Link href={{ pathname: "/rivendos", params: { email: email.trim() } }} style={styles.harrove}>
+          {t("auth.harrove")}
+        </Link>
+      ) : (
+        <Text style={styles.harroveTeksti}>{t("auth.harroveTelefoni")}</Text>
+      )}
       <Butoni titulli={t("auth.hyr")} onPress={hyr} ngarkohet={ngarkohet} style={styles.butoni} />
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => {
+          setMeEmail((v) => !v);
+          setProvuar(false);
+          setGabimi(null);
+        }}
+        hitSlop={8}
+        style={styles.ndryshoMenyren}
+      >
+        <Text style={styles.ndryshoMenyrenTeksti}>{meEmail ? t("auth.hyrMeTelefon") : t("auth.hyrMeEmail")}</Text>
+      </Pressable>
     </KornizaAuth>
   );
 }
@@ -109,6 +148,23 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       textDecorationLine: "underline",
       marginTop: -6,
       marginBottom: 16,
+    },
+    harroveTeksti: {
+      color: ngjyrat.tekstiDyte,
+      fontSize: 13,
+      lineHeight: 18,
+      marginTop: -6,
+      marginBottom: 16,
+    },
+    ndryshoMenyren: {
+      alignSelf: "center",
+      paddingVertical: 14,
+    },
+    ndryshoMenyrenTeksti: {
+      color: ngjyrat.ari,
+      fontSize: 15,
+      fontWeight: "700",
+      textDecorationLine: "underline",
     },
     tekstiFundit: {
       color: ngjyrat.tekstiDyte,

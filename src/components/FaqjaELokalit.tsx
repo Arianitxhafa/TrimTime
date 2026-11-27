@@ -545,7 +545,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     rubrika: {
       ...shkronjat.etiketeBold,
-      color: "#F4F1EA",
+      color: "#E6C25A",
       fontSize: 12,
       letterSpacing: 0.6,
       textTransform: "uppercase",
