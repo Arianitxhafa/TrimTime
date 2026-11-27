@@ -9,6 +9,7 @@ import { useLokaliIm } from "../api/lokalet";
 import KycjaBiometrike from "../components/KycjaBiometrike";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { PreferencatProvider, usePreferencat } from "../context/PreferencatContext";
+import { ShportaProvider } from "../context/ShportaContext";
 import { TemaProvider, useTema } from "../context/TemaContext";
 import { useModiAktiv } from "../hooks/useModiAktiv";
 import { useNjoftimetEPrekura } from "../hooks/useNjoftimetEPrekura";
@@ -23,7 +24,9 @@ export default function RootLayout() {
       <PreferencatProvider>
         <QueryClientProvider client={klientiIQuery}>
           <AuthProvider>
-            <Navigimi />
+            <ShportaProvider>
+              <Navigimi />
+            </ShportaProvider>
           </AuthProvider>
         </QueryClientProvider>
       </PreferencatProvider>
@@ -118,6 +121,12 @@ function Navigimi() {
             <Stack.Screen name="riplanifiko/[id]" options={{ title: t("terminetEMia.ndryshoTitulli") }} />
             <Stack.Screen name="vlereso/[terminiId]" options={{ title: "", presentation: "modal" }} />
             <Stack.Screen name="kartat" options={{ title: t("profili.kartat") }} />
+            {/* Harta me rrugën deri te Studio, si ekran më vete (hapet nga Ballina). */}
+            <Stack.Screen name="harta" options={{ headerShown: false }} />
+            {/* Dyqani: produkti, shporta dhe porositë e mia (merren dhe paguhen në Studio). */}
+            <Stack.Screen name="produkti/[id]" options={{ title: "", presentation: "modal" }} />
+            <Stack.Screen name="shporta" options={{ title: t("dyqani.shporta"), presentation: "modal" }} />
+            <Stack.Screen name="porosite" options={{ title: t("dyqani.porositeEMia") }} />
           </Stack.Protected>
 
           <Stack.Protected guard={modi === "biznes"} redirectTo="/ballina">
@@ -138,6 +147,9 @@ function Navigimi() {
             <Stack.Screen name="menaxho/besnikeria" options={{ title: t("besnikeria.titulli") }} />
             <Stack.Screen name="menaxho/portofoli" options={{ title: t("portofoli.titulli") }} />
             <Stack.Screen name="menaxho/qr" options={{ title: t("qr.titulli") }} />
+            <Stack.Screen name="menaxho/produktet" options={{ title: t("dyqani.produktet") }} />
+            <Stack.Screen name="menaxho/produkti" options={{ title: "", presentation: "modal" }} />
+            <Stack.Screen name="menaxho/porosite" options={{ title: t("dyqani.porosite") }} />
           </Stack.Protected>
 
           <Stack.Screen name="lokali/[id]" options={{ title: "" }} />

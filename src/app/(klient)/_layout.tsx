@@ -6,6 +6,7 @@ import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useListaEPritjesLive } from "../../api/listaEPritjes";
 import { ikonat } from "../../components/Ikona";
+import { useShporta } from "../../context/ShportaContext";
 import { useTema } from "../../context/TemaContext";
 import { formatoDaten } from "../../lib/datat";
 import { njoftoOrenELire } from "../../lib/kujtesat";
@@ -15,6 +16,7 @@ export default function KlientLayout() {
   const { t } = useTranslation();
   const { ngjyrat } = useTema();
   const klienti = useQueryClient();
+  const { numri } = useShporta();
   // Të gjitha tab-et kanë të njëjtën ngjyrë, atë të Studios: e zezë në dritë, e bardhë kockë në errësirë.
 
   // Një dëgjues i vetëm për listën e pritjes, i hapur sa kohë klienti është brenda.
@@ -43,7 +45,7 @@ export default function KlientLayout() {
         tabet={[
           { emri: "ballina", titulli: t("tabs.ballina"), ikona: ikonat.shtepia },
           { emri: "studio", titulli: t("tabs.rezervo"), ikona: ikonat.kalendar },
-          { emri: "harta", titulli: t("tabs.harta"), ikona: ikonat.harta },
+          { emri: "produkte", titulli: t("tabs.produkte"), ikona: ikonat.cante },
           { emri: "terminet-e-mia", titulli: t("tabs.terminet"), ikona: ikonat.kalendar },
           { emri: "profili", titulli: t("tabs.cilesimet"), ikona: ikonat.cilesimet },
         ]}
@@ -69,13 +71,10 @@ export default function KlientLayout() {
         <NativeTabs.Trigger.Icon sf="calendar.badge.plus" md={ikonat.kalendar.android} selectedColor={ngjyrat.ari} />
         <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.rezervo")}</NativeTabs.Trigger.Label>
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="harta">
-        <NativeTabs.Trigger.Icon
-          sf={{ default: "map", selected: "map.fill" }}
-          md={ikonat.harta.android}
-          selectedColor={ngjyrat.ari}
-        />
-        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.harta")}</NativeTabs.Trigger.Label>
+      <NativeTabs.Trigger name="produkte">
+        <NativeTabs.Trigger.Icon sf={{ default: "bag", selected: "bag.fill" }} md={ikonat.cante.android} selectedColor={ngjyrat.ari} />
+        <NativeTabs.Trigger.Label selectedStyle={{ color: ngjyrat.ari }}>{t("tabs.produkte")}</NativeTabs.Trigger.Label>
+        {numri > 0 ? <NativeTabs.Trigger.Badge>{String(numri)}</NativeTabs.Trigger.Badge> : null}
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="terminet-e-mia">
         <NativeTabs.Trigger.Icon sf="clock.arrow.circlepath" md={ikonat.ora.android} selectedColor={ngjyrat.ari} />

@@ -14,6 +14,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useShtypja } from "../../hooks/useShtypja";
+import { usePorositeEStudios, useProduktet } from "../../api/dyqani";
 import { useLokaliIm, usePerditesoLokalin } from "../../api/lokalet";
 import { useOrari } from "../../api/orari";
 import { useSherbimet } from "../../api/sherbimet";
@@ -84,6 +85,9 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
   const orari = useOrari(lokali.id);
   const perditeso = usePerditesoLokalin(lokali.id);
   const perdoruesiId = useAuth().sesioni?.user.id;
+  const porosite = usePorositeEStudios(true);
+  const produktet = useProduktet();
+  const porositeEHapura = porosite.data?.filter((p) => p.statusi === "e_re" || p.statusi === "gati").length;
 
   const scrollY = useSharedValue(0);
   const neScroll = useAnimatedScrollHandler((e) => {
@@ -201,6 +205,22 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
                 ]
               : []),
             { ikona: ikonat.klientet, titulli: t("lokali.stafi"), href: "/menaxho/stafi" as Href },
+            {
+              ikona: ikonat.shenime,
+              titulli: t("dyqani.porosite"),
+              vlera: porositeEHapura ? String(porositeEHapura) : undefined,
+              href: "/menaxho/porosite" as Href,
+            },
+            ...(eshtePronar
+              ? [
+                  {
+                    ikona: ikonat.cante,
+                    titulli: t("dyqani.produktet"),
+                    vlera: produktet.data ? String(produktet.data.length) : undefined,
+                    href: "/menaxho/produktet" as Href,
+                  },
+                ]
+              : []),
             ...(perdoruesiId
               ? [
                   {

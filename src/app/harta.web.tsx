@@ -1,8 +1,8 @@
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
-import Ikona, { ikonat } from "../../components/Ikona";
-import { useStilet, useTema } from "../../context/TemaContext";
-import { hapesira, shkronjat, type Ngjyrat } from "../../theme";
+import Ikona, { ikonat } from "../components/Ikona";
+import { useStilet, useTema } from "../context/TemaContext";
+import { hapesira, shkronjat, type Ngjyrat } from "../theme";
 
 // react-native-maps nuk punon në web: harta me rrugën është vetëm në telefon.
 export default function Harta() {
@@ -11,7 +11,7 @@ export default function Harta() {
   const styles = useStilet(krijoStilet);
   return (
     <View style={styles.container}>
-      <Ikona emri={ikonat.harta} madhesia={36} ngjyra={ngjyrat.portokalli} />
+      <Ikona emri={ikonat.harta} madhesia={36} ngjyra={ngjyrat.ari} />
       <Text style={styles.titulli}>{t("harta.webTitulli")}</Text>
       <Text style={styles.teksti}>{t("harta.webTeksti")}</Text>
     </View>

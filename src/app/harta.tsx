@@ -5,18 +5,18 @@ import { useTranslation } from "react-i18next";
 import { ActivityIndicator, Linking, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 import MapView, { Marker, Polyline } from "react-native-maps";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useLokali } from "../../api/lokalet";
-import { useRruga, type MenyraEUdhetimit } from "../../api/udhezimet";
-import Butoni from "../../components/Butoni";
-import Ikona, { ikonat } from "../../components/Ikona";
-import Xham from "../../components/Xham";
-import { useStilet, useTema } from "../../context/TemaContext";
-import { useVendndodhjaIme } from "../../hooks/useVendndodhjaIme";
-import { formatoDistancen, formatoKohezgjatjen } from "../../lib/formatimi";
-import { prekja } from "../../lib/prekja";
-import { FOTO_E_LOKALIT, STUDIO_ID } from "../../lib/studio";
-import { lidhjaEUdhezimeve } from "../../lib/vendndodhja";
-import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../../theme";
+import { useLokali } from "../api/lokalet";
+import { useRruga, type MenyraEUdhetimit } from "../api/udhezimet";
+import Butoni from "../components/Butoni";
+import Ikona, { ikonat } from "../components/Ikona";
+import Xham from "../components/Xham";
+import { useStilet, useTema } from "../context/TemaContext";
+import { useVendndodhjaIme } from "../hooks/useVendndodhjaIme";
+import { formatoDistancen, formatoKohezgjatjen } from "../lib/formatimi";
+import { prekja } from "../lib/prekja";
+import { FOTO_E_LOKALIT, STUDIO_ID } from "../lib/studio";
+import { lidhjaEUdhezimeve } from "../lib/vendndodhja";
+import { hapesira, rrezja, shkronjat, type Ngjyrat } from "../theme";
 
 const ZMADHIMI = { latitudeDelta: 0.012, longitudeDelta: 0.012 };
 
@@ -33,8 +33,8 @@ export default function Harta() {
   const [menyra, setMenyra] = useState<MenyraEUdhetimit>("makine");
   const deri = studio ? { lat: studio.lat, lng: studio.lng } : null;
   const rruga = useRruga(kaLeje ? pika : null, deri, menyra);
-  // Butonat poshtë qëndrojnë mbi shiritin e tab-eve, që noton mbi hartë.
-  const poshte = insets.bottom + 64;
+  // Harta hapet si ekran më vete (jo tab), ndaj butonat qëndrojnë mbi zonën e sigurt poshtë.
+  const poshte = insets.bottom;
 
   // Harta shfaq gjithë rrugën kur ajo vjen, ose vetëm Studion kur s'ka leje.
   const rrugaEShfaqur = useRef<string | null>(null);
@@ -68,7 +68,7 @@ export default function Harta() {
   if (!studio) {
     return (
       <View style={[styles.container, styles.qendra]}>
-        <ActivityIndicator color={ngjyrat.portokalli} />
+        <ActivityIndicator color={ngjyrat.ari} />
       </View>
     );
   }
@@ -83,12 +83,12 @@ export default function Harta() {
         showsUserLocation={kaLeje === true}
         showsMyLocationButton={false}
         showsCompass={false}
-        tintColor={ngjyrat.portokalli}
+        tintColor={ngjyrat.ari}
       >
         {rruga.data ? (
           <Polyline
             coordinates={rruga.data.koordinatat}
-            strokeColor={ngjyrat.portokalli}
+            strokeColor={ngjyrat.ari}
             strokeWidth={6}
             lineCap="round"
             lineJoin="round"
@@ -102,7 +102,7 @@ export default function Harta() {
               rruga.data.koordinatat[rruga.data.koordinatat.length - 1],
               { latitude: studio.lat, longitude: studio.lng },
             ]}
-            strokeColor={ngjyrat.portokalli}
+            strokeColor={ngjyrat.ari}
             strokeWidth={4}
             lineCap="round"
             lineDashPattern={[2, 8]}
@@ -127,6 +127,15 @@ export default function Harta() {
       <View style={[styles.siper, { top: insets.top + hapesira.sm }]} pointerEvents="box-none">
         <Xham style={styles.karta}>
           <View style={styles.kartaKoka}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={t("harta.kthehu")}
+              hitSlop={10}
+              onPress={() => (router.canGoBack() ? router.back() : router.navigate("/ballina"))}
+              style={styles.kthehu}
+            >
+              <Ikona emri={ikonat.majtas} madhesia={18} ngjyra={ngjyrat.teksti} />
+            </Pressable>
             <Image source={FOTO_E_LOKALIT} style={styles.fotoStudios} contentFit="cover" />
             <View style={styles.kartaTeksti}>
               <Text style={styles.emri} numberOfLines={1}>
@@ -148,7 +157,7 @@ export default function Harta() {
               <Text style={styles.distanca}>  ·  {formatoDistancen(rruga.data.distanca_m)}</Text>
             </Text>
           ) : (
-            <ActivityIndicator color={ngjyrat.portokalli} style={styles.ngarkimi} />
+            <ActivityIndicator color={ngjyrat.ari} style={styles.ngarkimi} />
           )}
 
           <View style={styles.menyrat}>
@@ -177,7 +186,7 @@ export default function Harta() {
         style={[styles.butoniVendit, { bottom: poshte + 96 }]}
       >
         <Xham style={styles.butoniVenditXham} iPrekshem>
-          <Ikona emri={ikonat.vendi} madhesia={20} ngjyra={ngjyrat.portokalli} />
+          <Ikona emri={ikonat.vendi} madhesia={20} ngjyra={ngjyrat.ari} />
         </Xham>
       </Pressable>
 
@@ -186,7 +195,7 @@ export default function Harta() {
         <Butoni
           titulli={t("profiliLokalit.rezervo")}
           ikona={ikonat.kalendar}
-          onPress={() => router.push({ pathname: "/rezervo/[lokaliId]", params: { lokaliId: studio.id } })}
+          onPress={() => router.navigate("/studio")}
           style={styles.gjysme}
         />
         <Butoni
@@ -234,7 +243,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       borderRadius: 19,
       borderWidth: 3,
       borderColor: "#FFFFFF",
-      backgroundColor: ngjyrat.portokalli,
+      backgroundColor: ngjyrat.ari,
       alignItems: "center",
       justifyContent: "center",
       shadowColor: "#000",
@@ -268,6 +277,14 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
       alignItems: "center",
       gap: hapesira.sm,
     },
+    kthehu: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: ngjyrat.siperfaqja2,
+      alignItems: "center",
+      justifyContent: "center",
+    },
     fotoStudios: {
       width: 48,
       height: 48,
@@ -288,7 +305,7 @@ const krijoStilet = (ngjyrat: Ngjyrat) =>
     },
     koha: {
       ...shkronjat.titull,
-      color: ngjyrat.portokalli,
+      color: ngjyrat.ari,
       fontSize: 28,
       letterSpacing: -0.4,
     },
