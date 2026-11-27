@@ -112,6 +112,9 @@ function Navigimi() {
           <Stack.Protected guard={modi === "klient"} redirectTo="/sot">
             <Stack.Screen name="(klient)" options={{ headerShown: false, animation: "fade" }} />
             <Stack.Screen name="rezervo/[lokaliId]" options={{ title: t("rezervimi.titulli"), presentation: "modal" }} />
+            {/* Rezervimi sipas berberit: profili me shërbimet, pastaj orari me statuse. */}
+            <Stack.Screen name="rezervo/berberi/[id]" options={{ title: t("rezervimi.profiliIBerberit") }} />
+            <Stack.Screen name="rezervo/orari" options={{ title: t("rezervimi.orariTitulli") }} />
             <Stack.Screen name="riplanifiko/[id]" options={{ title: t("terminetEMia.ndryshoTitulli") }} />
             <Stack.Screen name="vlereso/[terminiId]" options={{ title: "", presentation: "modal" }} />
             <Stack.Screen name="kartat" options={{ title: t("profili.kartat") }} />

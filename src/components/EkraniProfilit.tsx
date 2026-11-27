@@ -130,7 +130,11 @@ export default function EkraniProfilit(_props: { meTitullNative?: boolean }) {
             </View>
             <View style={styles.grupi}>
               {eshteKlient ? (
-                <Rreshti ikona={ikonat.gershere} titulli={t("profili.shikoStudion")} onPress={() => router.navigate("/studio")} />
+                <Rreshti
+                  ikona={ikonat.gershere}
+                  titulli={t("profili.shikoStudion")}
+                  onPress={() => router.push({ pathname: "/lokali/[id]", params: { id: STUDIO_ID } })}
+                />
               ) : null}
               {studio?.telefoni ? (
                 <Rreshti

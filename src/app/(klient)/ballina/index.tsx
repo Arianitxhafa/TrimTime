@@ -83,7 +83,7 @@ export default function Ballina() {
           <Butoni
             titulli={t("ballina.rezervo")}
             ikona={ikonat.kalendar}
-            onPress={() => router.push({ pathname: "/rezervo/[lokaliId]", params: { lokaliId: STUDIO_ID } })}
+            onPress={() => router.navigate("/studio")}
           />
           <Butoni
             titulli={t("ballina.terminetEMia")}
@@ -115,7 +115,11 @@ export default function Ballina() {
           <Text style={styles.kartaTeksti}>
             {studio ? `${studio.adresa}, ${studio.qyteti}` : t("ballina.studioTeksti")}
           </Text>
-          <Butoni titulli={t("ballina.shikoStudion")} ikona={ikonat.gershere} onPress={() => router.navigate("/studio")} />
+          <Butoni
+            titulli={t("ballina.shikoStudion")}
+            ikona={ikonat.gershere}
+            onPress={() => router.push({ pathname: "/lokali/[id]", params: { id: STUDIO_ID } })}
+          />
           <Butoni titulli={t("ballina.rruga")} ikona={ikonat.harta} varianti="dytesor" onPress={() => router.navigate("/harta")} />
         </Karta>
 

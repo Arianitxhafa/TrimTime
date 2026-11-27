@@ -99,7 +99,9 @@ export default function FaqjaELokalit({ id, neTab = false }: Props) {
   const mbiTabet = neTab ? 64 : 0;
 
   function hapRezervimin(sherbimiId?: string) {
-    router.push({ pathname: "/rezervo/[lokaliId]", params: { lokaliId: l.id, ...(sherbimiId ? { sherbimiId } : {}) } });
+    // Rezervimi fillon te zgjedhja e berberit (tab-i Rezervo); shërbimet zgjidhen te profili i tij.
+    void sherbimiId;
+    router.navigate("/studio");
   }
 
   return (

@@ -1,11 +1,10 @@
 import { Stack } from "expo-router";
-import { useOpsionetEStackut } from "../../../components/opsionetETabeve";
 
+// Tab-i Rezervo ka kokën e vet ("Zgjidh berberin tënd"), pa header-in e stack-ut.
 export default function Layout() {
-  const opsionet = useOpsionetEStackut();
   return (
-    <Stack screenOptions={opsionet}>
-      <Stack.Screen name="index" options={{ title: "" }} />
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" />
     </Stack>
   );
 }
