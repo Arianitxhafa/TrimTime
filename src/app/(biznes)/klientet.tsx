@@ -65,6 +65,19 @@ export default function Klientet() {
 
       <LlogariteERe aktiv={lokaliIm.data?.roli === "pronar"} />
 
+      {/* Klienti me telefon që ka harruar fjalëkalimin merr një kod nga pronari. */}
+      {lokaliIm.data?.roli === "pronar" ? (
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => router.push("/menaxho/kodi")}
+          style={({ pressed }) => [styles.kodi, pressed && { opacity: 0.7 }]}
+        >
+          <Ikona emri={ikonat.dryni} madhesia={16} ngjyra={ngjyrat.ari} />
+          <Text style={styles.kodiTeksti}>{t("rivendosja.stafiTitulli")}</Text>
+          <Ikona emri={ikonat.djathtas} madhesia={14} ngjyra={ngjyrat.tekstiZbehte} />
+        </Pressable>
+      ) : null}
+
       <View style={styles.kerkimi}>
         <Ikona emri={ikonat.kerko} madhesia={18} ngjyra={ngjyrat.tekstiZbehte} />
         <TextInput
@@ -178,6 +191,20 @@ function Rreshti({ klienti }: { klienti: KlientiILokalit }) {
 
 const krijoStilet = (ngjyrat: Ngjyrat) =>
   StyleSheet.create({
+    kodi: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: hapesira.sm,
+      marginHorizontal: hapesira.xl,
+      marginBottom: hapesira.md,
+      paddingVertical: hapesira.sm,
+    },
+    kodiTeksti: {
+      flex: 1,
+      color: ngjyrat.teksti,
+      fontSize: 15,
+      fontWeight: "600",
+    },
     container: {
       flex: 1,
       backgroundColor: ngjyrat.sfondi,

@@ -97,6 +97,7 @@ function Navigimi() {
           <Stack.Screen name="regjistrimi" options={{ headerShown: false, animation: "fade" }} />
           <Stack.Screen name="verifiko" options={{ headerShown: false, animation: "fade" }} />
           <Stack.Screen name="rivendos" options={{ headerShown: false, animation: "fade" }} />
+          <Stack.Screen name="rivendos-me-kod" options={{ headerShown: false, animation: "fade" }} />
         </Stack.Protected>
 
         {/* Llogaria e re: "Llogaria juaj po kontrollohet" derisa Studio ta aprovojë. */}
@@ -148,6 +149,7 @@ function Navigimi() {
             <Stack.Screen name="menaxho/produktet" options={{ title: t("dyqani.produktet") }} />
             <Stack.Screen name="menaxho/produkti" options={{ title: "", presentation: "modal" }} />
             <Stack.Screen name="menaxho/porosite" options={{ title: t("dyqani.porosite") }} />
+            <Stack.Screen name="menaxho/kodi" options={{ title: t("rivendosja.stafiTitulli"), presentation: "modal" }} />
           </Stack.Protected>
 
           <Stack.Screen name="lokali/[id]" options={{ title: "" }} />
