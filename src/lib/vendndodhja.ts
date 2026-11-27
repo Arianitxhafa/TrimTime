@@ -1,9 +1,6 @@
 import * as Location from "expo-location";
 import type { Koordinata } from "./tipet";
 
-// Qendra e Prishtinës, kur përdoruesi nuk e lejon vendndodhjen.
-export const PRISHTINA: Koordinata = { lat: 42.6629, lng: 21.1655 };
-
 export async function merrVendndodhjen(): Promise<Koordinata | null> {
   const { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== "granted") return null;
@@ -26,11 +23,4 @@ export async function gjejAdresen(k: Koordinata): Promise<AdresaEGjetur | null> 
   } catch {
     return null;
   }
-}
-
-// Hap navigimin në Apple Maps / Google Maps drejt lokalit.
-export function lidhjaEUdhezimeve(k: Koordinata, platforma: string): string {
-  return platforma === "ios"
-    ? `http://maps.apple.com/?daddr=${k.lat},${k.lng}`
-    : `https://www.google.com/maps/dir/?api=1&destination=${k.lat},${k.lng}`;
 }

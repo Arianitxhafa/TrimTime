@@ -871,4 +871,7 @@ export const sq = {
     gabimEmri: "Shkruaj emrin e produktit.",
     gabimStokuNumer: "Shkruaj një numër të plotë.",
   },
+  udhezimet: {
+    hapMe: "Hap rrugën deri te Studio me",
+  },
 };

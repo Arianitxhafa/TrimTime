@@ -871,4 +871,7 @@ export const en: Perkthimet = {
     gabimEmri: "Enter the product name.",
     gabimStokuNumer: "Enter a whole number.",
   },
+  udhezimet: {
+    hapMe: "Get directions to the studio with",
+  },
 };

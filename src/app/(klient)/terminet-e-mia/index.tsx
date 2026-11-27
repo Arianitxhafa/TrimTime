@@ -284,7 +284,7 @@ function KartaETerminit({ termini, iArdhshem, onAnulo }: KartaProps) {
             <Veprimi
               ikona={ikonat.harta}
               teksti={t("terminetEMia.udhezimet")}
-              onPress={() => hapUdhezimet({ id: termini.lokali_id, lat: termini.lat, lng: termini.lng })}
+              onPress={() => hapUdhezimet({ lat: termini.lat, lng: termini.lng })}
             />
           </View>
         ) : (
@@ -293,7 +293,7 @@ function KartaETerminit({ termini, iArdhshem, onAnulo }: KartaProps) {
             <Veprimi
               ikona={ikonat.harta}
               teksti={t("terminetEMia.udhezimet")}
-              onPress={() => hapUdhezimet({ id: termini.lokali_id, lat: termini.lat, lng: termini.lng })}
+              onPress={() => hapUdhezimet({ lat: termini.lat, lng: termini.lng })}
             />
           </View>
         )

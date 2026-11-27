@@ -121,8 +121,6 @@ function Navigimi() {
             <Stack.Screen name="riplanifiko/[id]" options={{ title: t("terminetEMia.ndryshoTitulli") }} />
             <Stack.Screen name="vlereso/[terminiId]" options={{ title: "", presentation: "modal" }} />
             <Stack.Screen name="kartat" options={{ title: t("profili.kartat") }} />
-            {/* Harta me rrugën deri te Studio, si ekran më vete (hapet nga Ballina). */}
-            <Stack.Screen name="harta" options={{ headerShown: false }} />
             {/* Dyqani: produkti, shporta dhe porositë e mia (merren dhe paguhen në Studio). */}
             <Stack.Screen name="produkti/[id]" options={{ title: "", presentation: "modal" }} />
             <Stack.Screen name="shporta" options={{ title: t("dyqani.shporta"), presentation: "modal" }} />

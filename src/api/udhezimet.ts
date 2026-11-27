@@ -1,70 +1,36 @@
-import { useQuery } from "@tanstack/react-query";
-import { router } from "expo-router";
-import { Linking, Platform } from "react-native";
-import { useModiAktiv } from "../hooks/useModiAktiv";
+import { useTranslation } from "react-i18next";
+import { ActionSheetIOS, Linking, Platform } from "react-native";
 import type { Koordinata } from "../lib/tipet";
-import { lidhjaEUdhezimeve } from "../lib/vendndodhja";
 
-export type MenyraEUdhetimit = "makine" | "kembe";
-
-export type Rruga = {
-  koordinatat: { latitude: number; longitude: number }[];
-  distanca_m: number;
-  kohezgjatja_s: number;
-};
-
-// Serverët falas të OSRM nga FOSSGIS (OpenStreetMap). Kushtet: pa çelës, më së shumti një kërkesë në
-// sekondë, me atribuim; rruga kërkohet vetëm kur klienti prek "Udhëzimet".
-const SERVERI = "https://routing.openstreetmap.de";
-const PROFILI: Record<MenyraEUdhetimit, string> = {
-  makine: "routed-car/route/v1/driving",
-  kembe: "routed-foot/route/v1/foot",
-};
-
-async function merrRrugen(nga: Koordinata, deri: Koordinata, menyra: MenyraEUdhetimit): Promise<Rruga> {
-  const url = `${SERVERI}/${PROFILI[menyra]}/${nga.lng},${nga.lat};${deri.lng},${deri.lat}?overview=full&geometries=geojson`;
-  const pergjigja = await fetch(url, { headers: { "User-Agent": "StudioBurimi/1.0" } });
-  if (!pergjigja.ok) throw new Error(`OSRM ${pergjigja.status}`);
-  const trupi = (await pergjigja.json()) as {
-    code: string;
-    routes?: { distance: number; duration: number; geometry: { coordinates: [number, number][] } }[];
-  };
-  const rruga = trupi.routes?.[0];
-  if (trupi.code !== "Ok" || !rruga) throw new Error(`OSRM ${trupi.code}`);
-  return {
-    koordinatat: rruga.geometry.coordinates.map(([lng, lat]) => ({ latitude: lat, longitude: lng })),
-    distanca_m: rruga.distance,
-    kohezgjatja_s: rruga.duration,
-  };
+// Lidhjet për navigimin deri te lokali. Google Maps hapet si aplikacion kur është i instaluar
+// (lidhje universale), përndryshe në shfletues.
+export function lidhjaEAppleMaps(k: Koordinata): string {
+  return `https://maps.apple.com/?daddr=${k.lat},${k.lng}&dirflg=d`;
 }
 
-export function useRruga(nga: Koordinata | null, deri: Koordinata | null, menyra: MenyraEUdhetimit) {
-  return useQuery({
-    // E rrumbullakosur në ~10 m, që lëvizjet e vogla të GPS-it të mos e kërkojnë rrugën sërish.
-    queryKey: [
-      "rruga",
-      menyra,
-      nga && Math.round(nga.lat * 1e4),
-      nga && Math.round(nga.lng * 1e4),
-      deri && Math.round(deri.lat * 1e4),
-      deri && Math.round(deri.lng * 1e4),
-    ],
-    enabled: Boolean(nga && deri),
-    staleTime: 5 * 60_000,
-    retry: 1,
-    queryFn: () => merrRrugen(nga!, deri!, menyra),
-  });
+export function lidhjaEGoogleMaps(k: Koordinata): string {
+  return `https://www.google.com/maps/dir/?api=1&destination=${k.lat},${k.lng}`;
 }
 
-// "Udhëzimet": klienti e sheh rrugën te tab-i Harta; stafi (që s'ka hartë) hap aplikacionin e
-// hartave të telefonit.
+// "Udhëzimet": aplikacioni nuk ka hartë brenda. Në iPhone klienti zgjedh Apple Maps ose Google Maps;
+// në Android hapet Google Maps direkt.
 export function useHapUdhezimet() {
-  const modi = useModiAktiv();
-  return (lokali: { id?: string; lat: number; lng: number }) => {
-    if (modi === "klient") {
-      router.navigate("/harta");
-    } else {
-      void Linking.openURL(lidhjaEUdhezimeve(lokali, Platform.OS));
+  const { t } = useTranslation();
+  return (lokali: Koordinata) => {
+    if (Platform.OS !== "ios") {
+      void Linking.openURL(lidhjaEGoogleMaps(lokali));
+      return;
     }
+    ActionSheetIOS.showActionSheetWithOptions(
+      {
+        title: t("udhezimet.hapMe"),
+        options: ["Apple Maps", "Google Maps", t("pergjithshme.anulo")],
+        cancelButtonIndex: 2,
+      },
+      (i) => {
+        if (i === 0) void Linking.openURL(lidhjaEAppleMaps(lokali));
+        else if (i === 1) void Linking.openURL(lidhjaEGoogleMaps(lokali));
+      },
+    );
   };
 }

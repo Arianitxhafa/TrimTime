@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useNumriIKlienteve } from "../../../api/klientet";
 import { useLokali } from "../../../api/lokalet";
 import { useOrari } from "../../../api/orari";
+import { useHapUdhezimet } from "../../../api/udhezimet";
 import { useTerminetEMia } from "../../../api/terminet";
 import Butoni from "../../../components/Butoni";
 import Ikona, { ikonat, type EmriIkones } from "../../../components/Ikona";
@@ -28,6 +29,7 @@ export default function Ballina() {
   const insets = useSafeAreaInsets();
   const { emriIShfaqur } = useAuth();
   const studio = useLokali(STUDIO_ID).data;
+  const hapUdhezimet = useHapUdhezimet();
   const orari = useOrari(STUDIO_ID).data ?? [];
   const terminet = useTerminetEMia();
   const klientet = useNumriIKlienteve();
@@ -118,7 +120,7 @@ export default function Ballina() {
             ikona={ikonat.gershere}
             onPress={() => router.push({ pathname: "/lokali/[id]", params: { id: STUDIO_ID } })}
           />
-          <Butoni titulli={t("ballina.rruga")} ikona={ikonat.harta} varianti="dytesor" onPress={() => router.navigate("/harta")} />
+          <Butoni titulli={t("ballina.rruga")} ikona={ikonat.harta} varianti="dytesor" onPress={() => studio && hapUdhezimet(studio)} />
         </Karta>
 
         <Animated.View entering={FadeInDown.delay(260).duration(420)} style={styles.kontaktet}>
@@ -130,7 +132,7 @@ export default function Ballina() {
             />
           ) : null}
           <Kontakti ikona={ikonat.kamera} etiketa="Instagram" onPress={() => void Linking.openURL(INSTAGRAMI)} />
-          <Kontakti ikona={ikonat.harta} etiketa={t("tabs.harta")} onPress={() => router.navigate("/harta")} />
+          <Kontakti ikona={ikonat.harta} etiketa={t("profiliLokalit.udhezimet")} onPress={() => studio && hapUdhezimet(studio)} />
         </Animated.View>
       </View>
     </ScrollView>
