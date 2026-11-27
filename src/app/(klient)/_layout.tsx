@@ -60,7 +60,6 @@ export default function KlientLayout() {
     <NativeTabs
       tintColor={ngjyrat.ari}
       iconColor={ngjyrat.tekstiZbehte}
-      minimizeBehavior="onScrollDown"
       backgroundColor={ngjyrat.siperfaqja}
     >
       <NativeTabs.Trigger name="ballina">

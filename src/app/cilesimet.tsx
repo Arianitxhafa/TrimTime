@@ -170,14 +170,14 @@ export default function Cilesimet() {
       </Animated.View>
 
       {/* Fundi: logoja, emri dhe versioni i aplikacionit. */}
-      <Animated.View entering={FadeInDown.delay(280).duration(380)} style={styles.fundi}>
+      <View style={styles.fundi}>
         <LogoStudio madhesia={56} />
         <ShiritiIBerberit gjeresia={48} lartesia={5} />
         <Text style={styles.fundiEmri}>{EMRI_I_STUDIOS}</Text>
         <Text style={styles.fundiVersioni}>
           {t("cilesimet.versioni", { versioni: Constants.expoConfig?.version ?? "1.0.0" })}
         </Text>
-      </Animated.View>
+      </View>
 
       <DialogKonfirmimi
         iDukshem={dialogFshirja}

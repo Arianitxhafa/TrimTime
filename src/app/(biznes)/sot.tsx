@@ -104,7 +104,7 @@ export default function Sot() {
 
   const koka = (
     <View>
-      <Animated.View entering={FadeInDown.duration(450)} style={styles.koka}>
+      <View style={styles.koka}>
         <LogoStudio madhesia={52} />
         <View style={styles.kokaTeksti}>
           <Text style={styles.data}>
@@ -133,7 +133,7 @@ export default function Sot() {
             <Ikona emri={ikonat.shto} madhesia={22} ngjyra={ngjyrat.mbiAri} />
           </Pressable>
         </View>
-      </Animated.View>
+      </View>
       <ShiritiIBerberit gjeresia={64} lartesia={6} style={styles.shtylla} />
 
       <View style={styles.ditet}>

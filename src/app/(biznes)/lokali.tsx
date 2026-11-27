@@ -10,7 +10,6 @@ import Animated, {
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
-  ZoomIn,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useShtypja } from "../../hooks/useShtypja";
@@ -136,7 +135,7 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
 
       <View style={styles.permbajtja}>
         <View style={styles.koka}>
-          <Animated.View entering={ZoomIn.springify().damping(13)} style={styles.logo}>
+          <View style={styles.logo}>
             {lokali.logo_url ? (
               <Image source={{ uri: lokali.logo_url }} style={StyleSheet.absoluteFill} contentFit="cover" />
             ) : lokali.id === STUDIO_ID ? (
@@ -144,7 +143,7 @@ function PaneliILokalit({ lokali, eshtePronar }: { lokali: Lokali; eshtePronar: 
             ) : (
               <Text style={styles.logoShkronja}>{lokali.emri.charAt(0).toUpperCase()}</Text>
             )}
-          </Animated.View>
+          </View>
           <Text style={styles.emri}>{lokali.emri}</Text>
           <Text style={styles.adresa}>
             {lokali.adresa}, {lokali.qyteti}

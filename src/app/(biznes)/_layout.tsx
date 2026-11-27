@@ -45,7 +45,6 @@ export default function BiznesLayout() {
     <NativeTabs
       tintColor={ngjyrat.ari}
       iconColor={ngjyrat.tekstiZbehte}
-      minimizeBehavior="onScrollDown"
       backgroundColor={ngjyrat.siperfaqja}
       badgeBackgroundColor={ngjyrat.theksi}
     >

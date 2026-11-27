@@ -19,13 +19,13 @@ export default function KokaEBiznesit({ titulli, shifrat }: Props) {
   const styles = useStilet(krijoStilet);
   return (
     <View style={styles.koka}>
-      <Animated.View entering={FadeInDown.duration(420)} style={styles.rreshti}>
+      <View style={styles.rreshti}>
         <LogoStudio madhesia={44} />
         <Text style={styles.titulli} numberOfLines={1}>
           {titulli}
         </Text>
         <ShiritiIBerberit gjeresia={44} lartesia={6} />
-      </Animated.View>
+      </View>
       <View style={styles.shifrat}>
         {shifrat.map((s, i) => (
           <Animated.View key={s.etiketa} entering={FadeInDown.delay(90 + i * 70).duration(420)} style={styles.shifra}>

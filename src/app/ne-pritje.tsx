@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, Text, View } from "react-native";
-import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withRepeat, withTiming, ZoomIn } from "react-native-reanimated";
+import Animated, { FadeInDown, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Butoni from "../components/Butoni";
 import LogoStudio from "../components/LogoStudio";
@@ -44,11 +44,11 @@ export default function NePritje() {
     <View style={[styles.container, { paddingTop: insets.top + hapesira.lg, paddingBottom: insets.bottom + hapesira.lg }]}>
       <Text style={styles.koka}>{t("pritja.koka")}</Text>
 
-      <Animated.View entering={FadeInDown.springify().damping(16)} style={styles.karta}>
-        <Animated.View entering={ZoomIn.delay(120).springify().damping(13)} style={styles.logo}>
+      <View style={styles.karta}>
+        <View style={styles.logo}>
           <LogoStudio madhesia={72} />
           <ShiritiIBerberit gjeresia={56} lartesia={6} />
-        </Animated.View>
+        </View>
         <Text style={styles.titulli}>{iRefuzuar ? t("pritja.refuzuarTitulli") : t("pritja.titulli")}</Text>
         <Text style={styles.teksti}>{iRefuzuar ? t("pritja.refuzuarTeksti") : t("pritja.teksti")}</Text>
         <View style={styles.statusi}>
@@ -60,7 +60,7 @@ export default function NePritje() {
             <Text style={styles.statusiVlera}>{iRefuzuar ? t("pritja.refuzuar") : t("pritja.nePritje")}</Text>
           </View>
         </View>
-      </Animated.View>
+      </View>
 
       <View style={styles.hapesire} />
 

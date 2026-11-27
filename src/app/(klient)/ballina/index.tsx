@@ -47,10 +47,8 @@ export default function Ballina() {
       style={styles.container}
       contentContainerStyle={{ paddingTop: insets.top + hapesira.md, paddingBottom: insets.bottom + 110 }}
     >
-      <Animated.View entering={FadeInDown.duration(420)} style={styles.koka}>
-        <Animated.View entering={ZoomIn.springify().damping(13)}>
-          <LogoStudio madhesia={64} />
-        </Animated.View>
+      <View style={styles.koka}>
+        <LogoStudio madhesia={64} />
         <View style={styles.kokaTeksti}>
           <Text style={styles.emri}>{EMRI_I_STUDIOS}</Text>
           <Text style={styles.pershendetja} numberOfLines={1}>
@@ -58,7 +56,7 @@ export default function Ballina() {
           </Text>
         </View>
         <ShiritiIBerberit gjeresia={36} lartesia={6} />
-      </Animated.View>
+      </View>
 
       <View style={styles.permbajtja}>
         {iRadhes ? <TerminiIRadhes termini={iRadhes} /> : null}

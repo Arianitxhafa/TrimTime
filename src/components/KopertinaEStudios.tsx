@@ -12,7 +12,6 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-  ZoomIn,
   type SharedValue,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -74,19 +73,17 @@ export default function KopertinaEStudios({ scrollY, lartesia, children }: Props
       />
 
       <Animated.View style={[styles.permbajtja, { paddingTop: insets.top + 56 }, stiliIPermbajtjes]}>
-        <Animated.View entering={ZoomIn.springify().damping(13).delay(80)}>
-          <LogoStudio madhesia={84} />
-        </Animated.View>
+        <LogoStudio madhesia={84} />
         <View style={styles.hapesire} />
         <Animated.View entering={FadeInDown.delay(220).duration(500)}>{children}</Animated.View>
-        <Animated.View entering={FadeInDown.delay(360).duration(500)} style={styles.shtylla}>
+        <View style={styles.shtylla}>
           <ShiritiIBerberit gjeresia={96} lartesia={8} />
           <View style={styles.pikat}>
             {FOTOT_E_STUDIOS.map((_, i) => (
               <View key={i} style={[styles.pika, i === indeksi && styles.pikaAktive]} />
             ))}
           </View>
-        </Animated.View>
+        </View>
       </Animated.View>
     </View>
   );

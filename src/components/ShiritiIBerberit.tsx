@@ -1,6 +1,4 @@
-import { useEffect } from "react";
 import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "react-native-reanimated";
 
 type Props = {
   gjeresia?: number;
@@ -10,18 +8,10 @@ type Props = {
 
 const NGJYRAT = ["#E5484D", "#F4F1EA", "#2F6FDE", "#F4F1EA"] as const;
 
-// Shtylla e berberit: vija të kuqe, të bardha dhe blu që rrëshqasin pa fund, si te dera e Studios.
+// Shtylla e berberit: vija të kuqe, të bardha dhe blu, si te dera e Studios. Qëndron e palëvizshme.
 export default function ShiritiIBerberit({ gjeresia = 120, lartesia = 10, style }: Props) {
   const vija = lartesia * 1.4;
-  const perioda = vija * NGJYRAT.length;
-  const zhvendosja = useSharedValue(0);
-
-  useEffect(() => {
-    zhvendosja.set(withRepeat(withTiming(perioda, { duration: 1400, easing: Easing.linear }), -1, false));
-  }, [perioda, zhvendosja]);
-
-  const stili = useAnimatedStyle(() => ({ transform: [{ translateX: zhvendosja.get() - perioda }] }));
-  const sa = Math.ceil((gjeresia + perioda * 2) / vija);
+  const sa = Math.ceil((gjeresia + lartesia * 2) / vija) + 1;
 
   return (
     <View
@@ -29,7 +19,7 @@ export default function ShiritiIBerberit({ gjeresia = 120, lartesia = 10, style 
       importantForAccessibility="no-hide-descendants"
       style={[styles.korniza, { width: gjeresia, height: lartesia, borderRadius: lartesia / 2 }, style]}
     >
-      <Animated.View style={[styles.rreshti, stili]}>
+      <View style={[styles.rreshti, { marginLeft: -lartesia }]}>
         {Array.from({ length: sa }, (_, i) => (
           <View
             key={i}
@@ -42,7 +32,7 @@ export default function ShiritiIBerberit({ gjeresia = 120, lartesia = 10, style 
             }}
           />
         ))}
-      </Animated.View>
+      </View>
     </View>
   );
 }
