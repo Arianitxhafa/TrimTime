@@ -2,6 +2,8 @@ import type { PostgrestError } from "@supabase/supabase-js";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { TFunction } from "i18next";
 import { useEffect } from "react";
+import { eshteOnline } from "../lib/lidhja";
+import { dergoKonfirmimin } from "./konfirmimet";
 import { supabase } from "../lib/supabase";
 import type {
   CmimiITerminit,
@@ -38,7 +40,7 @@ export function mesazhiIGabimitTeRezervimit(gabimi: unknown, t: TFunction): stri
     case "TT007":
       return t("qr.checkInPaTermin");
     default:
-      return t("pergjithshme.gabimPapritur");
+      return eshteOnline() ? t("pergjithshme.gabimPapritur") : t("offline.duhetInterneti");
   }
 }
 
@@ -109,6 +111,7 @@ export function useRezervoTermin() {
       if (error) throw error;
       return data as string;
     },
+    onSuccess: (id) => dergoKonfirmimin("termin", id),
     // Edhe kur dështon (p.sh. ora u zu), oraret duhet të rifreskohen.
     onSettled: invalido,
   });

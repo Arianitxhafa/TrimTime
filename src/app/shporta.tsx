@@ -11,6 +11,7 @@ import FushaTekstit from "../components/FushaTekstit";
 import Ikona, { ikonat } from "../components/Ikona";
 import { GabimiIFormes } from "../components/KornizaAuth";
 import { useShporta } from "../context/ShportaContext";
+import { eshteOnline } from "../lib/lidhja";
 import { useStilet, useTema } from "../context/TemaContext";
 import { formatoCmimin } from "../lib/formatimi";
 import { prekja } from "../lib/prekja";
@@ -35,7 +36,9 @@ export default function Shporta() {
         ? t("rezervimi.gabimAprovimi")
         : kodiIGabimit === "TT010"
           ? t("dyqani.gabimProdukti")
-          : t("pergjithshme.gabimPapritur");
+          : eshteOnline()
+            ? t("pergjithshme.gabimPapritur")
+            : t("offline.duhetInterneti");
 
   function dergo() {
     porosit.mutate(

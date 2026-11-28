@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../context/AuthContext";
 import { ngarkoNeStorage, type Fotoja } from "../lib/fotot";
 import { STUDIO_ID } from "../lib/studio";
+import { dergoKonfirmimin } from "./konfirmimet";
 import { supabase } from "../lib/supabase";
 
 export const KATEGORITE_E_PRODUKTEVE = ["pajisje", "stilim", "kujdes", "tjeter"] as const;
@@ -135,6 +136,7 @@ export function usePorosit() {
       if (error) throw error;
       return data as string;
     },
+    onSuccess: (id) => dergoKonfirmimin("porosi", id),
     onSettled: () => {
       klienti.invalidateQueries({ queryKey: ["porosite"] });
       klienti.invalidateQueries({ queryKey: ["produktet"] });

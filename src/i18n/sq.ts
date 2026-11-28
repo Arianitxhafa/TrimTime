@@ -875,11 +875,11 @@ export const sq = {
   },
   rivendosja: {
     titulli: "Fjalëkalim i ri",
-    nentitulliNumri: "Shkruaj numrin e telefonit. Kodi 6-shifror vjen te email-i i rikuperimit që ke vendosur.",
-    nentitulliKodi: "Nëse numri ka email rikuperimi, kodi sapo u dërgua. Shiko edhe te Spam.",
+    nentitulliNumri: "Shkruaj numrin e telefonit. Kodi 6-shifror vjen te email-i që ke vendosur në llogari.",
+    nentitulliKodi: "Nëse numri ka email, kodi sapo u dërgua. Shiko edhe te Spam.",
     dergoKodin: "Dërgo kodin",
     dergoSerish: "Dërgo kod tjetër",
-    paEmail: "Pa email rikuperimi kodi nuk mund të dërgohet. Shtoje te Profili → Të dhënat e mia.",
+    paEmail: "Pa email kodi nuk mund të dërgohet. Shtoje te Cilësimet → Të dhënat e mia.",
     gabimDergimi: "Kodi nuk u dërgua. Provo përsëri pas pak.",
     kodi: "Kodi nga email-i",
     fjalekalimiIRi: "Fjalëkalimi i ri",
@@ -888,7 +888,11 @@ export const sq = {
     gabimKodi: "Kodi ka 6 shifra.",
     nukPerputhen: "Fjalëkalimet nuk përputhen.",
     kodiNukVlen: "Kodi nuk vlen ose ka skaduar. Kërko një kod të ri.",
-    emailOpsional: "Email rikuperimi (opsional)",
-    emailShenim: "Vetëm për fjalëkalimin e harruar: kodi vjen këtu. Nuk e sheh askush tjetër.",
+    emailOpsional: "Email-i yt (opsional)",
+    emailShenim: "Këtu të vijnë konfirmimet e termineve dhe porosive, si dhe kodi kur harron fjalëkalimin. Nuk e sheh askush tjetër.",
+  },
+  offline: {
+    shiriti: "Pa internet · po shfaqen të dhënat e ruajtura",
+    duhetInterneti: "Nuk ke internet. Lidhu me WiFi ose të dhëna celulare dhe provo përsëri.",
   },
 };

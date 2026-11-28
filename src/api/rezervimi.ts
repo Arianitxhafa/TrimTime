@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { dergoKonfirmimin } from "./konfirmimet";
 import { supabase } from "../lib/supabase";
 
 export type StatusiIOres = "e_lire" | "ne_pritje" | "e_rezervuar" | "pa_vend" | "pushim" | "kaluar";
@@ -51,6 +52,7 @@ export function useRezervoMeSherbime() {
       if (error) throw error;
       return data as string;
     },
+    onSuccess: (id) => dergoKonfirmimin("termin", id),
     // Edhe kur dështon (p.sh. ora u zu), oraret rifreskohen.
     onSettled: () => {
       klienti.invalidateQueries({ queryKey: ["oraret-e-berberit"] });

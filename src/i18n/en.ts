@@ -875,11 +875,11 @@ export const en: Perkthimet = {
   },
   rivendosja: {
     titulli: "New password",
-    nentitulliNumri: "Enter your phone number. A 6-digit code is sent to the recovery email you set.",
-    nentitulliKodi: "If this number has a recovery email, the code was just sent. Check Spam too.",
+    nentitulliNumri: "Enter your phone number. A 6-digit code is sent to the email on your account.",
+    nentitulliKodi: "If this number has an email, the code was just sent. Check Spam too.",
     dergoKodin: "Send code",
     dergoSerish: "Send another code",
-    paEmail: "Without a recovery email the code can't be sent. Add one in Profile → My details.",
+    paEmail: "Without an email the code can't be sent. Add one in Settings → My details.",
     gabimDergimi: "The code wasn't sent. Try again in a moment.",
     kodi: "Code from the email",
     fjalekalimiIRi: "New password",
@@ -888,7 +888,11 @@ export const en: Perkthimet = {
     gabimKodi: "The code has 6 digits.",
     nukPerputhen: "Passwords don't match.",
     kodiNukVlen: "The code is invalid or has expired. Ask for a new one.",
-    emailOpsional: "Recovery email (optional)",
-    emailShenim: "Only for a forgotten password: the code is sent here. No one else sees it.",
+    emailOpsional: "Your email (optional)",
+    emailShenim: "Booking and order confirmations come here, plus the code if you forget your password. No one else sees it.",
+  },
+  offline: {
+    shiriti: "No internet · showing saved data",
+    duhetInterneti: "You're offline. Connect to Wi-Fi or mobile data and try again.",
   },
 };

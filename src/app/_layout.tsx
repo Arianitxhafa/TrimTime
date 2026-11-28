@@ -1,12 +1,14 @@
-import { QueryClientProvider } from "@tanstack/react-query";
+import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
+import Constants from "expo-constants";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { klientiIQuery } from "../api/klienti";
+import { klientiIQuery, MOSHA_E_CACHE, ruajtesiICache } from "../api/klienti";
 import { useLokaliIm } from "../api/lokalet";
 import KycjaBiometrike from "../components/KycjaBiometrike";
+import ShiritiOffline from "../components/ShiritiOffline";
 import { AuthProvider, useAuth } from "../context/AuthContext";
 import { PreferencatProvider, usePreferencat } from "../context/PreferencatContext";
 import { ShportaProvider } from "../context/ShportaContext";
@@ -22,13 +24,21 @@ export default function RootLayout() {
   return (
     <TemaProvider>
       <PreferencatProvider>
-        <QueryClientProvider client={klientiIQuery}>
+        {/* Cache-i ruhet në telefon: pa internet shfaqen të dhënat e fundit (deri në një ditë). */}
+        <PersistQueryClientProvider
+          client={klientiIQuery}
+          persistOptions={{
+            persister: ruajtesiICache,
+            maxAge: MOSHA_E_CACHE,
+            buster: Constants.expoConfig?.version ?? "1",
+          }}
+        >
           <AuthProvider>
             <ShportaProvider>
               <Navigimi />
             </ShportaProvider>
           </AuthProvider>
-        </QueryClientProvider>
+        </PersistQueryClientProvider>
       </PreferencatProvider>
     </TemaProvider>
   );
@@ -42,7 +52,8 @@ function Navigimi() {
   const modi = useModiAktiv();
   // Pas hyrjes duhet ditur nëse llogaria është staf i Studio Burimit, para se të zgjidhen tab-et.
   const lokaliIm = useLokaliIm();
-  const pritetRoli = sesioni !== null && (lokaliIm.isPending || profiliNgarkohet);
+  // Pa internet dhe pa të dhëna të ruajtura kërkesa pret ("paused"): aplikacioni hapet si klient.
+  const pritetRoli = sesioni !== null && ((lokaliIm.isPending && lokaliIm.fetchStatus !== "paused") || profiliNgarkohet);
   const gati = !ngarkohet && !pritetRoli;
 
   useEffect(() => {
@@ -159,6 +170,8 @@ function Navigimi() {
         {/* Politika e privatësisë: e hapur me ose pa llogari (App Store e kërkon). */}
         <Stack.Screen name="privatesia" options={{ title: t("privatesia.titulli") }} />
       </Stack>
+      {/* Pas Stack-ut, që të dalë mbi çdo ekran. */}
+      <ShiritiOffline />
     </KycjaBiometrike>
   );
 }
